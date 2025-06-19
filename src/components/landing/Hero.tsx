@@ -1,20 +1,13 @@
-
 import { ArrowRight, Heart } from 'lucide-react';
 import AuthButton from '../AuthButton';
-import LogoWithBackgroundRemoval from '../LogoWithBackgroundRemoval';
+import SocialPetworkLogo from '../SocialPetworkLogo';
 
 const Hero = () => {
   return (
     <section className="px-4 py-20 text-center">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6 flex justify-center">
-          <LogoWithBackgroundRemoval
-            originalImageSrc="/lovable-uploads/7d4aa119-8d6e-474d-8101-8636c0f0dedb.png"
-            alt="Social Petwork Logo"
-            width="96"
-            height="96"
-            className="w-24 h-24"
-          />
+          <SocialPetworkLogo className="w-24 h-24" size={96} />
         </div>
         <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-green-600 via-blue-600 to-orange-500 bg-clip-text text-transparent">
           Social Petwork
