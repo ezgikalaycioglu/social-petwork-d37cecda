@@ -75,7 +75,7 @@ const AuthButton = () => {
   return (
     <Button 
       onClick={() => navigate('/auth')}
-      className="bg-green-600 hover:bg-green-700"
+      className="bg-yellow-500 hover:bg-yellow-600 text-yellow-950"
     >
       Get Started
     </Button>
