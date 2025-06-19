@@ -1,68 +1,43 @@
 
-import { Button } from '@/components/ui/button';
-import { Smartphone, Download } from 'lucide-react';
+import { ArrowRight, Heart } from 'lucide-react';
+import AuthButton from '../AuthButton';
 
 const Hero = () => {
   return (
-    <section className="min-h-screen flex items-center justify-center px-4 py-16 bg-gradient-to-br from-green-100 via-blue-100 to-orange-100">
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-        {/* Text Content */}
-        <div className="text-center lg:text-left space-y-8">
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-800 leading-tight">
-              Social Petwork: 
-              <span className="text-green-600"> Connect</span> Your 
-              <span className="text-orange-500"> Furry Friends</span>, 
-              <span className="text-blue-600"> Explore & Save!</span>
-            </h1>
-            <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl">
-              The ultimate social app empowering pet parents to create profiles for their furry companions, 
-              facilitate real-time, location-based playdates and group walks, track adventures, 
-              and unlock exclusive discounts from pet businesses.
-            </p>
-          </div>
-          
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <Button 
-              size="lg" 
-              className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-6 text-lg rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              <Download className="mr-2 h-5 w-5" />
-              Download on the App Store
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white px-8 py-6 text-lg rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              <Smartphone className="mr-2 h-5 w-5" />
-              Get it on Google Play
-            </Button>
-          </div>
+    <section className="px-4 py-20 text-center">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-6xl mb-6">🐾</div>
+        <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-green-600 via-blue-600 to-orange-500 bg-clip-text text-transparent">
+          Social Petwork
+        </h1>
+        <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+          Connect with fellow pet parents, discover pet-friendly adventures, and build lasting friendships 
+          in your local pet community.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+          <AuthButton />
+          <button className="flex items-center text-green-600 hover:text-green-700 font-medium">
+            Learn More <ArrowRight className="ml-2 h-4 w-4" />
+          </button>
         </div>
         
-        {/* Visual Placeholder */}
-        <div className="flex justify-center lg:justify-end">
-          <div className="relative">
-            <div className="w-80 h-96 bg-white rounded-3xl shadow-2xl border-8 border-gray-200 overflow-hidden">
-              <div className="h-full bg-gradient-to-b from-green-200 via-blue-200 to-orange-200 flex flex-col items-center justify-center p-6">
-                <div className="text-6xl mb-4">🐕🐱</div>
-                <h3 className="text-xl font-bold text-gray-800 text-center mb-2">Social Petwork</h3>
-                <p className="text-sm text-gray-600 text-center">Connect • Play • Explore • Save</p>
-                <div className="mt-6 space-y-3 w-full">
-                  <div className="h-3 bg-white/50 rounded-full"></div>
-                  <div className="h-3 bg-white/30 rounded-full w-3/4"></div>
-                  <div className="h-3 bg-white/40 rounded-full w-1/2"></div>
-                </div>
-              </div>
+        <div className="bg-white/80 backdrop-blur rounded-2xl p-8 shadow-lg border">
+          <div className="flex flex-wrap justify-center items-center gap-8 text-gray-600">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🐕</span>
+              <span>Dog Playdates</span>
             </div>
-            {/* Floating elements */}
-            <div className="absolute -top-4 -right-4 w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center text-2xl animate-bounce">
-              🎾
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🐱</span>
+              <span>Cat Cafés</span>
             </div>
-            <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-pink-400 rounded-full flex items-center justify-center text-2xl animate-pulse">
-              🦴
+            <div className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-red-500" />
+              <span>Pet Care Tips</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🏞️</span>
+              <span>Adventures</span>
             </div>
           </div>
         </div>
