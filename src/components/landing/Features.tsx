@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from '@/components/ui/card';
 import { UserCircle, MapPin, Camera, Gift } from 'lucide-react';
 
@@ -39,7 +40,7 @@ const Features = () => {
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
             Everything Your Pet Needs to 
-            <span style={{ color: '#A8DAB5' }}> Socialize & Thrive</span>
+            <span style={{ color: '#FFB3A7' }}> Socialize & Thrive</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Discover the features that make Social Petwork the perfect companion for you and your furry friend's social adventures.
