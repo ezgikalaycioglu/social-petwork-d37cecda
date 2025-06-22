@@ -3,7 +3,7 @@ const AppPreview = () => {
   return (
     <section className="py-16 px-4 bg-white">
       <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#A8DAB5' }}>
+        <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#FFB3A7' }}>
           See the App in Action
         </h2>
         <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
