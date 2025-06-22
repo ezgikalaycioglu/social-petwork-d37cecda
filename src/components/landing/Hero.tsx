@@ -13,9 +13,12 @@ const Hero = () => {
             className="w-40 h-40"
           />
         </div>
-        <h1 className="text-5xl md:text-7xl font-bold mb-6" style={{ color: '#FFB3A7' }}>
-          Unleash Their Social Life: Connect, Play, and Reward Your Pet!
+        <h1 className="text-4xl md:text-6xl font-bold mb-4" style={{ color: '#FFB3A7' }}>
+          Social Petwork
         </h1>
+        <h2 className="text-3xl md:text-5xl font-bold mb-6" style={{ color: '#FFB3A7' }}>
+          Unleash Their Social Life: Connect, Play, and Reward Your Pet!
+        </h2>
         <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
           The ultimate social app empowering pet parents to create profiles for their furry companions, 
           facilitate real-time, location-based playdates and group walks, track adventures, and unlock 
