@@ -87,7 +87,7 @@ const AuthButton = () => {
 
   return (
     <Button 
-      onClick={() => navigate('/coming-soon')}
+      onClick={() => navigate('/auth')}
       size="default"
       className="text-sm sm:text-lg px-4 py-2 sm:px-8 sm:py-3 text-white hover:opacity-90"
       style={{ backgroundColor: '#FFB3A7' }}
