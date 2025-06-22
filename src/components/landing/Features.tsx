@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { UserCircle, MapPin, Camera, Gift } from 'lucide-react';
 
@@ -35,7 +34,7 @@ const Features = () => {
   ];
 
   return (
-    <section className="py-20 px-4 bg-white" data-section="features">
+    <section className="py-20 px-4" style={{ backgroundColor: '#F3FCF6' }} data-section="features">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
