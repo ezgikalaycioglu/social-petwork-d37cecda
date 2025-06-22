@@ -5,8 +5,9 @@ const ProblemSolution = () => {
   return (
     <section className="py-16 px-4" style={{ backgroundColor: '#F3FCF6' }}>
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-12" style={{ color: '#FFB3A7' }}>
-          Tired of Solo Walks? Discover Your Pet's New Best Friends!
+        <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-12">
+          Tired of Solo Walks? Discover Your Pet's 
+          <span style={{ color: '#A8DAB5' }}> New Best Friends!</span>
         </h2>
         
         <div className="grid md:grid-cols-2 gap-12 items-center">

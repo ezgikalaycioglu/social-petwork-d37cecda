@@ -3,10 +3,11 @@ const AppPreview = () => {
   return (
     <section className="py-16 px-4 bg-white">
       <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#FFB3A7' }}>
-          See the App in Action
+        <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+          See the App in 
+          <span style={{ color: '#A8DAB5' }}> Action</span>
         </h2>
-        <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
           Discover how Social Petwork makes connecting with other pet parents simple and fun
         </p>
         

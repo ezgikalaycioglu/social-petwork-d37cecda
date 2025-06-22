@@ -11,9 +11,9 @@ const Index = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F3FCF6' }}>
       <Hero />
-      <AppPreview />
       <ProblemSolution />
       <Features />
+      <AppPreview />
       <Testimonials />
       <FinalCTA />
       <Footer />
