@@ -38,7 +38,16 @@ const Hero = () => {
           <button 
             onClick={scrollToFeatures}
             className="flex items-center font-medium hover:opacity-80 transition-opacity text-lg px-8 py-3 rounded-lg border-2 border-transparent hover:border-current transform scale-125" 
-            style={{ color: '#FFB3A7' }}
+            style={{ 
+              color: '#FFB3A7',
+              borderColor: 'transparent'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#FFB3A7';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'transparent';
+            }}
           >
             Learn More <ArrowRight className="ml-2 h-5 w-5" />
           </button>
