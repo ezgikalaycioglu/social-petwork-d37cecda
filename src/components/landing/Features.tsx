@@ -9,13 +9,13 @@ const Features = () => {
       bgColor: "#B2EBF2"
     },
     {
-      image: "/lovable-uploads/3e6a2d26-3c26-45b5-9033-a36c0cf88527.png",
+      image: "/lovable-uploads/d98b0943-4ce6-4334-9339-47232c046eef.png",
       title: "Connect & Play Locally",
       description: "Easily discover nearby pet pals and organize spontaneous meetups or planned group walks. Our optional live location sharing ensures safe, fun, and effortless interactions.",
       bgColor: "#C8E6C9"
     },
     {
-      image: "/lovable-uploads/d98b0943-4ce6-4334-9339-47232c046eef.png",
+      image: "/lovable-uploads/3e6a2d26-3c26-45b5-9033-a36c0cf88527.png",
       title: "Track Their Pawsome Journeys",
       description: "Log your daily walks, track distances, and visualize the exciting places you and your pet have explored. Share your adventures with a supportive community and cherish every moment.",
       bgColor: "#FFDAB9"
