@@ -3,16 +3,19 @@ import { Heart, Users } from 'lucide-react';
 
 const ProblemSolution = () => {
   return (
-    <section className="py-16 px-4 bg-white">
+    <section className="py-16 px-4" style={{ backgroundColor: '#F3FCF6' }}>
       <div className="max-w-4xl mx-auto text-center">
+        <h2 className="text-3xl md:text-4xl font-bold mb-12" style={{ color: '#A8DAB5' }}>
+          Tired of Solo Walks? Discover Your Pet's New Best Friends!
+        </h2>
+        
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Problem */}
           <div className="space-y-4">
             <div className="text-gray-400 text-5xl mb-4">😔</div>
             <h3 className="text-2xl font-bold text-gray-800">The Challenge</h3>
             <p className="text-gray-600 leading-relaxed">
-              Finding like-minded pet parents for playdates, discovering pet-friendly places, 
-              and connecting with local pet communities can be difficult and time-consuming.
+              It's tough to connect with other pet owners in your neighborhood, find new playmates for your dog, or even know who to avoid on your walks. And let's be honest, wouldn't it be great to make those daily walks even more rewarding?
             </p>
           </div>
           
@@ -25,8 +28,7 @@ const ProblemSolution = () => {
             </div>
             <h3 className="text-2xl font-bold" style={{ color: '#A8DAB5' }}>The Solution</h3>
             <p className="text-gray-600 leading-relaxed">
-              Social Petwork brings pet families together with smart matching, 
-              real-time coordination, and a supportive community that makes every adventure rewarding.
+              Social Petwork changes everything. It's the social app designed exclusively for pets and their parents! Imagine your pet having their own profile, connecting with others, and unlocking a world of shared adventures right in your area.
             </p>
           </div>
         </div>
