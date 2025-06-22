@@ -23,7 +23,7 @@ const ProblemSolution = () => {
               <Heart className="h-8 w-8 text-red-500 mt-2" />
               <span>🐱</span>
             </div>
-            <h3 className="text-2xl font-bold text-green-600">The Solution</h3>
+            <h3 className="text-2xl font-bold" style={{ color: '#A8DAB5' }}>The Solution</h3>
             <p className="text-gray-600 leading-relaxed">
               Social Petwork brings pet families together with smart matching, 
               real-time coordination, and a supportive community that makes every adventure rewarding.

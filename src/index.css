@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -51,6 +52,15 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Custom color palette */
+    --orange-light: #FFDAB9;
+    --orange-medium: #FFB3A7;
+    --orange-dark: #FFB7A3;
+    
+    --green-light: #C8E6C9;
+    --green-medium: #A8DAB5;
+    --green-dark: #B2EBF2;
   }
 
   .dark {
@@ -100,4 +110,29 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom utility classes for the new color palette */
+@layer utilities {
+  .bg-orange-custom-light { background-color: var(--orange-light); }
+  .bg-orange-custom-medium { background-color: var(--orange-medium); }
+  .bg-orange-custom-dark { background-color: var(--orange-dark); }
+  .text-orange-custom-light { color: var(--orange-light); }
+  .text-orange-custom-medium { color: var(--orange-medium); }
+  .text-orange-custom-dark { color: var(--orange-dark); }
+  
+  .bg-green-custom-light { background-color: var(--green-light); }
+  .bg-green-custom-medium { background-color: var(--green-medium); }
+  .bg-green-custom-dark { background-color: var(--green-dark); }
+  .text-green-custom-light { color: var(--green-light); }
+  .text-green-custom-medium { color: var(--green-medium); }
+  .text-green-custom-dark { color: var(--green-dark); }
+  
+  .hover\:bg-orange-custom-medium:hover { background-color: var(--orange-medium); }
+  .hover\:bg-orange-custom-dark:hover { background-color: var(--orange-dark); }
+  .hover\:text-orange-custom-medium:hover { color: var(--orange-medium); }
+  .hover\:text-orange-custom-dark:hover { color: var(--orange-dark); }
+  
+  .border-orange-custom-medium { border-color: var(--orange-medium); }
+  .border-green-custom-medium { border-color: var(--green-medium); }
 }

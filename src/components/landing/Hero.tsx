@@ -13,7 +13,7 @@ const Hero = () => {
             className="w-40 h-40"
           />
         </div>
-        <h1 className="text-5xl md:text-7xl font-bold mb-6 text-orange-500">
+        <h1 className="text-5xl md:text-7xl font-bold mb-6" style={{ color: '#FFB3A7' }}>
           Social Petwork
         </h1>
         <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
@@ -22,7 +22,7 @@ const Hero = () => {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
           <AuthButton />
-          <button className="flex items-center text-orange-500 hover:text-orange-600 font-medium">
+          <button className="flex items-center font-medium" style={{ color: '#FFB3A7' }}>
             Learn More <ArrowRight className="ml-2 h-4 w-4" />
           </button>
         </div>

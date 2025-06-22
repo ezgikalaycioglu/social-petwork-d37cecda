@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -190,10 +189,13 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 via-blue-50 to-orange-50 flex items-center justify-center p-4">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{ background: 'linear-gradient(to bottom, #C8E6C9, #A8DAB5, #FFDAB9)' }}
+    >
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-green-600">
+          <CardTitle style={{ color: '#A8DAB5' }} className="text-2xl font-bold">
             🐾 Social Petwork
           </CardTitle>
           <CardDescription>
@@ -310,7 +312,8 @@ const Auth = () => {
 
             <Button 
               type="submit" 
-              className="w-full bg-green-600 hover:bg-green-700"
+              className="w-full text-white hover:opacity-90"
+              style={{ backgroundColor: '#A8DAB5' }}
               disabled={loading || socialLoading !== null}
             >
               {loading ? 'Please wait...' : isLogin ? 'Log In' : 'Sign Up'}
@@ -321,7 +324,8 @@ const Auth = () => {
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="text-green-600 hover:underline"
+              style={{ color: '#A8DAB5' }}
+              className="hover:underline"
             >
               {isLogin 
                 ? "Don't have an account? Sign up" 

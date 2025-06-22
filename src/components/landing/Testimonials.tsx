@@ -32,7 +32,7 @@ const Testimonials = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            <span className="text-orange-500">Paw-sitive</span> Stories from Our Community
+            <span style={{ color: '#FFB3A7' }}>Paw-sitive</span> Stories from Our Community
           </h2>
           <p className="text-xl text-gray-600">
             Hear how Social Petwork has transformed the lives of pets and their families

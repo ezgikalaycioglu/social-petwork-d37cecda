@@ -65,7 +65,17 @@ const AuthButton = () => {
           onClick={handleSignOut}
           variant="outline"
           size="sm"
-          className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
+          style={{ 
+            borderColor: '#FFB3A7', 
+            color: '#FFB3A7',
+          }}
+          className="hover:text-white"
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#FFB3A7';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
         >
           Sign Out
         </Button>
@@ -76,7 +86,8 @@ const AuthButton = () => {
   return (
     <Button 
       onClick={() => navigate('/auth')}
-      className="bg-orange-500 hover:bg-orange-600 text-white"
+      style={{ backgroundColor: '#FFB3A7' }}
+      className="text-white hover:opacity-90"
     >
       Get Started
     </Button>
