@@ -1,3 +1,4 @@
+
 import { Heart, Users } from 'lucide-react';
 
 const ProblemSolution = () => {
@@ -12,7 +13,13 @@ const ProblemSolution = () => {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Problem */}
           <div className="space-y-4">
-            <div className="text-gray-400 text-5xl mb-4">😔</div>
+            <div className="flex justify-center mb-4">
+              <img 
+                src="/lovable-uploads/6e457dfb-1058-40e5-a8bd-30f4d7bcc591.png" 
+                alt="Challenge illustration"
+                className="w-20 h-20"
+              />
+            </div>
             <h3 className="text-2xl font-bold" style={{ color: '#FFB3A7' }}>The Challenge</h3>
             <p className="text-gray-600 leading-relaxed">
               It's tough to connect with other pet owners in your neighborhood, find new playmates for your dog, or even know who to avoid on your walks. And let's be honest, wouldn't it be great to make those daily walks even more rewarding?
@@ -21,10 +28,12 @@ const ProblemSolution = () => {
           
           {/* Solution */}
           <div className="space-y-4">
-            <div className="flex justify-center space-x-2 text-4xl mb-4">
-              <span>🐕</span>
-              <Heart className="h-8 w-8 text-red-500 mt-2" />
-              <span>🐱</span>
+            <div className="flex justify-center mb-4">
+              <img 
+                src="/lovable-uploads/b0aaeefd-b613-4195-a9f1-fb54239a1595.png" 
+                alt="Solution illustration"
+                className="w-20 h-20"
+              />
             </div>
             <h3 className="text-2xl font-bold" style={{ color: '#FFB3A7' }}>The Solution</h3>
             <p className="text-gray-600 leading-relaxed">
