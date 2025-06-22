@@ -1,8 +1,15 @@
 
 import { Button } from '@/components/ui/button';
 import { Download, Smartphone } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const FinalCTA = () => {
+  const navigate = useNavigate();
+
+  const handleAppStoreClick = () => {
+    navigate('/coming-soon');
+  };
+
   return (
     <section 
       className="py-20 px-4"
@@ -20,16 +27,17 @@ const FinalCTA = () => {
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button 
+            onClick={handleAppStoreClick}
             size="lg" 
-            className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-6 text-lg rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
+            className="bg-white text-black hover:bg-gray-100 px-8 py-6 text-lg rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
           >
             <Download className="mr-2 h-5 w-5" />
             Download on the App Store
           </Button>
           <Button 
+            onClick={handleAppStoreClick}
             size="lg" 
-            variant="outline" 
-            className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-6 text-lg rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
+            className="bg-white text-black hover:bg-gray-100 px-8 py-6 text-lg rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
           >
             <Smartphone className="mr-2 h-5 w-5" />
             Get it on Google Play
