@@ -6,6 +6,9 @@ const Hero = () => {
   return (
     <section className="px-4 py-20 text-center">
       <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: '#FFB3A7' }}>
+          Social Petwork
+        </h1>
         <div className="mb-6 flex justify-center">
           <img 
             src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
@@ -13,9 +16,6 @@ const Hero = () => {
             className="w-40 h-40"
           />
         </div>
-        <h1 className="text-4xl md:text-6xl font-bold mb-4" style={{ color: '#FFB3A7' }}>
-          Social Petwork
-        </h1>
         <h2 className="text-3xl md:text-5xl font-bold mb-6" style={{ color: '#FFB3A7' }}>
           Unleash Their Social Life: Connect, Play, and Reward Your Pet!
         </h2>
