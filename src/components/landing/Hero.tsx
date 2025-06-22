@@ -31,14 +31,16 @@ const Hero = () => {
           facilitate real-time, location-based playdates and group walks, track adventures, and unlock 
           exclusive discounts from pet businesses.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <AuthButton />
+        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+          <div className="transform scale-125">
+            <AuthButton />
+          </div>
           <button 
             onClick={scrollToFeatures}
-            className="flex items-center font-medium hover:opacity-80 transition-opacity" 
+            className="flex items-center font-medium hover:opacity-80 transition-opacity text-lg px-6 py-3 rounded-lg border-2 border-transparent hover:border-current transform scale-125" 
             style={{ color: '#FFB3A7' }}
           >
-            Learn More <ArrowRight className="ml-2 h-4 w-4" />
+            Learn More <ArrowRight className="ml-2 h-5 w-5" />
           </button>
         </div>
       </div>
