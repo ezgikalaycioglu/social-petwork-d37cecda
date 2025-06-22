@@ -31,7 +31,7 @@ const Hero = () => {
           facilitate real-time, location-based playdates and group walks, track adventures, and unlock 
           exclusive discounts from pet businesses.
         </p>
-        <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
+        <div className="flex flex-col sm:flex-row gap-10 justify-center items-center">
           <div className="transform scale-125">
             <AuthButton />
           </div>
