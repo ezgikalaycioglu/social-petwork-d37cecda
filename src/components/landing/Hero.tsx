@@ -3,6 +3,13 @@ import { ArrowRight } from 'lucide-react';
 import AuthButton from '../AuthButton';
 
 const Hero = () => {
+  const scrollToFeatures = () => {
+    const featuresSection = document.querySelector('[data-section="features"]');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="px-4 py-20 text-center">
       <div className="max-w-4xl mx-auto">
@@ -13,10 +20,10 @@ const Hero = () => {
           <img 
             src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
             alt="Social Petwork Logo"
-            className="w-40 h-40"
+            className="w-52 h-52"
           />
         </div>
-        <h2 className="text-3xl md:text-5xl font-bold mb-6" style={{ color: '#FFB3A7' }}>
+        <h2 className="text-3xl md:text-5xl font-bold mb-6" style={{ color: '#A8DAB5' }}>
           Unleash Their Social Life: Connect, Play, and Reward Your Pet!
         </h2>
         <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
@@ -26,7 +33,11 @@ const Hero = () => {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <AuthButton />
-          <button className="flex items-center font-medium" style={{ color: '#FFB3A7' }}>
+          <button 
+            onClick={scrollToFeatures}
+            className="flex items-center font-medium hover:opacity-80 transition-opacity" 
+            style={{ color: '#FFB3A7' }}
+          >
             Learn More <ArrowRight className="ml-2 h-4 w-4" />
           </button>
         </div>
