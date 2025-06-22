@@ -37,7 +37,7 @@ const Hero = () => {
           </div>
           <button 
             onClick={scrollToFeatures}
-            className="flex items-center font-medium hover:opacity-80 transition-opacity text-lg px-8 py-3 rounded-lg border-2 border-transparent hover:border-current transform scale-125" 
+            className="flex items-center font-medium hover:opacity-80 transition-opacity text-lg px-8 py-3 border-transparent hover:border-current transform scale-125" 
             style={{ 
               color: '#FFB3A7',
               borderColor: 'transparent'
