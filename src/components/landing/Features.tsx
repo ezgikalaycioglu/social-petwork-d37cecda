@@ -1,10 +1,9 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 
 const Features = () => {
   const features = [
     {
-      image: "/lovable-uploads/8b5a6e00-39f2-4fb4-b968-a331dd55db04.png",
+      image: "/lovable-uploads/843c803e-8ea4-4a7c-865a-77f0687a1413.png",
       title: "Your Pet's Digital Identity",
       description: "Give your furry friend their own charming profile! Share adorable photos, unique personality traits, and preferences to help them find their perfect playmates.",
       bgColor: "#B2EBF2"
@@ -22,7 +21,7 @@ const Features = () => {
       bgColor: "#FFDAB9"
     },
     {
-      image: "/lovable-uploads/843c803e-8ea4-4a7c-865a-77f0687a1413.png",
+      image: "/lovable-uploads/8b5a6e00-39f2-4fb4-b968-a331dd55db04.png",
       title: "Stay Connected, Stay Safe",
       description: "Keep your local pet community informed with quick alerts like 'Heading out for a walk!' or 'Lost pet alert.' Foster a caring and engaged neighborhood network.",
       bgColor: "#E8D5FF"
