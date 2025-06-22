@@ -10,7 +10,7 @@ const Hero = () => {
           <img 
             src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
             alt="Social Petwork Logo"
-            className="w-24 h-24"
+            className="w-32 h-32"
           />
         </div>
         <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-green-600 via-blue-600 to-orange-500 bg-clip-text text-transparent">
