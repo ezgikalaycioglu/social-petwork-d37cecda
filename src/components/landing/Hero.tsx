@@ -10,10 +10,10 @@ const Hero = () => {
           <img 
             src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
             alt="Social Petwork Logo"
-            className="w-32 h-32"
+            className="w-40 h-40"
           />
         </div>
-        <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-green-600 via-blue-600 to-orange-500 bg-clip-text text-transparent">
+        <h1 className="text-5xl md:text-7xl font-bold mb-6 text-orange-500">
           Social Petwork
         </h1>
         <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
@@ -22,7 +22,7 @@ const Hero = () => {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
           <AuthButton />
-          <button className="flex items-center text-green-600 hover:text-green-700 font-medium">
+          <button className="flex items-center text-orange-500 hover:text-orange-600 font-medium">
             Learn More <ArrowRight className="ml-2 h-4 w-4" />
           </button>
         </div>

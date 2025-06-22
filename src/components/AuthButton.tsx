@@ -65,6 +65,7 @@ const AuthButton = () => {
           onClick={handleSignOut}
           variant="outline"
           size="sm"
+          className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
         >
           Sign Out
         </Button>
@@ -75,7 +76,7 @@ const AuthButton = () => {
   return (
     <Button 
       onClick={() => navigate('/auth')}
-      className="bg-green-600 hover:bg-green-700"
+      className="bg-orange-500 hover:bg-orange-600 text-white"
     >
       Get Started
     </Button>
