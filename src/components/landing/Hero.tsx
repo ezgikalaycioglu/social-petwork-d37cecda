@@ -20,7 +20,7 @@ const Hero = () => {
           <img 
             src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
             alt="Social Petwork Logo"
-            className="w-52 h-52"
+            className="w-64 h-64"
           />
         </div>
         <h2 className="text-3xl md:text-5xl font-bold mb-6" style={{ color: '#A8DAB5' }}>
@@ -31,13 +31,13 @@ const Hero = () => {
           facilitate real-time, location-based playdates and group walks, track adventures, and unlock 
           exclusive discounts from pet businesses.
         </p>
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+        <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
           <div className="transform scale-125">
             <AuthButton />
           </div>
           <button 
             onClick={scrollToFeatures}
-            className="flex items-center font-medium hover:opacity-80 transition-opacity text-lg px-6 py-3 rounded-lg border-2 border-transparent hover:border-current transform scale-125" 
+            className="flex items-center font-medium hover:opacity-80 transition-opacity text-lg px-8 py-3 rounded-lg border-2 border-transparent hover:border-current transform scale-125" 
             style={{ color: '#FFB3A7' }}
           >
             Learn More <ArrowRight className="ml-2 h-5 w-5" />
