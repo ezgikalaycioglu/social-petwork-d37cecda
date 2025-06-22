@@ -8,7 +8,7 @@ const Hero = () => {
       <div className="max-w-4xl mx-auto">
         <div className="mb-6 flex justify-center">
           <img 
-            src="/lovable-uploads/55e4f8ce-3be5-42b1-b0df-7790c06cfc73.png" 
+            src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
             alt="Social Petwork Logo"
             className="w-24 h-24"
           />
