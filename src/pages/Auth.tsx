@@ -191,7 +191,7 @@ const Auth = () => {
   return (
     <div 
       className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'linear-gradient(to bottom, #C8E6C9, #A8DAB5, #FFDAB9)' }}
+      style={{ backgroundColor: '#F3FCF6' }}
     >
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
