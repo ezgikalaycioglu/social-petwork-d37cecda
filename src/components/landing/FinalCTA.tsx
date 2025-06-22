@@ -12,16 +12,15 @@ const FinalCTA = () => {
 
   return (
     <section 
-      className="py-20 px-4"
-      style={{ background: 'linear-gradient(to right, #A8DAB5, #B2EBF2, #FFB3A7)' }}
+      className="py-20 px-4 bg-white"
     >
       <div className="max-w-4xl mx-auto text-center">
         <div className="text-6xl mb-8">🐕🎾🐱</div>
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+        <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: '#FFB3A7' }}>
           Ready to Elevate Your Pet's Social Life?
         </h2>
-        <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
-          Join thousands of pet parents who have already discovered the joy of connected pet adventures. 
+        <p className="text-xl text-gray-700 mb-10 max-w-2xl mx-auto">
+          Join pet parents in your neighbourhood who you can discover the joy of pet adventures together. 
           Download Social Petwork today and start your journey!
         </p>
         
@@ -29,7 +28,7 @@ const FinalCTA = () => {
           <Button 
             onClick={handleAppStoreClick}
             size="lg" 
-            className="bg-white text-black hover:bg-gray-100 px-8 py-6 text-lg rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
+            className="bg-white text-black hover:bg-gray-100 px-8 py-6 text-lg rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200 border-2 border-gray-300"
           >
             <Download className="mr-2 h-5 w-5" />
             Download on the App Store
@@ -37,7 +36,7 @@ const FinalCTA = () => {
           <Button 
             onClick={handleAppStoreClick}
             size="lg" 
-            className="bg-white text-black hover:bg-gray-100 px-8 py-6 text-lg rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
+            className="bg-white text-black hover:bg-gray-100 px-8 py-6 text-lg rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200 border-2 border-gray-300"
           >
             <Smartphone className="mr-2 h-5 w-5" />
             Get it on Google Play
