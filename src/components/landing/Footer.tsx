@@ -1,8 +1,15 @@
 
 import { Separator } from '@/components/ui/separator';
 import { Heart, Facebook, Twitter, Instagram } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const handleLinkClick = () => {
+    navigate('/coming-soon');
+  };
+
   return (
     <footer className="bg-gray-900 text-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -17,27 +24,78 @@ const Footer = () => {
               adventures, and community support.
             </p>
             <div className="flex space-x-4">
-              <Facebook className="h-6 w-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
-              <Twitter className="h-6 w-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
-              <Instagram className="h-6 w-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+              <Facebook 
+                className="h-6 w-6 text-gray-400 hover:text-white cursor-pointer transition-colors" 
+                onClick={handleLinkClick}
+              />
+              <Twitter 
+                className="h-6 w-6 text-gray-400 hover:text-white cursor-pointer transition-colors" 
+                onClick={handleLinkClick}
+              />
+              <Instagram 
+                className="h-6 w-6 text-gray-400 hover:text-white cursor-pointer transition-colors" 
+                onClick={handleLinkClick}
+              />
             </div>
           </div>
           
           <div>
             <h4 className="text-lg font-semibold mb-4">Legal</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Cookie Policy</a></li>
+              <li>
+                <button 
+                  onClick={handleLinkClick}
+                  className="text-gray-400 hover:text-white transition-colors text-left"
+                >
+                  Privacy Policy
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={handleLinkClick}
+                  className="text-gray-400 hover:text-white transition-colors text-left"
+                >
+                  Terms of Service
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={handleLinkClick}
+                  className="text-gray-400 hover:text-white transition-colors text-left"
+                >
+                  Cookie Policy
+                </button>
+              </li>
             </ul>
           </div>
           
           <div>
             <h4 className="text-lg font-semibold mb-4">Support</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Community Guidelines</a></li>
+              <li>
+                <button 
+                  onClick={handleLinkClick}
+                  className="text-gray-400 hover:text-white transition-colors text-left"
+                >
+                  Help Center
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={handleLinkClick}
+                  className="text-gray-400 hover:text-white transition-colors text-left"
+                >
+                  Contact Us
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={handleLinkClick}
+                  className="text-gray-400 hover:text-white transition-colors text-left"
+                >
+                  Community Guidelines
+                </button>
+              </li>
             </ul>
           </div>
         </div>
