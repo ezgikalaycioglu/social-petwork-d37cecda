@@ -31,13 +31,13 @@ const Hero = () => {
           facilitate real-time, location-based playdates and group walks, track adventures, and unlock 
           exclusive discounts from pet businesses.
         </p>
-        <div className="flex flex-col sm:flex-row gap-12 justify-center items-center">
-          <div className="transform scale-125">
+        <div className="flex flex-row gap-4 sm:gap-12 justify-center items-center">
+          <div className="transform scale-100 sm:scale-125">
             <AuthButton />
           </div>
           <button 
             onClick={scrollToFeatures}
-            className="flex items-center font-medium hover:opacity-80 transition-opacity text-lg px-8 py-3 border-transparent hover:border-current transform scale-125" 
+            className="flex items-center font-medium hover:opacity-80 transition-opacity text-base sm:text-lg px-4 py-2 sm:px-8 sm:py-3 border-transparent hover:border-current transform scale-100 sm:scale-125" 
             style={{ 
               color: '#FFB3A7',
               borderColor: 'transparent'
@@ -49,7 +49,7 @@ const Hero = () => {
               e.currentTarget.style.borderColor = 'transparent';
             }}
           >
-            Learn More <ArrowRight className="ml-2 h-5 w-5" />
+            Learn More <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         </div>
       </div>

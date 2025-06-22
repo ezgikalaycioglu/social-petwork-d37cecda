@@ -58,14 +58,14 @@ const AuthButton = () => {
   if (user) {
     return (
       <div className="flex items-center gap-4">
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-gray-600 hidden sm:block">
           Welcome, {user.email}
         </span>
         <Button 
           onClick={handleSignOut}
           variant="outline"
-          size="lg"
-          className="text-lg px-6 py-3"
+          size="default"
+          className="text-sm sm:text-lg px-4 py-2 sm:px-6 sm:py-3"
           style={{ 
             borderColor: '#FFB3A7', 
             color: '#FFB3A7',
@@ -88,8 +88,8 @@ const AuthButton = () => {
   return (
     <Button 
       onClick={() => navigate('/auth')}
-      size="lg"
-      className="text-lg px-8 py-3 text-white hover:opacity-90"
+      size="default"
+      className="text-sm sm:text-lg px-4 py-2 sm:px-8 sm:py-3 text-white hover:opacity-90"
       style={{ backgroundColor: '#FFB3A7' }}
     >
       Get Started
