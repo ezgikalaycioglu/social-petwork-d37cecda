@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Heart, Eye, Edit, PawPrint, LogOut } from 'lucide-react';
+import { Plus, Heart, Eye, Edit, PawPrint, LogOut, Users } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -124,7 +124,7 @@ const Dashboard = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer" 
                   onClick={() => navigate('/create-pet-profile')}>
               <CardHeader className="text-center pb-4">
@@ -155,6 +155,17 @@ const Dashboard = () => {
                 </div>
                 <CardTitle className="text-xl text-gray-800">Edit Pet Profiles</CardTitle>
                 <CardDescription>Update your pets' information</CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer" 
+                  onClick={() => navigate('/pet-social')}>
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-purple-600" />
+                </div>
+                <CardTitle className="text-xl text-gray-800">Pet Social Network</CardTitle>
+                <CardDescription>Connect your pets with new friends</CardDescription>
               </CardHeader>
             </Card>
           </div>

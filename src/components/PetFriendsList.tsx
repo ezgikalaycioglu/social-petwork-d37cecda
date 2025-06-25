@@ -1,0 +1,193 @@
+
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useToast } from '@/hooks/use-toast';
+import { Users, UserMinus, Heart } from 'lucide-react';
+import type { Tables } from '@/integrations/supabase/types';
+
+type PetProfile = Tables<'pet_profiles'>;
+
+interface Friend {
+  id: string;
+  friend_pet: PetProfile;
+  friendship_id: string;
+}
+
+interface PetFriendsListProps {
+  petId: string;
+  petName: string;
+  isOwner?: boolean;
+  onFriendRemoved?: () => void;
+}
+
+const PetFriendsList = ({ petId, petName, isOwner = false, onFriendRemoved }: PetFriendsListProps) => {
+  const [friends, setFriends] = useState<Friend[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [removingFriends, setRemovingFriends] = useState<Set<string>>(new Set());
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchFriends();
+  }, [petId]);
+
+  const fetchFriends = async () => {
+    try {
+      // Get friendships where this pet is either requester or recipient and status is accepted
+      const { data, error } = await supabase
+        .from('pet_friendships')
+        .select(`
+          id,
+          requester_pet_id,
+          recipient_pet_id,
+          requester_pet:pet_profiles!pet_friendships_requester_pet_id_fkey(*),
+          recipient_pet:pet_profiles!pet_friendships_recipient_pet_id_fkey(*)
+        `)
+        .or(`requester_pet_id.eq.${petId},recipient_pet_id.eq.${petId}`)
+        .eq('status', 'accepted')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Transform the data to get the friend pet (the one that's not the current pet)
+      const friendsList: Friend[] = (data || []).map((friendship: any) => {
+        const isRequester = friendship.requester_pet_id === petId;
+        return {
+          id: isRequester ? friendship.recipient_pet_id : friendship.requester_pet_id,
+          friend_pet: isRequester ? friendship.recipient_pet : friendship.requester_pet,
+          friendship_id: friendship.id
+        };
+      });
+
+      setFriends(friendsList);
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load friends list.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeFriend = async (friendshipId: string, friendName: string) => {
+    if (!confirm(`Are you sure you want to remove ${friendName} from ${petName}'s friends?`)) {
+      return;
+    }
+
+    setRemovingFriends(prev => new Set([...prev, friendshipId]));
+
+    try {
+      const { error } = await supabase
+        .from('pet_friendships')
+        .delete()
+        .eq('id', friendshipId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Friend Removed",
+        description: `${friendName} has been removed from ${petName}'s friends.`,
+      });
+
+      await fetchFriends();
+      if (onFriendRemoved) onFriendRemoved();
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove friend.",
+        variant: "destructive",
+      });
+    } finally {
+      setRemovingFriends(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(friendshipId);
+        return newSet;
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+        <p className="text-gray-600 mt-2">Loading friends...</p>
+      </div>
+    );
+  }
+
+  return (
+    <Card className="bg-white shadow-lg">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Users className="h-5 w-5 text-green-600" />
+          {petName}'s Friends ({friends.length})
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {friends.length === 0 ? (
+          <div className="text-center py-8">
+            <Heart className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">No friends yet!</h3>
+            <p className="text-gray-600">
+              {isOwner 
+                ? `${petName} hasn't made any friends yet. Use the search above to discover new pet friends!`
+                : `${petName} hasn't made any friends yet.`
+              }
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {friends.map((friend) => (
+              <div key={friend.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage 
+                      src={friend.friend_pet.profile_photo_url || ''} 
+                      alt={friend.friend_pet.name} 
+                    />
+                    <AvatarFallback className="bg-green-100 text-green-600">
+                      {friend.friend_pet.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div>
+                    <h4 className="font-semibold text-gray-800 text-sm">
+                      {friend.friend_pet.name}
+                    </h4>
+                    <p className="text-xs text-gray-600">
+                      {friend.friend_pet.breed}
+                    </p>
+                  </div>
+                </div>
+                
+                {isOwner && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => removeFriend(friend.friendship_id, friend.friend_pet.name)}
+                    disabled={removingFriends.has(friend.friendship_id)}
+                    className="border-red-500 text-red-600 hover:bg-red-50"
+                  >
+                    {removingFriends.has(friend.friendship_id) ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                    ) : (
+                      <UserMinus className="w-4 h-4" />
+                    )}
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default PetFriendsList;

@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      pet_friendships: {
+        Row: {
+          created_at: string
+          id: string
+          recipient_pet_id: string
+          requester_pet_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          recipient_pet_id: string
+          requester_pet_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          recipient_pet_id?: string
+          requester_pet_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pet_friendships_recipient_pet_id_fkey"
+            columns: ["recipient_pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pet_friendships_requester_pet_id_fkey"
+            columns: ["requester_pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pet_profiles: {
         Row: {
           about: string | null
@@ -19,6 +61,7 @@ export type Database = {
           id: string
           name: string
           profile_photo_url: string | null
+          unique_code: string | null
           updated_at: string
           user_id: string
         }
@@ -31,6 +74,7 @@ export type Database = {
           id?: string
           name: string
           profile_photo_url?: string | null
+          unique_code?: string | null
           updated_at?: string
           user_id: string
         }
@@ -43,6 +87,7 @@ export type Database = {
           id?: string
           name?: string
           profile_photo_url?: string | null
+          unique_code?: string | null
           updated_at?: string
           user_id?: string
         }

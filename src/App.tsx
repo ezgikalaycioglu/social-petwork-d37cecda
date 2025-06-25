@@ -11,6 +11,7 @@ import ComingSoon from "./pages/ComingSoon";
 import CreatePetProfile from "./pages/CreatePetProfile";
 import MyPets from "./pages/MyPets";
 import EditPetProfile from "./pages/EditPetProfile";
+import PetSocial from "./pages/PetSocial";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/create-pet-profile" element={<CreatePetProfile />} />
           <Route path="/my-pets" element={<MyPets />} />
           <Route path="/edit-pet-profile/:petId" element={<EditPetProfile />} />
+          <Route path="/pet-social" element={<PetSocial />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
