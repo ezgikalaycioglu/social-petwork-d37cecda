@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Heart, Eye, Edit, PawPrint, LogOut, Users } from 'lucide-react';
+import { Plus, Heart, Eye, Edit, PawPrint, Users } from 'lucide-react';
+import Layout from '@/components/Layout';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -65,62 +66,29 @@ const Dashboard = () => {
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        toast({
-          title: 'Error signing out',
-          description: error.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Signed out',
-          description: 'You have been successfully signed out.',
-        });
-        navigate('/');
-      }
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'An unexpected error occurred.',
-        variant: 'destructive',
-      });
-    }
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50 flex items-center justify-center">
-        <div className="text-center">
-          <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
-          <p className="text-gray-600">Loading your dashboard...</p>
+      <Layout>
+        <div className="flex items-center justify-center py-32">
+          <div className="text-center">
+            <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
+            <p className="text-gray-600">Loading your dashboard...</p>
+          </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50">
+    <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                🐾 Social Petwork Dashboard
-              </h1>
-              <p className="text-gray-600 mt-1">Welcome back, {userEmail}!</p>
-            </div>
-            <Button
-              onClick={handleSignOut}
-              variant="outline"
-              className="border-red-500 text-red-600 hover:bg-red-50"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
-            </Button>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
+              🐾 Welcome to Social Petwork
+            </h1>
+            <p className="text-gray-600 mt-1">Hello {userEmail}! Manage your pets and connect with other pet lovers.</p>
           </div>
 
           {/* Quick Actions */}
@@ -245,7 +213,7 @@ const Dashboard = () => {
           )}
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

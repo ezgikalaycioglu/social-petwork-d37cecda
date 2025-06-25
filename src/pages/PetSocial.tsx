@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, PawPrint } from 'lucide-react';
+import Layout from '@/components/Layout';
 import DiscoverPets from '@/components/DiscoverPets';
 import FriendRequests from '@/components/FriendRequests';
 import PetFriendsList from '@/components/PetFriendsList';
@@ -67,41 +68,29 @@ const PetSocial = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50 flex items-center justify-center">
-        <div className="text-center">
-          <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
-          <p className="text-gray-600">Loading pet social features...</p>
+      <Layout>
+        <div className="flex items-center justify-center py-32">
+          <div className="text-center">
+            <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
+            <p className="text-gray-600">Loading pet social features...</p>
+          </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   const userPetIds = pets.map(pet => pet.id);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50">
+    <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={() => navigate('/dashboard')}
-                variant="outline"
-                size="sm"
-                className="border-green-500 text-green-600 hover:bg-green-50"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Button>
-              
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                  🐾 Pet Social Network
-                </h1>
-                <p className="text-gray-600 mt-1">Connect your pets with new friends!</p>
-              </div>
-            </div>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
+              🐾 Pet Social Network
+            </h1>
+            <p className="text-gray-600 mt-1">Connect your pets with new friends!</p>
           </div>
 
           {pets.length === 0 ? (
@@ -148,7 +137,7 @@ const PetSocial = () => {
           )}
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
