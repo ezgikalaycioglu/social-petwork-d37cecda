@@ -7,6 +7,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ComingSoon from "./pages/ComingSoon";
+import CreatePetProfile from "./pages/CreatePetProfile";
+import MyPets from "./pages/MyPets";
+import EditPetProfile from "./pages/EditPetProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +24,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/coming-soon" element={<ComingSoon />} />
+          <Route path="/create-pet-profile" element={<CreatePetProfile />} />
+          <Route path="/my-pets" element={<MyPets />} />
+          <Route path="/edit-pet-profile/:petId" element={<EditPetProfile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
