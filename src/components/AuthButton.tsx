@@ -62,6 +62,14 @@ const AuthButton = () => {
           Welcome, {user.email}
         </span>
         <Button 
+          onClick={() => navigate('/dashboard')}
+          size="default"
+          className="text-sm sm:text-lg px-4 py-2 sm:px-6 sm:py-3 text-white hover:opacity-90 mr-2"
+          style={{ backgroundColor: '#A8DAB5' }}
+        >
+          Dashboard
+        </Button>
+        <Button 
           onClick={handleSignOut}
           variant="outline"
           size="default"

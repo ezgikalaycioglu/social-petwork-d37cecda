@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -30,9 +29,9 @@ const Auth = () => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Redirect authenticated users to coming soon
+        // Redirect authenticated users to dashboard
         if (session?.user) {
-          navigate('/coming-soon');
+          navigate('/dashboard');
         }
       }
     );
@@ -44,7 +43,7 @@ const Auth = () => {
       
       // Redirect if already authenticated
       if (session?.user) {
-        navigate('/coming-soon');
+        navigate('/dashboard');
       }
     });
 
@@ -101,7 +100,7 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const redirectUrl = `${window.location.origin}/coming-soon`;
+      const redirectUrl = `${window.location.origin}/dashboard`;
       
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -167,7 +166,7 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/coming-soon`
+          redirectTo: `${window.location.origin}/dashboard`
         }
       });
 
