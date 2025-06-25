@@ -18,6 +18,11 @@ const AuthButton = () => {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        
+        // Redirect to dashboard on successful sign in
+        if (event === 'SIGNED_IN' && session) {
+          navigate('/dashboard');
+        }
       }
     );
 
@@ -28,7 +33,7 @@ const AuthButton = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const handleSignOut = async () => {
     try {
