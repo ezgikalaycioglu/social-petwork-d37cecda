@@ -9,7 +9,7 @@ import Footer from '../components/landing/Footer';
 
 const Index = () => {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F3FCF6' }}>
+    <div className="min-h-screen">
       <Hero />
       <FinalCTA />
       <ProblemSolution />

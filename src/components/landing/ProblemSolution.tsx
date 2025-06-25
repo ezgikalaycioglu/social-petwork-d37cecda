@@ -1,9 +1,8 @@
-
 import { Heart, Users } from 'lucide-react';
 
 const ProblemSolution = () => {
   return (
-    <section className="py-16 px-4 bg-white">
+    <section className="py-16 px-4" style={{ backgroundColor: '#F3FCF6' }}>
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-12">
           Tired of Solo Walks? Discover Your Pet's 

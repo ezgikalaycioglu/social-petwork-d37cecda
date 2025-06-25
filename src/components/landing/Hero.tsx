@@ -1,4 +1,3 @@
-
 import { ArrowRight } from 'lucide-react';
 import AuthButton from '../AuthButton';
 
@@ -11,7 +10,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="px-4 py-20 text-center">
+    <section className="px-4 py-20 text-center" style={{ backgroundColor: '#F3FCF6' }}>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: '#FFB3A7' }}>
           Social Petwork
