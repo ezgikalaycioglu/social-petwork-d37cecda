@@ -14,12 +14,6 @@ import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
 
-interface PetLocation extends PetProfile {
-  latitude: number;
-  longitude: number;
-  is_available: boolean;
-}
-
 interface InteractiveMapProps {
   userPets: PetProfile[];
   onLocationPermissionChange?: (granted: boolean) => void;
@@ -85,7 +79,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const { toast } = useToast();
   const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const [nearbyPets, setNearbyPets] = useState<PetLocation[]>([]);
+  const [nearbyPets, setNearbyPets] = useState<PetProfile[]>([]);
   const [selectedPet, setSelectedPet] = useState<PetProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [locationPermission, setLocationPermission] = useState<boolean>(false);
@@ -176,14 +170,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
       if (error) throw error;
 
-      const petsWithLocation: PetLocation[] = (data || []).map(pet => ({
-        ...pet,
-        latitude: pet.latitude || 0,
-        longitude: pet.longitude || 0,
-        is_available: pet.is_available || false,
-      }));
-
-      setNearbyPets(petsWithLocation);
+      setNearbyPets(data || []);
     } catch (error) {
       console.error('Error fetching nearby pets:', error);
     }
@@ -321,13 +308,17 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           </Marker>
         )}
 
-        {/* Pet markers */}
+        {/* Pet markers - only show pets that have location data */}
         {nearbyPets
-          .filter(pet => !userPets.some(userPet => userPet.id === pet.id))
+          .filter(pet => 
+            !userPets.some(userPet => userPet.id === pet.id) && 
+            pet.latitude !== null && 
+            pet.longitude !== null
+          )
           .map((pet) => (
             <Marker
               key={pet.id}
-              position={[pet.latitude, pet.longitude]}
+              position={[pet.latitude!, pet.longitude!]}
               icon={createPetMarker(pet.profile_photo_url || undefined)}
             >
               <Popup>

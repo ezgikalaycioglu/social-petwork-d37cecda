@@ -13,6 +13,7 @@ import MyPets from "./pages/MyPets";
 import EditPetProfile from "./pages/EditPetProfile";
 import PetSocial from "./pages/PetSocial";
 import UserSettings from "./pages/UserSettings";
+import PetMap from "./pages/PetMap";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
