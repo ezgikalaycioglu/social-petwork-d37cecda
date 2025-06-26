@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { Plus, Heart, Eye, Edit, PawPrint, Users, MapPin } from 'lucide-react';
 import Layout from '@/components/Layout';
 import SocialFeed from '@/components/SocialFeed';
@@ -16,13 +16,16 @@ type PetProfile = Tables<'pet_profiles'>;
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { trackPageView, trackEvent } = useAnalytics();
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
+    // Track page view
+    trackPageView('Dashboard', '/dashboard');
     checkAuthAndFetchData();
-  }, []);
+  }, [trackPageView]);
 
   const checkAuthAndFetchData = async () => {
     try {
@@ -65,6 +68,14 @@ const Dashboard = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleQuickAction = (action: string, path: string) => {
+    trackEvent('Feature Accessed', {
+      feature_name: action,
+      source: 'dashboard_quick_actions',
+    });
+    navigate(path);
   };
 
   if (loading) {
@@ -111,7 +122,7 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button
-                    onClick={() => navigate('/create-pet-profile')}
+                    onClick={() => handleQuickAction('Create Pet Profile', '/create-pet-profile')}
                     className="w-full justify-start bg-green-600 hover:bg-green-700"
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -119,7 +130,7 @@ const Dashboard = () => {
                   </Button>
                   
                   <Button
-                    onClick={() => navigate('/my-pets')}
+                    onClick={() => handleQuickAction('My Pets Dashboard', '/my-pets')}
                     variant="outline"
                     className="w-full justify-start border-blue-500 text-blue-600 hover:bg-blue-50"
                   >
@@ -128,7 +139,7 @@ const Dashboard = () => {
                   </Button>
                   
                   <Button
-                    onClick={() => navigate('/events')}
+                    onClick={() => handleQuickAction('Events & Meetups', '/events')}
                     variant="outline"
                     className="w-full justify-start border-orange-500 text-orange-600 hover:bg-orange-50"
                   >
@@ -137,7 +148,7 @@ const Dashboard = () => {
                   </Button>
                   
                   <Button
-                    onClick={() => navigate('/pet-social')}
+                    onClick={() => handleQuickAction('Pet Social Network', '/pet-social')}
                     variant="outline"
                     className="w-full justify-start border-purple-500 text-purple-600 hover:bg-purple-50"
                   >
@@ -204,7 +215,7 @@ const Dashboard = () => {
                       Create your first pet profile to join the community.
                     </p>
                     <Button
-                      onClick={() => navigate('/create-pet-profile')}
+                      onClick={() => handleQuickAction('Create Pet Profile', '/create-pet-profile')}
                       className="bg-green-600 hover:bg-green-700 text-white"
                       size="sm"
                     >

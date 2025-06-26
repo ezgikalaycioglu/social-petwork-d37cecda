@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import PhotoUpload from '@/components/PhotoUpload';
 import MultiplePhotoUpload from '@/components/MultiplePhotoUpload';
 import PersonalityTraitsSelector from '@/components/PersonalityTraitsSelector';
@@ -32,6 +33,7 @@ type PetProfileForm = z.infer<typeof petProfileSchema>;
 const CreatePetProfile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { trackEvent } = useAnalytics();
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string>('');
   const [photos, setPhotos] = useState<string[]>([]);
   const [personalityTraits, setPersonalityTraits] = useState<string[]>([]);
@@ -85,6 +87,15 @@ const CreatePetProfile = () => {
       if (error) {
         throw error;
       }
+
+      // Track analytics event
+      trackEvent('Pet Profile Created', {
+        pet_breed: data.breed,
+        pet_age: data.age ? parseInt(data.age) : undefined,
+        pet_gender: data.gender,
+        has_profile_photo: !!profilePhotoUrl,
+        personality_traits_count: personalityTraits.length,
+      });
 
       toast({
         title: "Success!",
