@@ -1,109 +1,92 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-/**
- * Example component demonstrating various analytics tracking patterns
- * This is for documentation purposes and shows how to integrate analytics
- */
 const AnalyticsExample: React.FC = () => {
-  const { trackEvent } = useAnalytics();
+  const { trackEvent, trackPageView } = useAnalytics();
 
-  const handlePetProfileView = (petId: string, breed: string, isOwnPet: boolean) => {
+  const handlePetProfileViewed = () => {
     trackEvent('Pet Profile Viewed', {
-      pet_id: petId,
-      pet_breed: breed,
-      is_own_pet: isOwnPet,
+      pet_id: 'example-pet-id',
+      viewer_id: 'example-viewer-id',
+      pet_breed: 'Golden Retriever',
+      is_own_pet: false
     });
   };
 
-  const handleAdventureCreated = (petId: string, photoCount: number, hasDescription: boolean) => {
+  const handleAdventureCreated = () => {
     trackEvent('Adventure Created', {
-      pet_id: petId,
-      photo_count: photoCount,
-      has_description: hasDescription,
-      tagged_pets_count: 0,
+      pet_id: 'example-pet-id',
+      photo_count: 3,
+      has_description: true,
+      tagged_pets_count: 2
     });
   };
 
-  const handlePlaydateRequest = (requesterPetId: string, recipientPetId: string) => {
+  const handlePlaydateRequested = () => {
     trackEvent('Playdate Requested', {
-      requester_pet_id: requesterPetId,
-      recipient_pet_id: recipientPetId,
-      event_type: 'playdate',
+      requester_pet_id: 'requester-pet-id',
+      recipient_pet_id: 'recipient-pet-id',
+      event_type: 'walk'
     });
   };
 
-  const handleDealView = (dealId: string, businessName: string, category: string) => {
+  const handleDealViewed = () => {
     trackEvent('Deal Viewed', {
-      deal_id: dealId,
-      business_name: businessName,
-      deal_category: category,
+      deal_id: 'example-deal-id',
+      business_name: 'Pet Store',
+      deal_category: 'food',
       discount_type: 'percentage',
-      discount_value: 20,
+      discount_value: 20
     });
   };
 
-  const handleReadyToPlayToggle = (petId: string, isAvailable: boolean) => {
+  const handleReadyToPlayToggled = () => {
     trackEvent('Ready to Play Toggled', {
-      pet_id: petId,
-      is_available: isAvailable,
+      pet_id: 'example-pet-id',
+      is_available: true
     });
+  };
+
+  const handlePageView = () => {
+    trackPageView('Analytics Example', '/analytics-example');
   };
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Analytics Integration Examples</CardTitle>
+        <CardTitle>Analytics Example</CardTitle>
+        <CardDescription>
+          Test analytics tracking with sample events
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Button
-            onClick={() => handlePetProfileView('pet-123', 'Golden Retriever', true)}
-            variant="outline"
-          >
+        <div className="grid grid-cols-2 gap-4">
+          <Button onClick={handlePetProfileViewed} variant="outline">
             Track Pet Profile View
           </Button>
-
-          <Button
-            onClick={() => handleAdventureCreated('pet-123', 3, true)}
-            variant="outline"
-          >
+          
+          <Button onClick={handleAdventureCreated} variant="outline">
             Track Adventure Created
           </Button>
-
-          <Button
-            onClick={() => handlePlaydateRequest('pet-123', 'pet-456')}
-            variant="outline"
-          >
+          
+          <Button onClick={handlePlaydateRequested} variant="outline">
             Track Playdate Request
           </Button>
-
-          <Button
-            onClick={() => handleDealView('deal-123', 'PetCo', 'food')}
-            variant="outline"
-          >
-            Track Deal View
+          
+          <Button onClick={handleDealViewed} variant="outline">
+            Track Deal Viewed
           </Button>
-
-          <Button
-            onClick={() => handleReadyToPlayToggle('pet-123', true)}
-            variant="outline"
-          >
-            Track Ready to Play Toggle
+          
+          <Button onClick={handleReadyToPlayToggled} variant="outline">
+            Track Ready to Play
           </Button>
-        </div>
-
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-semibold mb-2">Usage Instructions:</h4>
-          <ul className="text-sm space-y-1 text-gray-600">
-            <li>• Import useAnalytics hook in your components</li>
-            <li>• Call trackEvent with type-safe event names and properties</li>
-            <li>• Page views are tracked automatically in main pages</li>
-            <li>• User identification happens automatically on login</li>
-          </ul>
+          
+          <Button onClick={handlePageView} variant="outline">
+            Track Page View
+          </Button>
         </div>
       </CardContent>
     </Card>
