@@ -32,6 +32,7 @@ const App = () => (
           <Route path="/my-pets" element={<MyPets />} />
           <Route path="/edit-pet-profile/:petId" element={<EditPetProfile />} />
           <Route path="/pet-social" element={<PetSocial />} />
+          <Route path="/pet-map" element={<PetMap />} />
           <Route path="/settings" element={<UserSettings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

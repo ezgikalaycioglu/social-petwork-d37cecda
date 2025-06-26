@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Home, PawPrint, Users, User, Settings, LogOut, Menu, X } from 'lucide-react';
+import { Home, PawPrint, Users, User, Settings, LogOut, Menu, X, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import SocialPetworkLogo from './SocialPetworkLogo';
 
@@ -50,6 +49,7 @@ const GlobalNavBar = () => {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'My Pets', href: '/my-pets', icon: PawPrint },
     { name: 'Pet Social', href: '/pet-social', icon: Users },
+    { name: 'Pet Map', href: '/pet-map', icon: MapPin },
   ];
 
   return (

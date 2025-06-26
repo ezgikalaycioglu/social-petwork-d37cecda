@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Heart, Eye, Edit, PawPrint, Users } from 'lucide-react';
+import { Plus, Heart, Eye, Edit, PawPrint, Users, MapPin } from 'lucide-react';
 import Layout from '@/components/Layout';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -116,17 +115,6 @@ const Dashboard = () => {
             </Card>
 
             <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer" 
-                  onClick={() => navigate('/my-pets')}>
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Edit className="w-8 h-8 text-orange-600" />
-                </div>
-                <CardTitle className="text-xl text-gray-800">Edit Pet Profiles</CardTitle>
-                <CardDescription>Update your pets' information</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer" 
                   onClick={() => navigate('/pet-social')}>
               <CardHeader className="text-center pb-4">
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -134,6 +122,17 @@ const Dashboard = () => {
                 </div>
                 <CardTitle className="text-xl text-gray-800">Pet Social Network</CardTitle>
                 <CardDescription>Connect your pets with new friends</CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer" 
+                  onClick={() => navigate('/pet-map')}>
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MapPin className="w-8 h-8 text-red-600" />
+                </div>
+                <CardTitle className="text-xl text-gray-800">Pet Map</CardTitle>
+                <CardDescription>Find pets near you and share your location</CardDescription>
               </CardHeader>
             </Card>
           </div>
