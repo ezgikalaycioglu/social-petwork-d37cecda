@@ -48,6 +48,158 @@ export type Database = {
         }
         Relationships: []
       }
+      business_profiles: {
+        Row: {
+          address: string | null
+          business_category: string
+          business_name: string
+          created_at: string
+          description: string | null
+          email: string
+          id: string
+          is_verified: boolean | null
+          logo_url: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          business_category: string
+          business_name: string
+          created_at?: string
+          description?: string | null
+          email: string
+          id?: string
+          is_verified?: boolean | null
+          logo_url?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          business_category?: string
+          business_name?: string
+          created_at?: string
+          description?: string | null
+          email?: string
+          id?: string
+          is_verified?: boolean | null
+          logo_url?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      deal_redemptions: {
+        Row: {
+          claimed_at: string
+          deal_id: string
+          id: string
+          is_redeemed: boolean | null
+          pet_id: string | null
+          redeemed_at: string | null
+          redemption_code: string
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          deal_id: string
+          id?: string
+          is_redeemed?: boolean | null
+          pet_id?: string | null
+          redeemed_at?: string | null
+          redemption_code: string
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          deal_id?: string
+          id?: string
+          is_redeemed?: boolean | null
+          pet_id?: string | null
+          redeemed_at?: string | null
+          redemption_code?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_redemptions_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deal_redemptions_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deals: {
+        Row: {
+          business_id: string
+          created_at: string
+          current_redemptions: number | null
+          description: string
+          discount_amount: number | null
+          discount_percentage: number | null
+          id: string
+          is_active: boolean | null
+          max_redemptions: number | null
+          terms: string | null
+          title: string
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          current_redemptions?: number | null
+          description: string
+          discount_amount?: number | null
+          discount_percentage?: number | null
+          id?: string
+          is_active?: boolean | null
+          max_redemptions?: number | null
+          terms?: string | null
+          title: string
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          current_redemptions?: number | null
+          description?: string
+          discount_amount?: number | null
+          discount_percentage?: number | null
+          id?: string
+          is_active?: boolean | null
+          max_redemptions?: number | null
+          terms?: string | null
+          title?: string
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deals_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           created_at: string
@@ -299,7 +451,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_redemption_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

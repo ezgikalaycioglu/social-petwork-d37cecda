@@ -1,0 +1,255 @@
+
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { Gift, QrCode, Copy, Check } from 'lucide-react';
+import type { Tables } from '@/integrations/supabase/types';
+
+type Deal = Tables<'deals'> & {
+  business_profiles: Tables<'business_profiles'>;
+};
+
+type PetProfile = Tables<'pet_profiles'>;
+
+interface ClaimDealModalProps {
+  deal: Deal;
+  onClose: () => void;
+  onClaimed: () => void;
+}
+
+const ClaimDealModal: React.FC<ClaimDealModalProps> = ({ deal, onClose, onClaimed }) => {
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [claimed, setClaimed] = useState(false);
+  const [redemptionCode, setRedemptionCode] = useState('');
+  const [pets, setPets] = useState<PetProfile[]>([]);
+  const [selectedPetId, setSelectedPetId] = useState<string>('');
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    fetchUserPets();
+    checkExistingClaim();
+  }, [deal.id]);
+
+  const fetchUserPets = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('pet_profiles')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      setPets(data || []);
+      if (data && data.length > 0) {
+        setSelectedPetId(data[0].id);
+      }
+    } catch (error) {
+      console.error('Error fetching pets:', error);
+    }
+  };
+
+  const checkExistingClaim = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('deal_redemptions')
+        .select('redemption_code')
+        .eq('deal_id', deal.id)
+        .eq('user_id', user.id)
+        .single();
+
+      if (data) {
+        setClaimed(true);
+        setRedemptionCode(data.redemption_code);
+      }
+    } catch (error) {
+      // No existing claim found, which is expected
+    }
+  };
+
+  const handleClaimDeal = async () => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to claim deals.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('deal_redemptions')
+        .insert({
+          deal_id: deal.id,
+          user_id: user.id,
+          pet_id: selectedPetId || null,
+        })
+        .select('redemption_code')
+        .single();
+
+      if (error) {
+        if (error.code === '23505') { // Unique constraint violation
+          toast({
+            title: "Already Claimed",
+            description: "You have already claimed this deal.",
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+        return;
+      }
+
+      setRedemptionCode(data.redemption_code);
+      setClaimed(true);
+      onClaimed();
+
+      toast({
+        title: "Deal Claimed!",
+        description: "Show your redemption code to the business to redeem this offer.",
+      });
+
+    } catch (error) {
+      console.error('Error claiming deal:', error);
+      toast({
+        title: "Error",
+        description: "Failed to claim deal. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(redemptionCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast({
+        title: "Copied!",
+        description: "Redemption code copied to clipboard.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to copy code.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Gift className="w-5 h-5 text-green-600" />
+            {claimed ? 'Deal Claimed!' : 'Claim Deal'}
+          </DialogTitle>
+          <DialogDescription>
+            {deal.business_profiles?.business_name} - {deal.title}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {/* Deal Details */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="font-semibold mb-2">{deal.title}</h4>
+            <p className="text-sm text-gray-600 mb-2">{deal.description}</p>
+            {deal.terms && (
+              <p className="text-xs text-gray-500">Terms: {deal.terms}</p>
+            )}
+          </div>
+
+          {!claimed ? (
+            <>
+              {/* Pet Selection */}
+              {pets.length > 0 && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Select Pet (Optional)
+                  </label>
+                  <Select value={selectedPetId} onValueChange={setSelectedPetId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a pet" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">No specific pet</SelectItem>
+                      {pets.map((pet) => (
+                        <SelectItem key={pet.id} value={pet.id}>
+                          {pet.name} ({pet.breed})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Claim Button */}
+              <Button
+                onClick={handleClaimDeal}
+                disabled={loading}
+                className="w-full bg-green-600 hover:bg-green-700"
+              >
+                {loading ? 'Claiming...' : 'Claim This Deal'}
+              </Button>
+            </>
+          ) : (
+            <>
+              {/* Redemption Code Display */}
+              <div className="text-center space-y-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                  <QrCode className="w-16 h-16 mx-auto mb-4 text-green-600" />
+                  <p className="text-sm text-gray-600 mb-2">Your Redemption Code:</p>
+                  <div className="bg-white border rounded-lg p-3 font-mono text-lg font-bold text-green-700">
+                    {redemptionCode}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={copyToClipboard}
+                    className="mt-2"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4 mr-1" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4 mr-1" />
+                        Copy Code
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                <div className="text-sm text-gray-600 space-y-1">
+                  <p>📱 Show this screen to the business</p>
+                  <p>📍 Visit: {deal.business_profiles?.address}</p>
+                  {deal.business_profiles?.phone && (
+                    <p>📞 Call: {deal.business_profiles.phone}</p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default ClaimDealModal;
