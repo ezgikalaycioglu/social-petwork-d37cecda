@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      notification_preferences: {
+        Row: {
+          created_at: string | null
+          event_reminders: boolean | null
+          id: string
+          new_follower_alerts: boolean | null
+          playdate_confirmations: boolean | null
+          playdate_requests: boolean | null
+          updated_at: string | null
+          user_id: string | null
+          weekly_newsletter: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_reminders?: boolean | null
+          id?: string
+          new_follower_alerts?: boolean | null
+          playdate_confirmations?: boolean | null
+          playdate_requests?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+          weekly_newsletter?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          event_reminders?: boolean | null
+          id?: string
+          new_follower_alerts?: boolean | null
+          playdate_confirmations?: boolean | null
+          playdate_requests?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+          weekly_newsletter?: boolean | null
+        }
+        Relationships: []
+      }
       pet_friendships: {
         Row: {
           created_at: string
@@ -129,6 +165,36 @@ export type Database = {
           id?: string
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          city: string | null
+          created_at: string | null
+          display_name: string | null
+          email: string | null
+          id: string
+          neighborhood: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          email?: string | null
+          id: string
+          neighborhood?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          neighborhood?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
