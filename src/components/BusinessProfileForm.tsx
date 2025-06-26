@@ -10,6 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Building2 } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
+import { 
+  validateBusinessProfile, 
+  sanitizeInput, 
+  APPROVED_BUSINESS_CATEGORIES,
+  INPUT_LIMITS
+} from '@/utils/validation';
 
 type BusinessProfile = Tables<'business_profiles'>;
 
@@ -22,6 +28,7 @@ interface BusinessProfileFormProps {
 const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onClose, onSave }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     business_name: profile?.business_name || '',
     email: profile?.email || '',
@@ -32,28 +39,27 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
     website: profile?.website || '',
   });
 
-  const categories = [
-    'Groomer',
-    'Pet Store',
-    'Trainer',
-    'Veterinarian',
-    'Boarding',
-    'Daycare',
-    'Pet Sitter',
-    'Pet Photography',
-    'Other'
-  ];
-
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    const sanitizedValue = sanitizeInput(value);
+    setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
+    
+    // Clear error for this field when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.business_name || !formData.email || !formData.business_category) {
+    
+    // Perform comprehensive validation
+    const validation = validateBusinessProfile(formData);
+    
+    if (!validation.isValid) {
+      setErrors(validation.errors);
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
+        title: "Validation Error",
+        description: "Please fix the errors below and try again.",
         variant: "destructive",
       });
       return;
@@ -129,8 +135,16 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
                 value={formData.business_name}
                 onChange={(e) => handleInputChange('business_name', e.target.value)}
                 placeholder="Pawsome Pet Services"
+                maxLength={INPUT_LIMITS.BUSINESS_NAME.max}
                 required
+                className={errors.business_name ? 'border-red-500' : ''}
               />
+              {errors.business_name && (
+                <p className="text-sm text-red-500 mt-1">{errors.business_name}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                {formData.business_name.length}/{INPUT_LIMITS.BUSINESS_NAME.max} characters
+              </p>
             </div>
 
             <div>
@@ -141,8 +155,16 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 placeholder="contact@pawsome.com"
+                maxLength={INPUT_LIMITS.EMAIL.max}
                 required
+                className={errors.email ? 'border-red-500' : ''}
               />
+              {errors.email && (
+                <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                {formData.email.length}/{INPUT_LIMITS.EMAIL.max} characters
+              </p>
             </div>
 
             <div>
@@ -151,17 +173,20 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
                 value={formData.business_category}
                 onValueChange={(value) => handleInputChange('business_category', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className={errors.business_category ? 'border-red-500' : ''}>
                   <SelectValue placeholder="Select your business category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
+                  {APPROVED_BUSINESS_CATEGORIES.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {errors.business_category && (
+                <p className="text-sm text-red-500 mt-1">{errors.business_category}</p>
+              )}
             </div>
 
             <div>
@@ -171,7 +196,15 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
                 value={formData.address}
                 onChange={(e) => handleInputChange('address', e.target.value)}
                 placeholder="123 Pet Street, Pet City, PC 12345"
+                maxLength={INPUT_LIMITS.ADDRESS.max}
+                className={errors.address ? 'border-red-500' : ''}
               />
+              {errors.address && (
+                <p className="text-sm text-red-500 mt-1">{errors.address}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                {formData.address.length}/{INPUT_LIMITS.ADDRESS.max} characters
+              </p>
             </div>
 
             <div>
@@ -182,7 +215,15 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 placeholder="(555) 123-4567"
+                maxLength={INPUT_LIMITS.PHONE.max}
+                className={errors.phone ? 'border-red-500' : ''}
               />
+              {errors.phone && (
+                <p className="text-sm text-red-500 mt-1">{errors.phone}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                {formData.phone.length}/{INPUT_LIMITS.PHONE.max} characters
+              </p>
             </div>
 
             <div>
@@ -193,7 +234,15 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
                 value={formData.website}
                 onChange={(e) => handleInputChange('website', e.target.value)}
                 placeholder="https://www.pawsome.com"
+                maxLength={INPUT_LIMITS.WEBSITE.max}
+                className={errors.website ? 'border-red-500' : ''}
               />
+              {errors.website && (
+                <p className="text-sm text-red-500 mt-1">{errors.website}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                {formData.website.length}/{INPUT_LIMITS.WEBSITE.max} characters
+              </p>
             </div>
 
             <div>
@@ -204,7 +253,15 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 placeholder="Tell customers about your business..."
                 rows={3}
+                maxLength={INPUT_LIMITS.DESCRIPTION.max}
+                className={errors.description ? 'border-red-500' : ''}
               />
+              {errors.description && (
+                <p className="text-sm text-red-500 mt-1">{errors.description}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                {formData.description.length}/{INPUT_LIMITS.DESCRIPTION.max} characters
+              </p>
             </div>
           </div>
 

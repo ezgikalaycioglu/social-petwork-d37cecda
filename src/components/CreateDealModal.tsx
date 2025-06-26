@@ -10,6 +10,13 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { Gift } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
+import { 
+  validateDealTitle, 
+  validateDealDescription, 
+  validateDealTerms, 
+  sanitizeInput, 
+  INPUT_LIMITS 
+} from '@/utils/validation';
 
 type BusinessProfile = Tables<'business_profiles'>;
 type Deal = Tables<'deals'>;
@@ -23,6 +30,7 @@ interface CreateDealModalProps {
 const CreateDealModal: React.FC<CreateDealModalProps> = ({ businessProfile, onClose, onCreated }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -35,24 +43,91 @@ const CreateDealModal: React.FC<CreateDealModalProps> = ({ businessProfile, onCl
   });
 
   const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    if (typeof value === 'string') {
+      const sanitizedValue = sanitizeInput(value);
+      setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
+    
+    // Clear error for this field when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Title validation
+    const titleValidation = validateDealTitle(formData.title);
+    if (!titleValidation.isValid) {
+      newErrors.title = titleValidation.error!;
+    }
+
+    // Description validation
+    const descriptionValidation = validateDealDescription(formData.description);
+    if (!descriptionValidation.isValid) {
+      newErrors.description = descriptionValidation.error!;
+    }
+
+    // Terms validation
+    const termsValidation = validateDealTerms(formData.terms);
+    if (!termsValidation.isValid) {
+      newErrors.terms = termsValidation.error!;
+    }
+
+    // Discount validation
+    if (!formData.discount_percentage && !formData.discount_amount) {
+      newErrors.discount = "Please specify either a percentage or amount discount.";
+    }
+
+    // Percentage validation
+    if (formData.discount_percentage) {
+      const percentage = parseInt(formData.discount_percentage);
+      if (isNaN(percentage) || percentage < 1 || percentage > 100) {
+        newErrors.discount_percentage = "Discount percentage must be between 1 and 100.";
+      }
+    }
+
+    // Amount validation
+    if (formData.discount_amount) {
+      const amount = parseFloat(formData.discount_amount);
+      if (isNaN(amount) || amount <= 0) {
+        newErrors.discount_amount = "Discount amount must be greater than 0.";
+      }
+    }
+
+    // Max redemptions validation
+    if (formData.max_redemptions) {
+      const maxRedemptions = parseInt(formData.max_redemptions);
+      if (isNaN(maxRedemptions) || maxRedemptions < 1) {
+        newErrors.max_redemptions = "Max redemptions must be a positive number.";
+      }
+    }
+
+    // Valid until validation
+    if (formData.valid_until) {
+      const selectedDate = new Date(formData.valid_until);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      if (selectedDate < today) {
+        newErrors.valid_until = "Valid until date must be in the future.";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.description) {
+    
+    if (!validateForm()) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in title and description.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!formData.discount_percentage && !formData.discount_amount) {
-      toast({
-        title: "Missing Discount",
-        description: "Please specify either a percentage or amount discount.",
+        title: "Validation Error",
+        description: "Please fix the errors below and try again.",
         variant: "destructive",
       });
       return;
@@ -119,8 +194,16 @@ const CreateDealModal: React.FC<CreateDealModalProps> = ({ businessProfile, onCl
               value={formData.title}
               onChange={(e) => handleInputChange('title', e.target.value)}
               placeholder="20% Off First Grooming Session"
+              maxLength={INPUT_LIMITS.DEAL_TITLE.max}
               required
+              className={errors.title ? 'border-red-500' : ''}
             />
+            {errors.title && (
+              <p className="text-sm text-red-500 mt-1">{errors.title}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.title.length}/{INPUT_LIMITS.DEAL_TITLE.max} characters
+            </p>
           </div>
 
           <div>
@@ -131,8 +214,16 @@ const CreateDealModal: React.FC<CreateDealModalProps> = ({ businessProfile, onCl
               onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Describe your offer in detail..."
               rows={3}
+              maxLength={INPUT_LIMITS.DEAL_DESCRIPTION.max}
               required
+              className={errors.description ? 'border-red-500' : ''}
             />
+            {errors.description && (
+              <p className="text-sm text-red-500 mt-1">{errors.description}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.description.length}/{INPUT_LIMITS.DEAL_DESCRIPTION.max} characters
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -146,7 +237,11 @@ const CreateDealModal: React.FC<CreateDealModalProps> = ({ businessProfile, onCl
                 value={formData.discount_percentage}
                 onChange={(e) => handleInputChange('discount_percentage', e.target.value)}
                 placeholder="20"
+                className={errors.discount_percentage ? 'border-red-500' : ''}
               />
+              {errors.discount_percentage && (
+                <p className="text-sm text-red-500 mt-1">{errors.discount_percentage}</p>
+              )}
             </div>
 
             <div>
@@ -159,9 +254,17 @@ const CreateDealModal: React.FC<CreateDealModalProps> = ({ businessProfile, onCl
                 value={formData.discount_amount}
                 onChange={(e) => handleInputChange('discount_amount', e.target.value)}
                 placeholder="15.00"
+                className={errors.discount_amount ? 'border-red-500' : ''}
               />
+              {errors.discount_amount && (
+                <p className="text-sm text-red-500 mt-1">{errors.discount_amount}</p>
+              )}
             </div>
           </div>
+
+          {errors.discount && (
+            <p className="text-sm text-red-500">{errors.discount}</p>
+          )}
 
           <div>
             <Label htmlFor="terms">Terms & Conditions</Label>
@@ -171,7 +274,15 @@ const CreateDealModal: React.FC<CreateDealModalProps> = ({ businessProfile, onCl
               onChange={(e) => handleInputChange('terms', e.target.value)}
               placeholder="Valid for new customers only. Cannot be combined with other offers."
               rows={2}
+              maxLength={INPUT_LIMITS.DEAL_TERMS.max}
+              className={errors.terms ? 'border-red-500' : ''}
             />
+            {errors.terms && (
+              <p className="text-sm text-red-500 mt-1">{errors.terms}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.terms.length}/{INPUT_LIMITS.DEAL_TERMS.max} characters
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -183,7 +294,11 @@ const CreateDealModal: React.FC<CreateDealModalProps> = ({ businessProfile, onCl
                 value={formData.valid_until}
                 onChange={(e) => handleInputChange('valid_until', e.target.value)}
                 min={new Date().toISOString().split('T')[0]}
+                className={errors.valid_until ? 'border-red-500' : ''}
               />
+              {errors.valid_until && (
+                <p className="text-sm text-red-500 mt-1">{errors.valid_until}</p>
+              )}
             </div>
 
             <div>
@@ -195,7 +310,11 @@ const CreateDealModal: React.FC<CreateDealModalProps> = ({ businessProfile, onCl
                 value={formData.max_redemptions}
                 onChange={(e) => handleInputChange('max_redemptions', e.target.value)}
                 placeholder="100"
+                className={errors.max_redemptions ? 'border-red-500' : ''}
               />
+              {errors.max_redemptions && (
+                <p className="text-sm text-red-500 mt-1">{errors.max_redemptions}</p>
+              )}
             </div>
           </div>
 
