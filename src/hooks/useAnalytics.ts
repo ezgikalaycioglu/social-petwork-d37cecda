@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import analyticsService, { AnalyticsEvent, EventProperties } from '@/services/AnalyticsService';
 
 /**
- * Custom hook for analytics tracking
+ * Custom hook for analytics tracking with graceful degradation
  * Provides a convenient way to track events from React components
  */
 export const useAnalytics = () => {
@@ -27,5 +27,6 @@ export const useAnalytics = () => {
     trackPageView,
     setUserProperties,
     isInitialized: analyticsService.isInitialized(),
+    isAvailable: analyticsService.isAvailable(),
   };
 };

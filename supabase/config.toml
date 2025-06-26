@@ -38,3 +38,12 @@ port = 54326
 
 [functions.send-playdate-notification]
 verify_jwt = false
+
+[functions.security-headers]
+verify_jwt = false
+
+[functions.rate-limit]
+verify_jwt = false
+
+[functions.security-monitor]
+verify_jwt = false

@@ -102,10 +102,11 @@ export interface UserProperties {
 
 /**
  * Centralized analytics service using Mixpanel
- * Provides type-safe event tracking and user identification
+ * Provides type-safe event tracking and user identification with graceful degradation
  */
 class AnalyticsService {
   private initialized = false;
+  private available = false;
   private mixpanelToken: string | null = null;
 
   /**
@@ -113,12 +114,19 @@ class AnalyticsService {
    * Should be called once when the application starts
    */
   init(): void {
-    // In a real app, you'd get this from environment variables
-    // For now, we'll use a placeholder - you'll need to replace this with your actual token
-    this.mixpanelToken = process.env.REACT_APP_MIXPANEL_TOKEN || 'YOUR_MIXPANEL_TOKEN';
+    // Check for environment variable - no fallback to placeholder
+    this.mixpanelToken = process.env.REACT_APP_MIXPANEL_TOKEN;
     
-    if (!this.mixpanelToken || this.mixpanelToken === 'YOUR_MIXPANEL_TOKEN') {
-      console.warn('Mixpanel token not found. Analytics will not work properly.');
+    if (!this.mixpanelToken) {
+      console.info('Analytics disabled: REACT_APP_MIXPANEL_TOKEN not configured');
+      this.available = false;
+      return;
+    }
+
+    // Validate token format (basic check)
+    if (this.mixpanelToken.length < 10 || this.mixpanelToken.includes('YOUR_')) {
+      console.warn('Invalid Mixpanel token format. Analytics disabled.');
+      this.available = false;
       return;
     }
 
@@ -128,22 +136,37 @@ class AnalyticsService {
         track_pageview: true,
         persistence: 'localStorage',
         batch_requests: true,
+        // Security: disable cross-subdomain cookie tracking
+        cross_subdomain_cookie: false,
+        // Security: use secure cookies in production
+        secure_cookie: process.env.NODE_ENV === 'production',
       });
       
       this.initialized = true;
+      this.available = true;
       console.log('Analytics service initialized successfully');
     } catch (error) {
       console.error('Failed to initialize analytics service:', error);
+      this.available = false;
     }
   }
 
   /**
+   * Check if analytics is available and properly configured
+   */
+  isAvailable(): boolean {
+    return this.available;
+  }
+
+  /**
    * Identify a user and set their properties
-   * Should be called after user authentication
+   * Gracefully degrades when analytics is unavailable
    */
   identifyUser(userId: string, properties?: UserProperties): void {
-    if (!this.initialized) {
-      console.warn('Analytics service not initialized');
+    if (!this.available) {
+      if (process.env.NODE_ENV === 'development') {
+        console.info('Analytics unavailable - would identify user:', userId, properties);
+      }
       return;
     }
 
@@ -157,19 +180,22 @@ class AnalyticsService {
       console.log('User identified:', userId);
     } catch (error) {
       console.error('Failed to identify user:', error);
+      this.available = false; // Mark as unavailable on error
     }
   }
 
   /**
    * Track an event with optional properties
-   * Provides type safety for known events
+   * Gracefully degrades when analytics is unavailable
    */
   trackEvent<T extends AnalyticsEvent>(
     eventName: T,
     properties?: T extends keyof EventProperties ? EventProperties[T] : Record<string, any>
   ): void {
-    if (!this.initialized) {
-      console.warn('Analytics service not initialized');
+    if (!this.available) {
+      if (process.env.NODE_ENV === 'development') {
+        console.info('Analytics unavailable - would track event:', eventName, properties);
+      }
       return;
     }
 
@@ -187,15 +213,19 @@ class AnalyticsService {
       }
     } catch (error) {
       console.error('Failed to track event:', error);
+      this.available = false; // Mark as unavailable on error
     }
   }
 
   /**
    * Set user properties without tracking an event
+   * Gracefully degrades when analytics is unavailable
    */
   setUserProperties(properties: UserProperties): void {
-    if (!this.initialized) {
-      console.warn('Analytics service not initialized');
+    if (!this.available) {
+      if (process.env.NODE_ENV === 'development') {
+        console.info('Analytics unavailable - would set properties:', properties);
+      }
       return;
     }
 
@@ -203,11 +233,13 @@ class AnalyticsService {
       mixpanel.people.set(properties);
     } catch (error) {
       console.error('Failed to set user properties:', error);
+      this.available = false; // Mark as unavailable on error
     }
   }
 
   /**
    * Track page views
+   * Gracefully degrades when analytics is unavailable
    */
   trackPageView(pageName: string, path?: string): void {
     this.trackEvent('Page Viewed', {
@@ -218,15 +250,17 @@ class AnalyticsService {
 
   /**
    * Reset analytics (useful for logout)
+   * Gracefully degrades when analytics is unavailable
    */
   reset(): void {
-    if (!this.initialized) return;
+    if (!this.available) return;
 
     try {
       mixpanel.reset();
       console.log('Analytics reset');
     } catch (error) {
       console.error('Failed to reset analytics:', error);
+      this.available = false; // Mark as unavailable on error
     }
   }
 
