@@ -448,7 +448,21 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      feed_items_view: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          event_id: string | null
+          id: string | null
+          image_url: string | null
+          item_type: string | null
+          location_name: string | null
+          title: string | null
+          user_display_name: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       generate_redemption_code: {

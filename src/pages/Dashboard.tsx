@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Heart, Eye, Edit, PawPrint, Users, MapPin } from 'lucide-react';
 import Layout from '@/components/Layout';
+import SocialFeed from '@/components/SocialFeed';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -87,129 +89,133 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
               🐾 Welcome to Social Petwork
             </h1>
-            <p className="text-gray-600 mt-1">Hello {userEmail}! Manage your pets and connect with other pet lovers.</p>
+            <p className="text-gray-600 mt-1">Hello {userEmail}! Stay connected with the pet community.</p>
           </div>
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer" 
-                  onClick={() => navigate('/create-pet-profile')}>
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Plus className="w-8 h-8 text-green-600" />
-                </div>
-                <CardTitle className="text-xl text-gray-800">Create Pet Profile</CardTitle>
-                <CardDescription>Add a new furry friend to your collection</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer" 
-                  onClick={() => navigate('/my-pets')}>
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Eye className="w-8 h-8 text-blue-600" />
-                </div>
-                <CardTitle className="text-xl text-gray-800">My Pets Dashboard</CardTitle>
-                <CardDescription>View and manage all your pet profiles</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer" 
-                  onClick={() => navigate('/events')}>
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-orange-600" />
-                </div>
-                <CardTitle className="text-xl text-gray-800">My Events</CardTitle>
-                <CardDescription>Manage playdates and group walks</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer" 
-                  onClick={() => navigate('/pet-social')}>
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-purple-600" />
-                </div>
-                <CardTitle className="text-xl text-gray-800">Pet Social Network</CardTitle>
-                <CardDescription>Connect your pets with new friends</CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-
-          {/* Recent Pets */}
-          {pets.length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                  Your Recent Pets
-                  <Heart className="h-5 w-5 text-red-500" />
-                </h2>
-                <Button
-                  onClick={() => navigate('/my-pets')}
-                  variant="outline"
-                  className="border-green-500 text-green-600 hover:bg-green-50"
-                >
-                  View All Pets
-                </Button>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Feed - Takes up 2/3 on large screens */}
+            <div className="lg:col-span-2">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">Community Feed</h2>
+                <p className="text-gray-600">See what's happening in your pet network</p>
               </div>
+              <SocialFeed />
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {pets.map((pet) => (
-                  <Card key={pet.id} className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200">
-                    <CardContent className="p-6">
-                      <div className="flex flex-col items-center text-center">
-                        <Avatar className="w-20 h-20 mb-4 border-4 border-green-200">
+            {/* Sidebar - Takes up 1/3 on large screens */}
+            <div className="space-y-6">
+              {/* Quick Actions */}
+              <Card className="bg-white shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-lg">Quick Actions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button
+                    onClick={() => navigate('/create-pet-profile')}
+                    className="w-full justify-start bg-green-600 hover:bg-green-700"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Pet Profile
+                  </Button>
+                  
+                  <Button
+                    onClick={() => navigate('/my-pets')}
+                    variant="outline"
+                    className="w-full justify-start border-blue-500 text-blue-600 hover:bg-blue-50"
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    My Pets Dashboard
+                  </Button>
+                  
+                  <Button
+                    onClick={() => navigate('/events')}
+                    variant="outline"
+                    className="w-full justify-start border-orange-500 text-orange-600 hover:bg-orange-50"
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    Events & Meetups
+                  </Button>
+                  
+                  <Button
+                    onClick={() => navigate('/pet-social')}
+                    variant="outline"
+                    className="w-full justify-start border-purple-500 text-purple-600 hover:bg-purple-50"
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    Pet Social Network
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Recent Pets */}
+              {pets.length > 0 && (
+                <Card className="bg-white shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      Your Pets
+                      <Heart className="h-4 w-4 text-red-500" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {pets.map((pet) => (
+                      <div key={pet.id} className="flex items-center space-x-3">
+                        <Avatar className="w-12 h-12 border-2 border-green-200">
                           <AvatarImage src={pet.profile_photo_url || ''} alt={pet.name} />
-                          <AvatarFallback className="bg-green-100 text-green-600 text-xl">
+                          <AvatarFallback className="bg-green-100 text-green-600">
                             {pet.name.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">{pet.name}</h3>
-                        
-                        <div className="text-sm text-gray-600 mb-4 space-y-1">
-                          <p><span className="font-medium">Breed:</span> {pet.breed}</p>
-                          {pet.age && <p><span className="font-medium">Age:</span> {pet.age} years old</p>}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-800 truncate">{pet.name}</p>
+                          <p className="text-sm text-gray-600 truncate">{pet.breed}</p>
                         </div>
                         
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="ghost"
                           onClick={() => navigate(`/edit-pet-profile/${pet.id}`)}
-                          className="border-green-500 text-green-600 hover:bg-green-50"
+                          className="text-green-600 hover:bg-green-50"
                         >
-                          <Edit className="w-4 h-4 mr-1" />
-                          Edit Profile
+                          <Edit className="w-4 h-4" />
                         </Button>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
+                    ))}
+                    
+                    <Button
+                      onClick={() => navigate('/my-pets')}
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-3"
+                    >
+                      View All Pets
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
 
-          {/* Welcome Message for New Users */}
-          {pets.length === 0 && (
-            <Card className="bg-white shadow-lg">
-              <CardContent className="p-12 text-center">
-                <PawPrint className="w-16 h-16 mx-auto mb-6 text-gray-400" />
-                <h2 className="text-2xl font-semibold text-gray-700 mb-4">Welcome to Social Petwork!</h2>
-                <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-                  You haven't created any pet profiles yet. Get started by creating your first pet profile 
-                  and join our amazing pet community!
-                </p>
-                <Button
-                  onClick={() => navigate('/create-pet-profile')}
-                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Create Your First Pet Profile
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+              {/* Welcome Message for New Users */}
+              {pets.length === 0 && (
+                <Card className="bg-white shadow-lg">
+                  <CardContent className="p-6 text-center">
+                    <PawPrint className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Get Started!</h3>
+                    <p className="text-gray-600 text-sm mb-4">
+                      Create your first pet profile to join the community.
+                    </p>
+                    <Button
+                      onClick={() => navigate('/create-pet-profile')}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      size="sm"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Create Pet Profile
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
