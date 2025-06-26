@@ -1,1 +1,40 @@
+
 project_id = "jiezjfwsbemcmtbsoifi"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public"]
+max_rows = 1000
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[inbound_email]
+enabled = false
+
+[storage]
+enabled = true
+port = 54324
+image_transformation = {enabled = true}
+
+[auth]
+enabled = true
+port = 54325
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://lovable.dev"]
+jwt_expiry = 3600
+refresh_token_rotation_enabled = true
+security_update_password_require_reauthentication = true
+
+[edge_functions]
+enabled = true
+port = 54326
+
+[functions.send-playdate-notification]
+verify_jwt = false
