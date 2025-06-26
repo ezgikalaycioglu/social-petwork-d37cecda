@@ -55,41 +55,53 @@ export type Database = {
         Row: {
           about: string | null
           age: number | null
+          bio: string | null
           breed: string
           created_at: string
           gender: string | null
           id: string
           name: string
+          personality_traits: string[] | null
+          photos: string[] | null
           profile_photo_url: string | null
           unique_code: string | null
           updated_at: string
           user_id: string
+          vaccination_status: string | null
         }
         Insert: {
           about?: string | null
           age?: number | null
+          bio?: string | null
           breed: string
           created_at?: string
           gender?: string | null
           id?: string
           name: string
+          personality_traits?: string[] | null
+          photos?: string[] | null
           profile_photo_url?: string | null
           unique_code?: string | null
           updated_at?: string
           user_id: string
+          vaccination_status?: string | null
         }
         Update: {
           about?: string | null
           age?: number | null
+          bio?: string | null
           breed?: string
           created_at?: string
           gender?: string | null
           id?: string
           name?: string
+          personality_traits?: string[] | null
+          photos?: string[] | null
           profile_photo_url?: string | null
           unique_code?: string | null
           updated_at?: string
           user_id?: string
+          vaccination_status?: string | null
         }
         Relationships: []
       }

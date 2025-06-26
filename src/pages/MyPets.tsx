@@ -5,8 +5,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Heart, Edit, Trash2, PawPrint } from 'lucide-react';
+import { Plus, Heart, Edit, Trash2, PawPrint, Image } from 'lucide-react';
+import Layout from '@/components/Layout';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -83,17 +85,19 @@ const MyPets = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50 flex items-center justify-center">
-        <div className="text-center">
-          <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
-          <p className="text-gray-600">Loading your pets...</p>
+      <Layout>
+        <div className="flex items-center justify-center py-32">
+          <div className="text-center">
+            <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
+            <p className="text-gray-600">Loading your pets...</p>
+          </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50">
+    <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -143,15 +147,42 @@ const MyPets = () => {
                       
                       <h3 className="text-xl font-bold text-gray-800 mb-2">{pet.name}</h3>
                       
-                      <div className="text-sm text-gray-600 mb-4 space-y-1">
+                      <div className="text-sm text-gray-600 mb-3 space-y-1">
                         <p><span className="font-medium">Breed:</span> {pet.breed}</p>
                         {pet.age && <p><span className="font-medium">Age:</span> {pet.age} years old</p>}
                         {pet.gender && <p><span className="font-medium">Gender:</span> {pet.gender}</p>}
+                        {pet.vaccination_status && (
+                          <p><span className="font-medium">Vaccination:</span> {pet.vaccination_status}</p>
+                        )}
                       </div>
+
+                      {/* Additional Photos Count */}
+                      {pet.photos && pet.photos.length > 0 && (
+                        <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
+                          <Image className="w-4 h-4" />
+                          <span>{pet.photos.length} additional photo{pet.photos.length > 1 ? 's' : ''}</span>
+                        </div>
+                      )}
                       
-                      {pet.about && (
+                      {/* Personality Traits */}
+                      {pet.personality_traits && pet.personality_traits.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-3 justify-center">
+                          {pet.personality_traits.slice(0, 3).map((trait, index) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              {trait}
+                            </Badge>
+                          ))}
+                          {pet.personality_traits.length > 3 && (
+                            <Badge variant="secondary" className="text-xs">
+                              +{pet.personality_traits.length - 3} more
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                      
+                      {(pet.bio || pet.about) && (
                         <p className="text-gray-700 text-sm mb-4 line-clamp-3">
-                          {pet.about}
+                          {pet.bio || pet.about}
                         </p>
                       )}
                       
@@ -183,7 +214,7 @@ const MyPets = () => {
           )}
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
