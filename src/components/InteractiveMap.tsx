@@ -48,25 +48,25 @@ const LocationTracker: React.FC<{ onLocationUpdate: (lat: number, lng: number) =
   const map = useMap();
   
   useEffect(() => {
-    if (navigator.geolocation) {
-      const watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          onLocationUpdate(latitude, longitude);
-          map.setView([latitude, longitude], map.getZoom());
-        },
-        (error) => {
-          console.error('Error watching position:', error);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000,
-        }
-      );
+    if (!navigator.geolocation) return;
 
-      return () => navigator.geolocation.clearWatch(watchId);
-    }
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        onLocationUpdate(latitude, longitude);
+        map.setView([latitude, longitude], map.getZoom());
+      },
+      (error) => {
+        console.error('Error watching position:', error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000,
+      }
+    );
+
+    return () => navigator.geolocation.clearWatch(watchId);
   }, [map, onLocationUpdate]);
 
   return null;
@@ -80,7 +80,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [nearbyPets, setNearbyPets] = useState<PetProfile[]>([]);
-  const [selectedPet, setSelectedPet] = useState<PetProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [locationPermission, setLocationPermission] = useState<boolean>(false);
   const channelRef = useRef<any>(null);
@@ -90,14 +89,18 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   useEffect(() => {
     initializeLocation();
-    setupRealtimeListener();
-    
     return () => {
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (locationPermission) {
+      setupRealtimeListener();
+    }
+  }, [locationPermission]);
 
   const initializeLocation = async () => {
     try {
@@ -139,6 +142,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   };
 
   const setupRealtimeListener = () => {
+    fetchNearbyPets();
+    
     // Listen for real-time updates to pet locations
     channelRef.current = supabase
       .channel('pet-locations')
@@ -155,12 +160,12 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         }
       )
       .subscribe();
-
-    fetchNearbyPets();
   };
 
   const fetchNearbyPets = async () => {
     try {
+      console.log('Fetching nearby pets...');
+      
       const { data, error } = await supabase
         .from('pet_profiles')
         .select('*')
@@ -168,11 +173,20 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         .not('latitude', 'is', null)
         .not('longitude', 'is', null);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching nearby pets:', error);
+        throw error;
+      }
 
+      console.log('Fetched nearby pets:', data);
       setNearbyPets(data || []);
     } catch (error) {
       console.error('Error fetching nearby pets:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load nearby pets.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -189,6 +203,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     try {
       const [latitude, longitude] = currentLocation;
       
+      console.log('Updating availability status:', { available, latitude, longitude, petCount: userPets.length });
+      
       // Update all user's pets
       const updates = userPets.map(pet => 
         supabase
@@ -202,7 +218,14 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           .eq('id', pet.id)
       );
 
-      await Promise.all(updates);
+      const results = await Promise.all(updates);
+      
+      // Check for errors in any of the updates
+      const errors = results.filter(result => result.error);
+      if (errors.length > 0) {
+        console.error('Update errors:', errors);
+        throw new Error('Failed to update some pets');
+      }
       
       setIsReady(available);
       
@@ -308,7 +331,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           </Marker>
         )}
 
-        {/* Pet markers - only show pets that have location data */}
+        {/* Pet markers - only show pets that have location data and are not user's pets */}
         {nearbyPets
           .filter(pet => 
             !userPets.some(userPet => userPet.id === pet.id) && 
@@ -339,7 +362,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   <Button
                     size="sm"
                     className="bg-green-600 hover:bg-green-700 text-white"
-                    onClick={() => setSelectedPet(pet)}
+                    onClick={() => console.log('View profile for pet:', pet.id)}
                   >
                     View Profile
                   </Button>

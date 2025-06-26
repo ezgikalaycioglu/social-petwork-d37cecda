@@ -15,6 +15,7 @@ const PetMap = () => {
   const { toast } = useToast();
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     checkAuthAndFetchData();
@@ -22,16 +23,31 @@ const PetMap = () => {
 
   const checkAuthAndFetchData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      console.log('Checking authentication...');
       
-      if (!user) {
+      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        console.error('Auth error:', userError);
+        throw userError;
+      }
+      
+      if (!currentUser) {
+        console.log('No user found, redirecting to auth');
         navigate('/auth');
         return;
       }
 
-      await fetchUserPets(user.id);
+      console.log('User authenticated:', currentUser.id);
+      setUser(currentUser);
+      await fetchUserPets(currentUser.id);
     } catch (error) {
       console.error('Error checking auth:', error);
+      toast({
+        title: "Authentication Error",
+        description: "Please log in to access the pet map.",
+        variant: "destructive",
+      });
       navigate('/auth');
     } finally {
       setLoading(false);
@@ -40,13 +56,20 @@ const PetMap = () => {
 
   const fetchUserPets = async (userId: string) => {
     try {
+      console.log('Fetching user pets for:', userId);
+      
       const { data, error } = await supabase
         .from('pet_profiles')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching pets:', error);
+        throw error;
+      }
+
+      console.log('Fetched pets:', data);
       setPets(data || []);
     } catch (error) {
       console.error('Error fetching pets:', error);
@@ -64,6 +87,12 @@ const PetMap = () => {
         title: "Location Enabled",
         description: "You can now find pets near you and share your location!",
       });
+    } else {
+      toast({
+        title: "Location Disabled",
+        description: "Enable location access for the full pet map experience.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -74,6 +103,26 @@ const PetMap = () => {
           <div className="text-center">
             <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
             <p className="text-gray-600">Loading pet map...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-32">
+          <div className="text-center">
+            <PawPrint className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <h2 className="text-2xl font-semibold text-gray-700 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-6">Please log in to access the pet map.</p>
+            <button
+              onClick={() => navigate('/auth')}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium"
+            >
+              Log In
+            </button>
           </div>
         </div>
       </Layout>
