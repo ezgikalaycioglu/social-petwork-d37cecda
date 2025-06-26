@@ -50,7 +50,7 @@ const SocialFeed: React.FC = () => {
 
       if (error) throw error;
 
-      const newItems = data || [];
+      const newItems = (data || []) as FeedItem[];
 
       if (isInitial) {
         setFeedItems(newItems);
