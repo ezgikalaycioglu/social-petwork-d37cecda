@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Home, PawPrint, Users, User, Settings, LogOut, Menu, X, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import SocialPetworkLogo from './SocialPetworkLogo';
+import AuthButton from './AuthButton';
 
 const GlobalNavBar = () => {
   const [user, setUser] = useState<any>(null);
@@ -53,35 +54,50 @@ const GlobalNavBar = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-white shadow-lg border-b-2 border-green-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <SocialPetworkLogo className="h-8 w-8" />
-            <span className="text-xl font-bold text-gray-800 hidden sm:block">
-              Social Petwork
-            </span>
-          </Link>
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <Link to="/dashboard" className="flex items-center space-x-2">
+              <SocialPetworkLogo className="h-10 w-auto" />
+              <span className="text-xl font-bold text-green-600">Social Petwork</span>
+            </Link>
+          </div>
 
-          {/* Desktop Navigation */}
-          {user && (
-            <div className="hidden md:flex items-center space-x-6">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className="flex items-center space-x-1 text-gray-600 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
+          <div className="hidden md:flex items-center space-x-4">
+            <Link 
+              to="/dashboard" 
+              className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              Dashboard
+            </Link>
+            <Link 
+              to="/my-pets" 
+              className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              My Pets
+            </Link>
+            <Link 
+              to="/pet-social" 
+              className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              Social
+            </Link>
+            <Link 
+              to="/events" 
+              className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              Events
+            </Link>
+            <Link 
+              to="/pet-map" 
+              className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              Map
+            </Link>
+            
+            <AuthButton />
+          </div>
 
           {/* User Menu */}
           <div className="flex items-center space-x-4">

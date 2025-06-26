@@ -9,6 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      events: {
+        Row: {
+          created_at: string
+          creator_id: string
+          event_type: string
+          id: string
+          location_lat: number | null
+          location_lon: number | null
+          location_name: string
+          message: string | null
+          participants: string[]
+          scheduled_time: string
+          status: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          event_type: string
+          id?: string
+          location_lat?: number | null
+          location_lon?: number | null
+          location_name: string
+          message?: string | null
+          participants?: string[]
+          scheduled_time: string
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          event_type?: string
+          id?: string
+          location_lat?: number | null
+          location_lon?: number | null
+          location_name?: string
+          message?: string | null
+          participants?: string[]
+          scheduled_time?: string
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           created_at: string | null

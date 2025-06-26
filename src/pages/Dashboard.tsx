@@ -115,6 +115,17 @@ const Dashboard = () => {
             </Card>
 
             <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer" 
+                  onClick={() => navigate('/events')}>
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-orange-600" />
+                </div>
+                <CardTitle className="text-xl text-gray-800">My Events</CardTitle>
+                <CardDescription>Manage playdates and group walks</CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer" 
                   onClick={() => navigate('/pet-social')}>
               <CardHeader className="text-center pb-4">
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -122,17 +133,6 @@ const Dashboard = () => {
                 </div>
                 <CardTitle className="text-xl text-gray-800">Pet Social Network</CardTitle>
                 <CardDescription>Connect your pets with new friends</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer" 
-                  onClick={() => navigate('/pet-map')}>
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MapPin className="w-8 h-8 text-red-600" />
-                </div>
-                <CardTitle className="text-xl text-gray-800">Pet Map</CardTitle>
-                <CardDescription>Find pets near you and share your location</CardDescription>
               </CardHeader>
             </Card>
           </div>

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +14,7 @@ import PetSocial from "./pages/PetSocial";
 import UserSettings from "./pages/UserSettings";
 import PetMap from "./pages/PetMap";
 import NotFound from "./pages/NotFound";
+import Events from "./pages/Events";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +34,7 @@ const App = () => (
           <Route path="/edit-pet-profile/:petId" element={<EditPetProfile />} />
           <Route path="/pet-social" element={<PetSocial />} />
           <Route path="/pet-map" element={<PetMap />} />
+          <Route path="/events" element={<Events />} />
           <Route path="/settings" element={<UserSettings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
