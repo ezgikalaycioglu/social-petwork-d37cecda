@@ -1,23 +1,27 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Heart, Plus, Edit, Trash2, Camera } from 'lucide-react';
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Heart, Edit, Trash2, PawPrint, Image } from 'lucide-react';
-import Layout from '@/components/Layout';
-import type { Tables } from '@/integrations/supabase/types';
+import GlobalNavBar from '@/components/GlobalNavBar';
 
-type PetProfile = Tables<'pet_profiles'>;
+interface PetProfile {
+  id: string;
+  name: string;
+  breed: string;
+  age: number | null;
+  profile_photo_url: string | null;
+}
 
 const MyPets = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchPets();
@@ -25,39 +29,28 @@ const MyPets = () => {
 
   const fetchPets = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        navigate('/auth');
-        return;
-      }
-
+      setLoading(true);
       const { data, error } = await supabase
         .from('pet_profiles')
-        .select('*')
-        .eq('user_id', user.id)
+        .select('id, name, breed, age, profile_photo_url')
         .order('created_at', { ascending: false });
 
       if (error) {
-        throw error;
+        console.error('Error fetching pets:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load pet profiles",
+          variant: "destructive",
+        });
+      } else {
+        setPets(data || []);
       }
-
-      setPets(data || []);
-    } catch (error) {
-      console.error('Error fetching pets:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load your pets.",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
   };
 
-  const deletePet = async (petId: string) => {
-    if (!confirm('Are you sure you want to delete this pet profile?')) return;
-
+  const handleDeletePet = async (petId: string) => {
     try {
       const { error } = await supabase
         .from('pet_profiles')
@@ -65,156 +58,150 @@ const MyPets = () => {
         .eq('id', petId);
 
       if (error) {
-        throw error;
+        console.error('Error deleting pet:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete pet profile",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success!",
+          description: "Pet profile deleted successfully!",
+        });
+        fetchPets(); // Refresh the pet list
       }
-
-      setPets(pets.filter(pet => pet.id !== petId));
-      toast({
-        title: "Success",
-        description: "Pet profile deleted successfully.",
-      });
     } catch (error) {
-      console.error('Error deleting pet:', error);
+      console.error('Unexpected error deleting pet:', error);
       toast({
-        title: "Error",
-        description: "Failed to delete pet profile.",
+        title: "Unexpected Error",
+        description: "An unexpected error occurred while deleting the pet profile.",
         variant: "destructive",
       });
     }
   };
 
-  if (loading) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center py-32">
-          <div className="text-center">
-            <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
-            <p className="text-gray-600">Loading your pets...</p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
   return (
-    <Layout>
+    <div className="min-h-screen bg-gray-50">
+      <GlobalNavBar />
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                My Pets
-                <Heart className="h-6 w-6 text-red-500" />
-              </h1>
-              <p className="text-gray-600 mt-1">Manage your furry friends' profiles</p>
-            </div>
-            <Button
-              onClick={() => navigate('/create-pet-profile')}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add New Pet
-            </Button>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">My Pets</h1>
+          <p className="text-gray-600">Manage your pet profiles and their adventures</p>
+        </div>
 
-          {/* Pet Cards */}
-          {pets.length === 0 ? (
-            <div className="text-center py-12">
-              <PawPrint className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <h2 className="text-2xl font-semibold text-gray-700 mb-2">No pets yet!</h2>
-              <p className="text-gray-600 mb-6">Create your first pet profile to get started.</p>
-              <Button
-                onClick={() => navigate('/create-pet-profile')}
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Pet Profile
-              </Button>
-            </div>
-          ) : (
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map(i => (
+              <Card key={i} className="animate-pulse">
+                <CardContent className="p-6">
+                  <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-2/3 mx-auto"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : pets.length === 0 ? (
+          <Card className="p-8 text-center">
+            <CardContent>
+              <div className="mb-6">
+                <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Heart className="w-12 h-12 text-green-600" />
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-2">No pets yet!</h2>
+                <p className="text-gray-600 mb-6">Create your first pet profile to get started</p>
+                <Button 
+                  onClick={() => navigate('/create-pet-profile')}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Pet Profile
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {pets.map((pet) => (
-                <Card key={pet.id} className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200">
+                <Card key={pet.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
-                    <div className="flex flex-col items-center text-center">
-                      <Avatar className="w-24 h-24 mb-4 border-4 border-green-200">
+                    <div className="text-center mb-4">
+                      <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-green-200">
                         <AvatarImage src={pet.profile_photo_url || ''} alt={pet.name} />
                         <AvatarFallback className="bg-green-100 text-green-600 text-2xl">
-                          {pet.name.charAt(0).toUpperCase()}
+                          {pet.name.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
-                      
-                      <h3 className="text-xl font-bold text-gray-800 mb-2">{pet.name}</h3>
-                      
-                      <div className="text-sm text-gray-600 mb-3 space-y-1">
-                        <p><span className="font-medium">Breed:</span> {pet.breed}</p>
-                        {pet.age && <p><span className="font-medium">Age:</span> {pet.age} years old</p>}
-                        {pet.gender && <p><span className="font-medium">Gender:</span> {pet.gender}</p>}
-                        {pet.vaccination_status && (
-                          <p><span className="font-medium">Vaccination:</span> {pet.vaccination_status}</p>
-                        )}
-                      </div>
+                      <h3 className="text-xl font-semibold text-gray-800">{pet.name}</h3>
+                      <p className="text-gray-600">{pet.breed}</p>
+                      {pet.age && <p className="text-sm text-gray-500">{pet.age} years old</p>}
+                    </div>
 
-                      {/* Additional Photos Count */}
-                      {pet.photos && pet.photos.length > 0 && (
-                        <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
-                          <Image className="w-4 h-4" />
-                          <span>{pet.photos.length} additional photo{pet.photos.length > 1 ? 's' : ''}</span>
-                        </div>
-                      )}
+                    <div className="space-y-2">
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => navigate(`/edit-pet-profile/${pet.id}`)}
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit Profile
+                      </Button>
                       
-                      {/* Personality Traits */}
-                      {pet.personality_traits && pet.personality_traits.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-3 justify-center">
-                          {pet.personality_traits.slice(0, 3).map((trait, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {trait}
-                            </Badge>
-                          ))}
-                          {pet.personality_traits.length > 3 && (
-                            <Badge variant="secondary" className="text-xs">
-                              +{pet.personality_traits.length - 3} more
-                            </Badge>
-                          )}
-                        </div>
-                      )}
-                      
-                      {(pet.bio || pet.about) && (
-                        <p className="text-gray-700 text-sm mb-4 line-clamp-3">
-                          {pet.bio || pet.about}
-                        </p>
-                      )}
-                      
-                      <div className="flex gap-2 mt-auto">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => navigate(`/edit-pet-profile/${pet.id}`)}
-                          className="border-green-500 text-green-600 hover:bg-green-50"
-                        >
-                          <Edit className="w-4 h-4 mr-1" />
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => deletePet(pet.id)}
-                          className="border-red-500 text-red-600 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Delete
-                        </Button>
-                      </div>
+                      <Button
+                        variant="outline"
+                        className="w-full border-green-500 text-green-600 hover:bg-green-50"
+                        onClick={() => navigate(`/pet-adventures/${pet.id}`)}
+                      >
+                        <Camera className="w-4 h-4 mr-2" />
+                        View Adventures
+                      </Button>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" className="w-full text-red-600 hover:bg-red-50">
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete {pet.name}'s profile?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete {pet.name}'s profile and all associated data.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeletePet(pet.id)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
-          )}
-        </div>
+
+            <div className="mt-8 text-center">
+              <Button 
+                onClick={() => navigate('/create-pet-profile')}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Another Pet
+              </Button>
+            </div>
+          </>
+        )}
       </div>
-    </Layout>
+    </div>
   );
 };
 

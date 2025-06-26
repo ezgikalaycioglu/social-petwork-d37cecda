@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +16,7 @@ import UserSettings from "./pages/UserSettings";
 import PetMap from "./pages/PetMap";
 import NotFound from "./pages/NotFound";
 import Events from "./pages/Events";
+import PetAdventures from "./pages/PetAdventures";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +37,7 @@ const App = () => (
           <Route path="/pet-social" element={<PetSocial />} />
           <Route path="/pet-map" element={<PetMap />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/pet-adventures/:petId" element={<PetAdventures />} />
           <Route path="/settings" element={<UserSettings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
