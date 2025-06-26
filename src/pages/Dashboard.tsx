@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,10 +23,14 @@ const Dashboard = () => {
   const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
-    // Track page view
-    trackPageView('Dashboard', '/dashboard');
+    // Track page view safely
+    try {
+      trackPageView('Dashboard', '/dashboard');
+    } catch (error) {
+      console.warn('Analytics tracking failed:', error);
+    }
     checkAuthAndFetchData();
-  }, [trackPageView]);
+  }, []);
 
   const checkAuthAndFetchData = async () => {
     try {
@@ -71,10 +76,14 @@ const Dashboard = () => {
   };
 
   const handleQuickAction = (action: string, path: string) => {
-    trackEvent('Feature Accessed', {
-      feature_name: action,
-      source: 'dashboard_quick_actions',
-    });
+    try {
+      trackEvent('Feature Accessed', {
+        feature_name: action,
+        source: 'dashboard_quick_actions',
+      });
+    } catch (error) {
+      console.warn('Analytics tracking failed:', error);
+    }
     navigate(path);
   };
 
