@@ -88,7 +88,7 @@ const CreatePetProfile = () => {
         throw error;
       }
 
-      // Track analytics event
+      // Track analytics event with correct property names
       trackEvent('Pet Profile Created', {
         pet_breed: data.breed,
         pet_age: data.age ? parseInt(data.age) : undefined,
