@@ -30,11 +30,13 @@ const DiscoverPets = ({ userPetIds, onFriendRequestSent }: DiscoverPetsProps) =>
   const fetchAvailablePets = async () => {
     setLoading(true);
     try {
+      // Now we can fetch from all pet profiles since RLS allows public viewing
+      // Filter out user's own pets and get a broader selection
       const { data, error } = await supabase
         .from('pet_profiles')
         .select('*')
-        .not('id', 'in', `(${userPetIds.join(',')})`)
-        .limit(9);
+        .not('id', 'in', userPetIds.length > 0 ? `(${userPetIds.join(',')})` : '()')
+        .limit(12);
 
       if (error) throw error;
       setAvailablePets(data || []);

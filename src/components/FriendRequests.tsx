@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -37,6 +36,8 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
     }
 
     try {
+      // With the new RLS policies, we can now properly fetch friend requests
+      // The join with pet_profiles will work since all profiles are now viewable
       const { data, error } = await supabase
         .from('pet_friendships')
         .select(`

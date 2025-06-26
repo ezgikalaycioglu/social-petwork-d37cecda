@@ -30,6 +30,8 @@ const MyPets = () => {
   const fetchPets = async () => {
     try {
       setLoading(true);
+      // With the new RLS policies, we can still fetch our own pets normally
+      // The policy "Users can update their own pet profiles" handles ownership checks
       const { data, error } = await supabase
         .from('pet_profiles')
         .select('id, name, breed, age, profile_photo_url')

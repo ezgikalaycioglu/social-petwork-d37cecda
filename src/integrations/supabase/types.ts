@@ -142,6 +142,13 @@ export type Database = {
             referencedRelation: "pet_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "deal_redemptions_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       deals: {
@@ -345,10 +352,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "pet_friendships_recipient_pet_id_fkey"
+            columns: ["recipient_pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "pet_friendships_requester_pet_id_fkey"
             columns: ["requester_pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pet_friendships_requester_pet_id_fkey"
+            columns: ["requester_pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -487,6 +508,69 @@ export type Database = {
           title: string | null
           user_display_name: string | null
           user_id: string | null
+        }
+        Relationships: []
+      }
+      pet_profiles_public: {
+        Row: {
+          about: string | null
+          age: number | null
+          approx_latitude: number | null
+          approx_longitude: number | null
+          bio: string | null
+          breed: string | null
+          created_at: string | null
+          gender: string | null
+          id: string | null
+          is_available: boolean | null
+          name: string | null
+          personality_traits: string[] | null
+          photos: string[] | null
+          profile_photo_url: string | null
+          unique_code: string | null
+          updated_at: string | null
+          user_id: string | null
+          vaccination_status: string | null
+        }
+        Insert: {
+          about?: string | null
+          age?: number | null
+          approx_latitude?: never
+          approx_longitude?: never
+          bio?: string | null
+          breed?: string | null
+          created_at?: string | null
+          gender?: string | null
+          id?: string | null
+          is_available?: boolean | null
+          name?: string | null
+          personality_traits?: string[] | null
+          photos?: string[] | null
+          profile_photo_url?: string | null
+          unique_code?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          vaccination_status?: string | null
+        }
+        Update: {
+          about?: string | null
+          age?: number | null
+          approx_latitude?: never
+          approx_longitude?: never
+          bio?: string | null
+          breed?: string | null
+          created_at?: string | null
+          gender?: string | null
+          id?: string | null
+          is_available?: boolean | null
+          name?: string | null
+          personality_traits?: string[] | null
+          photos?: string[] | null
+          profile_photo_url?: string | null
+          unique_code?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          vaccination_status?: string | null
         }
         Relationships: []
       }
