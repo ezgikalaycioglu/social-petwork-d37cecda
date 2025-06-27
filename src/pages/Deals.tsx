@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { useAuthAndFetch } from '@/hooks/useAuthAndFetch';
 import { Gift, MapPin, Clock, Percent, DollarSign } from 'lucide-react';
 import Layout from '@/components/Layout';
 import ClaimDealModal from '@/components/ClaimDealModal';
@@ -20,16 +19,10 @@ const Deals = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [deals, setDeals] = useState<Deal[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [user, setUser] = useState<any>(null);
-
-  const { checkAuthAndFetchData, loading } = useAuthAndFetch({
-    onSuccess: async (userId: string) => {
-      setUser({ id: userId });
-      await fetchDeals();
-    }
-  });
 
   const categories = [
     { value: 'all', label: 'All Categories' },
@@ -43,9 +36,28 @@ const Deals = () => {
 
   useEffect(() => {
     checkAuthAndFetchData();
-  }, [checkAuthAndFetchData]);
+  }, []);
 
-  async function fetchDeals() {
+  const checkAuthAndFetchData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
+
+      setUser(user);
+      await fetchDeals();
+    } catch (error) {
+      console.error('Error checking auth:', error);
+      navigate('/auth');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDeals = async () => {
     try {
       const { data, error } = await supabase
         .from('deals')
@@ -67,7 +79,7 @@ const Deals = () => {
         variant: "destructive",
       });
     }
-  }
+  };
 
   const filteredDeals = deals.filter(deal => 
     filterCategory === 'all' || deal.business_profiles?.business_category === filterCategory

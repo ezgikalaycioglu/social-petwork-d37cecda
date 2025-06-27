@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useAuthAndFetch } from '@/hooks/useAuthAndFetch';
 import { PawPrint } from 'lucide-react';
 import Layout from '@/components/Layout';
 import InteractiveMap from '@/components/InteractiveMap';
@@ -15,21 +14,47 @@ const PetMap = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [pets, setPets] = useState<PetProfile[]>([]);
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
-
-  const { checkAuthAndFetchData, loading } = useAuthAndFetch({
-    onSuccess: async (userId: string) => {
-      console.log('User authenticated:', userId);
-      setUser({ id: userId });
-      await fetchUserPets(userId);
-    }
-  });
 
   useEffect(() => {
     checkAuthAndFetchData();
-  }, [checkAuthAndFetchData]);
+  }, []);
 
-  async function fetchUserPets(userId: string) {
+  const checkAuthAndFetchData = async () => {
+    try {
+      console.log('Checking authentication...');
+      
+      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        console.error('Auth error:', userError);
+        throw userError;
+      }
+      
+      if (!currentUser) {
+        console.log('No user found, redirecting to auth');
+        navigate('/auth');
+        return;
+      }
+
+      console.log('User authenticated:', currentUser.id);
+      setUser(currentUser);
+      await fetchUserPets(currentUser.id);
+    } catch (error) {
+      console.error('Error checking auth:', error);
+      toast({
+        title: "Authentication Error",
+        description: "Please log in to access the pet map.",
+        variant: "destructive",
+      });
+      navigate('/auth');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUserPets = async (userId: string) => {
     try {
       console.log('Fetching user pets for:', userId);
       
@@ -54,7 +79,7 @@ const PetMap = () => {
         variant: "destructive",
       });
     }
-  }
+  };
 
   const handleLocationPermissionChange = (granted: boolean) => {
     if (granted) {

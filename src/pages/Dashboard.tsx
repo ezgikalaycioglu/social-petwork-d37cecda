@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { useAnalytics } from '@/hooks/useAnalytics';
-import { useAuthAndFetch } from '@/hooks/useAuthAndFetch';
 import { Plus, Heart, Eye, Edit, PawPrint, Users, MapPin } from 'lucide-react';
 import Layout from '@/components/Layout';
 import SocialFeed from '@/components/SocialFeed';
@@ -20,10 +18,8 @@ const Dashboard = () => {
   const { toast } = useToast();
   const { trackPageView, trackEvent } = useAnalytics();
   const [pets, setPets] = useState<PetProfile[]>([]);
-
-  const { checkAuthAndFetchData, loading, userEmail } = useAuthAndFetch({
-    onSuccess: fetchPets
-  });
+  const [loading, setLoading] = useState(true);
+  const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
     // Track page view safely
@@ -33,9 +29,45 @@ const Dashboard = () => {
       console.warn('Analytics tracking failed:', error);
     }
     checkAuthAndFetchData();
-  }, [checkAuthAndFetchData, trackPageView]);
+  }, []);
 
-  async function fetchPets(userId: string) {
+   const checkAuthAndFetchData = async () => {
+      try {
+        // 1. Önce üst seviye objeleri güvenli bir şekilde al
+        const { data, error: authError } = await supabase.auth.getUser(); 
+  
+        console.log("Auth response:", { data, authError });
+  
+        // 2. Hata varsa veya kullanıcı bilgisi (data.user) yoksa kontrol et
+        // data?.user kullanımı, 'data' null ise hata vermesini engeller (optional chaining)
+        if (authError || !data?.user) {
+          console.error('Authentication error or no user:', authError?.message || 'No user found');
+          navigate('/auth');
+          return; // Fonksiyonun devam etmesini engelle
+        }
+  
+        // 3. Artık 'user' objesinin varlığından eminiz, şimdi kullanabiliriz.
+        const { user } = data;
+    
+        setUserEmail(user.email || '');
+        await fetchPets(user.id);
+  
+      } catch (outerError) {
+        // Bu catch bloğu, kodunuzdaki diğer beklenmedik hataları yakalar (örn: fetchPets içindeki bir hata)
+        console.error('Caught an unexpected error during auth/fetch process:', outerError);
+        toast({
+          title: "An Unexpected Error Occurred",
+          description: "Please try logging in again.",
+          variant: "destructive",
+        });
+        navigate('/auth');
+      } finally {
+        // Bu blok her zaman çalışır (return kullanılsa bile)
+        setLoading(false); 
+      }
+    };
+
+  const fetchPets = async (userId: string) => {
     console.log(userId)
     try {
       const { data, error } = await supabase
@@ -61,7 +93,7 @@ const Dashboard = () => {
         variant: "destructive",
       });
     }
-  }
+  };
 
   const handleQuickAction = (action: string, path: string) => {
     try {

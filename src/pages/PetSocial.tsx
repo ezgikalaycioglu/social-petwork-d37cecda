@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useAuthAndFetch } from '@/hooks/useAuthAndFetch';
 import { ArrowLeft, PawPrint } from 'lucide-react';
 import Layout from '@/components/Layout';
 import DiscoverPets from '@/components/DiscoverPets';
@@ -18,17 +17,32 @@ const PetSocial = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [pets, setPets] = useState<PetProfile[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
-
-  const { checkAuthAndFetchData, loading } = useAuthAndFetch({
-    onSuccess: fetchUserPets
-  });
 
   useEffect(() => {
     checkAuthAndFetchData();
-  }, [checkAuthAndFetchData]);
+  }, []);
 
-  async function fetchUserPets(userId: string) {
+  const checkAuthAndFetchData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
+
+      await fetchUserPets(user.id);
+    } catch (error) {
+      console.error('Error checking auth:', error);
+      navigate('/auth');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUserPets = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('pet_profiles')
@@ -46,7 +60,7 @@ const PetSocial = () => {
         variant: "destructive",
       });
     }
-  }
+  };
 
   const handleRefresh = () => {
     setRefreshKey(prev => prev + 1);
