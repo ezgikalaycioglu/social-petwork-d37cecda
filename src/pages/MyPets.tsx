@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Heart, Plus, Edit, Trash2, Camera } from 'lucide-react';
+import { Heart, Plus, Edit, Trash2, Camera, PawPrint } from 'lucide-react';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 import GlobalNavBar from '@/components/GlobalNavBar';
@@ -20,39 +21,96 @@ interface PetProfile {
 const MyPets = () => {
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchPets();
+    checkAuthAndFetchPets();
   }, []);
 
-  const fetchPets = async () => {
+  const checkAuthAndFetchPets = async () => {
     try {
-      setLoading(true);
-      // With the new RLS policies, we can still fetch our own pets normally
-      // The policy "Users can update their own pet profiles" handles ownership checks
+      // Check if user is authenticated
+      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        console.error('Auth error:', userError);
+        throw userError;
+      }
+      
+      if (!currentUser) {
+        console.log('No user found, redirecting to auth');
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to view your pets.",
+          variant: "destructive",
+        });
+        navigate('/auth');
+        return;
+      }
+
+      console.log('User authenticated:', currentUser.id);
+      setUser(currentUser);
+      
+      // Fetch pets belonging to the authenticated user
+      await fetchUserPets(currentUser.id);
+    } catch (error) {
+      console.error('Error checking auth:', error);
+      toast({
+        title: "Authentication Error",
+        description: "Please log in to access your pets.",
+        variant: "destructive",
+      });
+      navigate('/auth');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUserPets = async (userId: string) => {
+    try {
+      console.log('Fetching pets for user:', userId);
+      
+      // With RLS policies in place, this query will automatically only return
+      // pets belonging to the authenticated user
       const { data, error } = await supabase
         .from('pet_profiles')
         .select('id, name, breed, age, profile_photo_url')
+        .eq('user_id', userId) // Explicitly filter by user_id for clarity
         .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching pets:', error);
         toast({
           title: "Error",
-          description: "Failed to load pet profiles",
+          description: "Failed to load your pet profiles.",
           variant: "destructive",
         });
       } else {
+        console.log('Fetched pets:', data);
         setPets(data || []);
       }
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('Unexpected error fetching pets:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while loading your pets.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleDeletePet = async (petId: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication Error",
+        description: "You must be logged in to delete pets.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('pet_profiles')
@@ -63,7 +121,7 @@ const MyPets = () => {
         console.error('Error deleting pet:', error);
         toast({
           title: "Error",
-          description: "Failed to delete pet profile",
+          description: "Failed to delete pet profile.",
           variant: "destructive",
         });
       } else {
@@ -71,7 +129,8 @@ const MyPets = () => {
           title: "Success!",
           description: "Pet profile deleted successfully!",
         });
-        fetchPets(); // Refresh the pet list
+        // Refresh the pet list
+        await fetchUserPets(user.id);
       }
     } catch (error) {
       console.error('Unexpected error deleting pet:', error);
@@ -83,6 +142,41 @@ const MyPets = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <GlobalNavBar />
+        <div className="flex items-center justify-center py-32">
+          <div className="text-center">
+            <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
+            <p className="text-gray-600">Loading your pets...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <GlobalNavBar />
+        <div className="flex items-center justify-center py-32">
+          <div className="text-center">
+            <PawPrint className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <h2 className="text-2xl font-semibold text-gray-700 mb-2">Authentication Required</h2>
+            <p className="text-gray-600 mb-6">Please log in to view your pets.</p>
+            <Button
+              onClick={() => navigate('/auth')}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              Log In
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <GlobalNavBar />
@@ -92,19 +186,7 @@ const MyPets = () => {
           <p className="text-gray-600">Manage your pet profiles and their adventures</p>
         </div>
 
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map(i => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="p-6">
-                  <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-2/3 mx-auto"></div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : pets.length === 0 ? (
+        {pets.length === 0 ? (
           <Card className="p-8 text-center">
             <CardContent>
               <div className="mb-6">
