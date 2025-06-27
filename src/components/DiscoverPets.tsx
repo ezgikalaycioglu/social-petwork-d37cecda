@@ -30,13 +30,46 @@ const DiscoverPets = ({ userPetIds, onFriendRequestSent }: DiscoverPetsProps) =>
   const fetchAvailablePets = async () => {
     setLoading(true);
     try {
-      // Now we can fetch from all pet profiles since RLS allows public viewing
-      // Filter out user's own pets and get a broader selection
-      const { data, error } = await supabase
+      // If user has no pets, we can show all pets
+      if (userPetIds.length === 0) {
+        const { data, error } = await supabase
+          .from('pet_profiles')
+          .select('*')
+          .limit(12);
+
+        if (error) throw error;
+        setAvailablePets(data || []);
+        return;
+      }
+
+      // 1. Get user's existing friendships (both accepted and pending)
+      const { data: friendships, error: friendshipsError } = await supabase
+        .from('pet_friendships')
+        .select('requester_pet_id, recipient_pet_id, status')
+        .or(`requester_pet_id.in.(${userPetIds.join(',')}),recipient_pet_id.in.(${userPetIds.join(',')})`)
+        .in('status', ['accepted', 'pending']);
+
+      if (friendshipsError) throw friendshipsError;
+
+      // Extract friend IDs (pets that are already friends or have pending requests)
+      const friendIds = friendships?.map(f => 
+        userPetIds.includes(f.requester_pet_id) ? f.recipient_pet_id : f.requester_pet_id
+      ) || [];
+      
+      // Combine user's own pets and their friends/pending requests to exclude
+      const excludedPetIds = [...new Set([...userPetIds, ...friendIds])];
+
+      // 2. Fetch pets excluding the ones already connected to user
+      let query = supabase
         .from('pet_profiles')
-        .select('*')
-        .not('id', 'in', userPetIds.length > 0 ? `(${userPetIds.join(',')})` : '()')
-        .limit(12);
+        .select('*');
+
+      // Only apply the exclusion filter if there are pets to exclude
+      if (excludedPetIds.length > 0) {
+        query = query.not('id', 'in', `(${excludedPetIds.join(',')})`);
+      }
+
+      const { data, error } = await query.limit(12);
 
       if (error) throw error;
       setAvailablePets(data || []);
