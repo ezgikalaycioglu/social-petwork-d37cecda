@@ -14,7 +14,7 @@ import type { Tables } from '@/integrations/supabase/types';
 type PetProfile = Tables<'pet_profiles'>;
 
 const Dashboard = () => {
-  console.log("Dashboard render edildi!")
+  console.log("Dashboard render edildi!");
   const navigate = useNavigate();
   const { toast } = useToast();
   const { trackPageView, trackEvent } = useAnalytics();
