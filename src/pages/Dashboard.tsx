@@ -14,7 +14,6 @@ import type { Tables } from '@/integrations/supabase/types';
 type PetProfile = Tables<'pet_profiles'>;
 
 const Dashboard = () => {
-  console.log("Dashboard render edildi!");
   const navigate = useNavigate();
   const { toast } = useToast();
   const { trackPageView, trackEvent } = useAnalytics();
@@ -37,7 +36,7 @@ const Dashboard = () => {
         // 1. Önce üst seviye objeleri güvenli bir şekilde al
         const { data, error: authError } = await supabase.auth.getUser(); 
   
-        console.log("Auth response:", { data, authError }); // Ne döndüğünü görmek için bunu logla
+        console.log("Auth response:", { data, authError });
   
         // 2. Hata varsa veya kullanıcı bilgisi (data.user) yoksa kontrol et
         // data?.user kullanımı, 'data' null ise hata vermesini engeller (optional chaining)
@@ -65,7 +64,6 @@ const Dashboard = () => {
       } finally {
         // Bu blok her zaman çalışır (return kullanılsa bile)
         setLoading(false); 
-        console.log("Loading state set to false.");
       }
     };
 
