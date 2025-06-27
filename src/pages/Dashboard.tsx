@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { useAnalytics } from '@/hooks/useAnalytics';
-import { useAuth } from '@/contexts/AuthContext';
 import { Plus, Heart, Eye, Edit, PawPrint, Users, MapPin } from 'lucide-react';
 import Layout from '@/components/Layout';
 import SocialFeed from '@/components/SocialFeed';
@@ -16,36 +14,79 @@ import type { Tables } from '@/integrations/supabase/types';
 type PetProfile = Tables<'pet_profiles'>;
 
 const Dashboard = () => {
+  console.log("Dashboard render edildi!");
   const navigate = useNavigate();
   const { toast } = useToast();
   const { trackPageView, trackEvent } = useAnalytics();
-  const { user } = useAuth();
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
+    // Track page view safely
     try {
       trackPageView('Dashboard', '/dashboard');
     } catch (error) {
       console.warn('Analytics tracking failed:', error);
     }
+    checkAuthAndFetchData();
+  }, []);
+
+   const checkAuthAndFetchData = async () => {
+      try {
+        // 1. Önce üst seviye objeleri güvenli bir şekilde al
+        const { data, error: authError } = await supabase.auth.getUser(); 
+  
+        console.log("Auth response:", { data, authError }); // Ne döndüğünü görmek için bunu logla
+  
+        // 2. Hata varsa veya kullanıcı bilgisi (data.user) yoksa kontrol et
+        // data?.user kullanımı, 'data' null ise hata vermesini engeller (optional chaining)
+        if (authError || !data?.user) {
+          console.error('Authentication error or no user:', authError?.message || 'No user found');
+          navigate('/auth');
+          return; // Fonksiyonun devam etmesini engelle
+        }
+  
+        // 3. Artık 'user' objesinin varlığından eminiz, şimdi kullanabiliriz.
+        const { user } = data;
     
-    if (user) {
-      fetchPets(user.id);
-    }
-  }, [user]);
+        setUserEmail(user.email || '');
+        await fetchPets(user.id);
+  
+      } catch (outerError) {
+        // Bu catch bloğu, kodunuzdaki diğer beklenmedik hataları yakalar (örn: fetchPets içindeki bir hata)
+        console.error('Caught an unexpected error during auth/fetch process:', outerError);
+        toast({
+          title: "An Unexpected Error Occurred",
+          description: "Please try logging in again.",
+          variant: "destructive",
+        });
+        navigate('/auth');
+      } finally {
+        // Bu blok her zaman çalışır (return kullanılsa bile)
+        setLoading(false); 
+        console.log("Loading state set to false.");
+      }
+    };
 
   const fetchPets = async (userId: string) => {
+    console.log(userId)
     try {
       const { data, error } = await supabase
         .from('pet_profiles')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
-        .limit(3);
+        .limit(3); // Show only first 3 pets on dashboard
+      console.log(data)
       
-      if (error) throw error;
+      if (error) {
+        console.log("Failed fetching pets")
+        throw error;
+      }
+
       setPets(data || []);
+      console.log("pets are set")
     } catch (error) {
       console.error('Error fetching pets:', error);
       toast({
@@ -53,8 +94,6 @@ const Dashboard = () => {
         description: "Failed to load your pets.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -92,11 +131,11 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
               🐾 Welcome to Social Petwork
             </h1>
-            <p className="text-gray-600 mt-1">Hello {user?.email}! Stay connected with the pet community.</p>
+            <p className="text-gray-600 mt-1">Hello {userEmail}! Stay connected with the pet community.</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Feed */}
+            {/* Main Feed - Takes up 2/3 on large screens */}
             <div className="lg:col-span-2">
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">Community Feed</h2>
@@ -105,7 +144,7 @@ const Dashboard = () => {
               <SocialFeed />
             </div>
 
-            {/* Sidebar */}
+            {/* Sidebar - Takes up 1/3 on large screens */}
             <div className="space-y-6">
               {/* Quick Actions */}
               <Card className="bg-white shadow-lg">
