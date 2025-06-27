@@ -35,6 +35,8 @@ const Dashboard = () => {
   const checkAuthAndFetchData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      console.log("I'm here!!!!!")
+      console.log(data)
       
       if (!user) {
         navigate('/auth');
