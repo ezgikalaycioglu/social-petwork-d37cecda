@@ -52,6 +52,7 @@ const Dashboard = () => {
   };
 
   const fetchPets = async (userId: string) => {
+    console.log(userId)
     try {
       const { data, error } = await supabase
         .from('pet_profiles')
@@ -59,12 +60,15 @@ const Dashboard = () => {
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(3); // Show only first 3 pets on dashboard
-
+      console.log(data)
+      
       if (error) {
+        console.log("Failed fetching pets")
         throw error;
       }
 
       setPets(data || []);
+      console.log("pets are set")
     } catch (error) {
       console.error('Error fetching pets:', error);
       toast({
