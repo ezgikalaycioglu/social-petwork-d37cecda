@@ -10,6 +10,10 @@ const Footer = () => {
     navigate('/coming-soon');
   };
 
+  const handleChangelogClick = () => {
+    navigate('/changelog');
+  };
+
   return (
     <footer className="bg-gray-900 text-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -86,6 +90,14 @@ const Footer = () => {
                   className="text-gray-400 hover:text-white transition-colors text-left"
                 >
                   Contact Us
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={handleChangelogClick}
+                  className="text-gray-400 hover:text-white transition-colors text-left"
+                >
+                  Changelog
                 </button>
               </li>
               <li>
