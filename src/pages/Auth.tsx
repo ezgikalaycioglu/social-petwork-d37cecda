@@ -21,6 +21,8 @@ const Auth = () => {
     // Check if user is already logged in
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      console.log(data)
+      console.log(session)
       if (session) {
         console.log("I'm here!! login!!")
         navigate('/dashboard');
