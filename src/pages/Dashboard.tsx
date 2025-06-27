@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { useAuth } from '@/contexts/AuthContext';
 import { Plus, Heart, Eye, Edit, PawPrint, Users, MapPin } from 'lucide-react';
 import Layout from '@/components/Layout';
 import SocialFeed from '@/components/SocialFeed';
@@ -14,64 +16,36 @@ import type { Tables } from '@/integrations/supabase/types';
 type PetProfile = Tables<'pet_profiles'>;
 
 const Dashboard = () => {
-  console.log("Dashboard render edildi!");
   const navigate = useNavigate();
   const { toast } = useToast();
   const { trackPageView, trackEvent } = useAnalytics();
+  const { user } = useAuth();
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
-    // Track page view safely
     try {
       trackPageView('Dashboard', '/dashboard');
     } catch (error) {
       console.warn('Analytics tracking failed:', error);
     }
-    checkAuthAndFetchData();
-  }, []);
-
-  const checkAuthAndFetchData = async () => {
-    try {
-      const { data: { user }, error } = await supabase.auth.getUser(); // Hata objesini de yakala
-      console.log("User data:", user);
-      console.log("User fetch error:", error); // Hatayı logla
-  
-      if (error || !user) {
-        console.error('Authentication error or no user:', error?.message || 'No user found');
-        navigate('/auth');
-        return;
-      }
-  
-      setUserEmail(user.email || '');
-      await fetchPets(user.id);
-    } catch (outerError) {
-      console.error('Caught outer error during auth check:', outerError);
-      navigate('/auth');
-    } finally {
-      setLoading(false); // Her durumda loading'i kapat
+    
+    if (user) {
+      fetchPets(user.id);
     }
-  };
+  }, [user]);
 
   const fetchPets = async (userId: string) => {
-    console.log(userId)
     try {
       const { data, error } = await supabase
         .from('pet_profiles')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
-        .limit(3); // Show only first 3 pets on dashboard
-      console.log(data)
+        .limit(3);
       
-      if (error) {
-        console.log("Failed fetching pets")
-        throw error;
-      }
-
+      if (error) throw error;
       setPets(data || []);
-      console.log("pets are set")
     } catch (error) {
       console.error('Error fetching pets:', error);
       toast({
@@ -79,6 +53,8 @@ const Dashboard = () => {
         description: "Failed to load your pets.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,11 +92,11 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
               🐾 Welcome to Social Petwork
             </h1>
-            <p className="text-gray-600 mt-1">Hello {userEmail}! Stay connected with the pet community.</p>
+            <p className="text-gray-600 mt-1">Hello {user?.email}! Stay connected with the pet community.</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Feed - Takes up 2/3 on large screens */}
+            {/* Main Feed */}
             <div className="lg:col-span-2">
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">Community Feed</h2>
@@ -129,7 +105,7 @@ const Dashboard = () => {
               <SocialFeed />
             </div>
 
-            {/* Sidebar - Takes up 1/3 on large screens */}
+            {/* Sidebar */}
             <div className="space-y-6">
               {/* Quick Actions */}
               <Card className="bg-white shadow-lg">
