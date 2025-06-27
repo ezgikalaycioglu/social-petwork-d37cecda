@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,6 +21,7 @@ import Events from "./pages/Events";
 import PetAdventures from "./pages/PetAdventures";
 import Deals from "./pages/Deals";
 import BusinessDashboard from "./pages/BusinessDashboard";
+import ChangelogPage from "./pages/ChangelogPage";
 
 const queryClient = new QueryClient();
 
@@ -104,6 +104,7 @@ const App = () => {
             <Route path="/business-dashboard" element={<BusinessDashboard />} />
             <Route path="/pet-adventures/:petId" element={<PetAdventures />} />
             <Route path="/settings" element={<UserSettings />} />
+            <Route path="/changelog" element={<ChangelogPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
