@@ -33,21 +33,23 @@ const Dashboard = () => {
 
   const checkAuthAndFetchData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error } = await supabase.auth.getUser(); // Hata objesini de yakala
       console.log("User data:", user);
-      
-      if (!user) {
+      console.log("User fetch error:", error); // Hatayı logla
+  
+      if (error || !user) {
+        console.error('Authentication error or no user:', error?.message || 'No user found');
         navigate('/auth');
         return;
       }
-
+  
       setUserEmail(user.email || '');
       await fetchPets(user.id);
-    } catch (error) {
-      console.error('Error checking auth:', error);
+    } catch (outerError) {
+      console.error('Caught outer error during auth check:', outerError);
       navigate('/auth');
     } finally {
-      setLoading(false);
+      setLoading(false); // Her durumda loading'i kapat
     }
   };
 
