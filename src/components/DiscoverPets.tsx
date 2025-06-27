@@ -1,12 +1,12 @@
+
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { Heart, Users, PawPrint } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 import PlaydateRequestModal from './PlaydateRequestModal';
+import PetCard from './PetCard';
+import DiscoverPetsLoading from './DiscoverPetsLoading';
+import DiscoverPetsEmpty from './DiscoverPetsEmpty';
 
 type PetProfile = Tables<'pet_profiles'>;
 
@@ -141,80 +141,19 @@ const DiscoverPets = ({ userPetIds, onFriendRequestSent }: DiscoverPetsProps) =>
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
-            <p className="text-gray-600">Loading available pets...</p>
-          </div>
-        </div>
+        <DiscoverPetsLoading />
       ) : availablePets.length === 0 ? (
-        <div className="text-center py-12">
-          <PawPrint className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-          <h2 className="text-2xl font-semibold text-gray-700 mb-2">No new pets found!</h2>
-          <p className="text-gray-600 mb-6">Check back later for more furry friends.</p>
-        </div>
+        <DiscoverPetsEmpty />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {availablePets.map((pet) => (
-            <Card key={pet.id} className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200">
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center text-center">
-                  <Avatar className="w-20 h-20 mb-4 border-4 border-green-200">
-                    <AvatarImage src={pet.profile_photo_url || ''} alt={pet.name} />
-                    <AvatarFallback className="bg-green-100 text-green-600 text-xl">
-                      {pet.name.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">{pet.name}</h3>
-                  
-                  <div className="text-sm text-gray-600 mb-4 space-y-1">
-                    <p><span className="font-medium">Breed:</span> {pet.breed}</p>
-                    {pet.age && <p><span className="font-medium">Age:</span> {pet.age} years old</p>}
-                    {pet.gender && <p><span className="font-medium">Gender:</span> {pet.gender}</p>}
-                  </div>
-
-                  {pet.personality_traits && pet.personality_traits.length > 0 && (
-                    <div className="mb-4">
-                      <div className="flex flex-wrap gap-1 justify-center">
-                        {pet.personality_traits.slice(0, 3).map((trait, index) => (
-                          <span key={index} className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
-                            {trait}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="flex gap-2 w-full">
-                    <Button
-                      size="sm"
-                      onClick={() => handleSendFriendRequest(pet.id)}
-                      disabled={loadingRequests[pet.id]}
-                      className="bg-green-600 hover:bg-green-700 text-white flex-1"
-                    >
-                      {loadingRequests[pet.id] ? (
-                        'Sending...'
-                      ) : (
-                        <>
-                          <Heart className="w-4 h-4 mr-1" />
-                          Add Friend
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleRequestPlaydate(pet.id, pet.user_id)}
-                      className="border-blue-500 text-blue-600 hover:bg-blue-50 flex-1"
-                    >
-                      <Users className="w-4 h-4 mr-1" />
-                      Playdate
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <PetCard
+              key={pet.id}
+              pet={pet}
+              isLoading={loadingRequests[pet.id] || false}
+              onSendFriendRequest={handleSendFriendRequest}
+              onRequestPlaydate={handleRequestPlaydate}
+            />
           ))}
         </div>
       )}
