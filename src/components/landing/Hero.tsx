@@ -1,4 +1,3 @@
-
 import { ArrowRight, Menu } from 'lucide-react';
 import AuthButton from '../AuthButton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -35,10 +34,9 @@ const Hero = () => {
             <Button 
               variant="outline" 
               size="sm"
-              className="bg-white/80 backdrop-blur-sm border-green-200 hover:bg-white/90"
+              className="bg-white/80 backdrop-blur-sm border-green-200 hover:bg-white/90 p-2"
             >
-              <Menu className="h-4 w-4 mr-2" />
-              Sections
+              <Menu className="h-8 w-8" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
