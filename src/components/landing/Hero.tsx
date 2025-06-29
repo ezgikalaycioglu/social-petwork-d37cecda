@@ -23,7 +23,7 @@ const Hero = () => {
           />
         </div>
         <h2 className="text-3xl md:text-5xl font-bold mb-6" style={{ color: '#A8DAB5' }}>
-          Unleash Their Social Life: Connect, Play, and Reward Your Pet!
+          Your pet's social life starts here.
         </h2>
         <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
           The ultimate social app empowering pet parents to create profiles for their furry companions, 
