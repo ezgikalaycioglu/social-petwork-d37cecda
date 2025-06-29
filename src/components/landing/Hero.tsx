@@ -1,3 +1,4 @@
+
 import { ArrowRight, Menu } from 'lucide-react';
 import AuthButton from '../AuthButton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -19,10 +20,10 @@ const Hero = () => {
   };
 
   const navigationItems = [
+    { label: 'Get Started', id: 'final-cta' },
     { label: 'Problem & Solution', id: 'problem-solution' },
     { label: 'Features', id: 'features' },
-    { label: 'App Preview', id: 'app-preview' },
-    { label: 'Get Started', id: 'final-cta' }
+    { label: 'App Preview', id: 'app-preview' }
   ];
 
   return (
@@ -34,20 +35,20 @@ const Hero = () => {
             <Button 
               variant="outline" 
               size="sm"
-              className="bg-white/80 backdrop-blur-sm border-green-200 hover:bg-white/90 p-2"
+              className="bg-white backdrop-blur-sm border-green-200 hover:bg-white/90 p-2 shadow-lg"
             >
-              <Menu className="h-8 w-8" />
+              <Menu className="h-6 w-6" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             align="end" 
-            className="w-48 bg-white/95 backdrop-blur-sm border-green-200"
+            className="w-48 bg-white backdrop-blur-sm border-green-200 shadow-lg z-50"
           >
             {navigationItems.map((item) => (
               <DropdownMenuItem 
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className="cursor-pointer hover:bg-green-50"
+                className="cursor-pointer hover:bg-green-50 py-2 px-3"
               >
                 {item.label}
               </DropdownMenuItem>
