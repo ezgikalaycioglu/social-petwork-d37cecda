@@ -1,5 +1,8 @@
-import { ArrowRight } from 'lucide-react';
+
+import { ArrowRight, Menu } from 'lucide-react';
 import AuthButton from '../AuthButton';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 const Hero = () => {
   const scrollToFeatures = () => {
@@ -9,8 +12,52 @@ const Hero = () => {
     }
   };
 
+  const scrollToSection = (sectionId: string) => {
+    const section = document.querySelector(`[data-section="${sectionId}"]`);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const navigationItems = [
+    { label: 'Problem & Solution', id: 'problem-solution' },
+    { label: 'Features', id: 'features' },
+    { label: 'App Preview', id: 'app-preview' },
+    { label: 'Get Started', id: 'final-cta' }
+  ];
+
   return (
-    <section className="px-4 py-20 text-center" style={{ backgroundColor: '#F3FCF6' }}>
+    <section className="px-4 py-20 text-center relative" style={{ backgroundColor: '#F3FCF6' }}>
+      {/* Navigation Dropdown */}
+      <div className="absolute top-4 right-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="bg-white/80 backdrop-blur-sm border-green-200 hover:bg-white/90"
+            >
+              <Menu className="h-4 w-4 mr-2" />
+              Sections
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="end" 
+            className="w-48 bg-white/95 backdrop-blur-sm border-green-200"
+          >
+            {navigationItems.map((item) => (
+              <DropdownMenuItem 
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className="cursor-pointer hover:bg-green-50"
+              >
+                {item.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: '#FFB3A7' }}>
           Social Petwork

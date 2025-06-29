@@ -13,6 +13,7 @@ const FinalCTA = () => {
   return (
     <section 
       className="py-20 px-4 bg-white"
+      data-section="final-cta"
     >
       <div className="max-w-4xl mx-auto text-center">
         <div className="text-6xl mb-8">🐕🎾🐱</div>

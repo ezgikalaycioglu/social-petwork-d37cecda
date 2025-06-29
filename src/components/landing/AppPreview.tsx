@@ -1,7 +1,6 @@
-
 const AppPreview = () => {
   return (
-    <section className="py-16 px-4" style={{ backgroundColor: '#F3FCF6' }}>
+    <section className="py-16 px-4" style={{ backgroundColor: '#F3FCF6' }} data-section="app-preview">
       <div className="max-w-6xl mx-auto text-center">
         <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
           See the App in 
