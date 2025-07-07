@@ -1,21 +1,15 @@
-
 import { ArrowRight, Menu } from 'lucide-react';
 import AuthButton from '../AuthButton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 
 const Hero = () => {
-  const scrollToFeatures = () => {
-    const featuresSection = document.querySelector('[data-section="features"]');
-    if (featuresSection) {
-      featuresSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const scrollToSection = (sectionId: string) => {
     const section = document.querySelector(`[data-section="${sectionId}"]`);
     if (section) {
       section.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      console.log(`Section with data-section="${sectionId}" not found`);
     }
   };
 
@@ -23,7 +17,8 @@ const Hero = () => {
     { label: 'Get Started', id: 'final-cta' },
     { label: 'Problem & Solution', id: 'problem-solution' },
     { label: 'Features', id: 'features' },
-    { label: 'App Preview', id: 'app-preview' }
+    { label: 'App Preview', id: 'app-preview' },
+    { label: 'Benefits', id: 'benefits' }
   ];
 
   return (
@@ -97,7 +92,7 @@ const Hero = () => {
                 </Button>
                 
                 <button 
-                  onClick={scrollToFeatures}
+                  onClick={() => scrollToSection('features')}
                   className="flex items-center font-medium hover:opacity-80 transition-opacity text-lg px-6 py-3 text-gray-600 hover:text-gray-800"
                 >
                   Learn More <ArrowRight className="ml-2 h-5 w-5" />

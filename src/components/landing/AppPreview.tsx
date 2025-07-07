@@ -1,39 +1,59 @@
+
 const AppPreview = () => {
+  const features = [
+    {
+      title: "Interactive Pet Map",
+      description: "See where pets are playing in real-time and discover new locations",
+      image: "/lovable-uploads/d9e8b07e-7d6b-4ddb-ae7c-bcf5166c1ce0.png"
+    },
+    {
+      title: "Social Feed",
+      description: "Share adventures and connect with your pet community",
+      image: "/lovable-uploads/5f6310c4-2136-48d2-84a3-11a3c11677d2.png"
+    },
+    {
+      title: "Event Planning",
+      description: "Organize and join pet meetups, training sessions, and fun activities",
+      image: "/lovable-uploads/843c803e-8ea4-4a7c-865a-77f0687a1413.png"
+    }
+  ];
+
   return (
-    <section className="py-16 px-4" style={{ backgroundColor: '#F3FCF6' }} data-section="app-preview">
-      <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-          See the App in 
-          <span style={{ color: '#A8DAB5' }}> Action</span>
-        </h2>
-        <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
-          Discover how Social Petwork makes connecting with other pet parents simple and fun
-        </p>
-        
-        <div className="grid md:grid-cols-3 gap-8 items-center justify-center">
-          <div className="flex justify-center">
-            <img 
-              src="/lovable-uploads/5f6310c4-2136-48d2-84a3-11a3c11677d2.png" 
-              alt="Pet community profiles and connections"
-              className="w-64 h-auto rounded-2xl shadow-lg"
-            />
-          </div>
-          
-          <div className="flex justify-center">
-            <img 
-              src="/lovable-uploads/4c206775-4a71-4b32-a928-56724509f935.png" 
-              alt="Walk coordination and messaging"
-              className="w-64 h-auto rounded-2xl shadow-lg"
-            />
-          </div>
-          
-          <div className="flex justify-center">
-            <img 
-              src="/lovable-uploads/d9e8b07e-7d6b-4ddb-ae7c-bcf5166c1ce0.png" 
-              alt="Location-based pet tracking and walks"
-              className="w-64 h-auto rounded-2xl shadow-lg"
-            />
-          </div>
+    <section data-section="app-preview" className="py-20 px-4 bg-gradient-to-br from-purple-50 to-pink-50">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-5xl font-bold text-gray-900 mb-6">
+            See Social Petwork in Action
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Take a peek at how our app makes pet socializing simple and fun
+          </p>
+        </div>
+
+        <div className="space-y-20">
+          {features.map((feature, index) => (
+            <div key={index} className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12`}>
+              <div className="flex-1 space-y-6">
+                <h3 className="text-3xl font-bold text-gray-900">
+                  {feature.title}
+                </h3>
+                <p className="text-xl text-gray-600 leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+              
+              <div className="flex-1 flex justify-center">
+                <div className="relative">
+                  <img 
+                    src={feature.image} 
+                    alt={feature.title}
+                    className="w-80 h-auto rounded-3xl shadow-2xl border-4 border-white transform hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute -z-10 top-4 left-4 w-full h-full bg-gradient-to-br from-purple-200 to-pink-200 rounded-3xl opacity-50"></div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
