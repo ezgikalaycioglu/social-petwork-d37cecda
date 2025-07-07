@@ -18,23 +18,11 @@ const DiscoverPets = ({ userPetIds, onFriendRequestSent }: DiscoverPetsProps) =>
   const {
     availablePets,
     loading,
-    loadingRequests,
-    handleSendFriendRequest,
   } = useDiscoverPets({ userPetIds, onFriendRequestSent });
 
-  const handleRequestPlaydate = (petId: string, userId: string) => {
-    setSelectedPetForPlaydate({ petId, userId });
-    setShowPlaydateModal(true);
-  };
-
-  const handleClosePlaydateModal = () => {
-    setShowPlaydateModal(false);
-    setSelectedPetForPlaydate(null);
-  };
-
-  const handlePlaydateSuccess = () => {
-    setShowPlaydateModal(false);
-    setSelectedPetForPlaydate(null);
+  const handlePetSelect = (pet: any) => {
+    // Handle pet selection - could navigate to pet details or open a modal
+    console.log('Pet selected:', pet);
   };
 
   return (
@@ -52,16 +40,15 @@ const DiscoverPets = ({ userPetIds, onFriendRequestSent }: DiscoverPetsProps) =>
       ) : (
         <DiscoverPetsGrid
           pets={availablePets}
-          loadingRequests={loadingRequests}
-          onSendFriendRequest={handleSendFriendRequest}
-          onRequestPlaydate={handleRequestPlaydate}
+          onPetSelect={handlePetSelect}
+          isLoading={loading}
         />
       )}
 
       <PlaydateRequestModal
         isOpen={showPlaydateModal}
-        onClose={handleClosePlaydateModal}
-        onSuccess={handlePlaydateSuccess}
+        onClose={() => setShowPlaydateModal(false)}
+        onSuccess={() => setShowPlaydateModal(false)}
         userPets={[]} // Not needed for this use case
         targetPetId={selectedPetForPlaydate?.petId}
         targetUserId={selectedPetForPlaydate?.userId}
