@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -12,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Settings, User, Bell, Loader2 } from 'lucide-react';
 import Layout from '@/components/Layout';
 import type { Tables } from '@/integrations/supabase/types';
+import PushNotificationSettings from '@/components/PushNotificationSettings';
 
 type UserProfile = Tables<'user_profiles'>;
 type NotificationPreferences = Tables<'notification_preferences'>;
@@ -249,6 +249,9 @@ const UserSettings = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Push Notifications Section */}
+              <PushNotificationSettings />
 
               {/* Notification Preferences Section */}
               <Card>

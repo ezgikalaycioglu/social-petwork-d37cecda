@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 type NotificationPermission = 'default' | 'granted' | 'denied';
 
@@ -63,6 +64,14 @@ export const usePushNotifications = (): PushNotificationHook => {
 
   const handlePermissionGranted = async () => {
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        console.error('User not authenticated');
+        return;
+      }
+
       // Get service worker registration
       const registration = await navigator.serviceWorker.ready;
       console.log('Service worker ready:', registration);
@@ -82,10 +91,30 @@ export const usePushNotifications = (): PushNotificationHook => {
 
       console.log('Push subscription:', subscription);
       
-      // Here we would typically send the subscription to our backend
-      // For now, we'll just log it
       if (subscription) {
-        console.log('Push subscription endpoint:', subscription.endpoint);
+        // Store subscription in database
+        const subscriptionData = {
+          endpoint: subscription.endpoint,
+          keys: {
+            p256dh: subscription.getKey('p256dh') ? btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('p256dh')!))) : null,
+            auth: subscription.getKey('auth') ? btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('auth')!))) : null,
+          }
+        };
+
+        const { error } = await supabase
+          .from('push_subscriptions')
+          .upsert({
+            user_id: user.id,
+            subscription_details: subscriptionData,
+          }, {
+            onConflict: 'user_id'
+          });
+
+        if (error) {
+          console.error('Error storing push subscription:', error);
+        } else {
+          console.log('Push subscription stored successfully');
+        }
       }
 
     } catch (error) {
