@@ -1,10 +1,14 @@
 
+
 import { ArrowRight, Menu } from 'lucide-react';
 import AuthButton from '../AuthButton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   const scrollToSection = (sectionId: string) => {
     console.log(`Attempting to scroll to section: ${sectionId}`);
     
@@ -104,6 +108,7 @@ const Hero = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
                 <Button
                   size="lg"
+                  onClick={() => navigate('/auth')}
                   className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold text-lg px-8 py-6 rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300 border-0 min-w-[240px]"
                   style={{ 
                     background: 'linear-gradient(135deg, #FFB3A7 0%, #A8DAB5 100%)',
@@ -164,3 +169,4 @@ const Hero = () => {
 };
 
 export default Hero;
+
