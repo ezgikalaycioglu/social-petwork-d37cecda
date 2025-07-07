@@ -68,7 +68,7 @@ const Hero = () => {
               <img 
                 src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
                 alt="Social Petwork Logo"
-                className="w-20 h-20 lg:w-24 lg:h-24"
+                className="w-40 h-40 lg:w-48 lg:h-48"
               />
             </div>
 
