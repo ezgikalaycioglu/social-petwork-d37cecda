@@ -22,6 +22,7 @@ import PetAdventures from "./pages/PetAdventures";
 import Deals from "./pages/Deals";
 import BusinessDashboard from "./pages/BusinessDashboard";
 import ChangelogPage from "./pages/ChangelogPage";
+import Packs from "./pages/Packs";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -94,6 +95,11 @@ const App = () => {
               <Route path="/business-dashboard" element={
                 <ProtectedRoute>
                   <BusinessDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/packs" element={
+                <ProtectedRoute>
+                  <Packs />
                 </ProtectedRoute>
               } />
               <Route path="/pet-adventures/:petId" element={
