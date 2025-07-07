@@ -34,16 +34,32 @@ const PackSettingsModal = ({ pack, open, onOpenChange, onUpdate }: PackSettingsM
   const { data: members, refetch: refetchMembers } = useQuery({
     queryKey: ['pack-members', pack.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First get pack members
+      const { data: packMembers, error: membersError } = await supabase
         .from('pack_members')
-        .select(`
-          *,
-          user_profiles!inner(display_name, email)
-        `)
+        .select('*')
         .eq('pack_id', pack.id);
       
-      if (error) throw error;
-      return data;
+      if (membersError) throw membersError;
+      
+      if (!packMembers || packMembers.length === 0) {
+        return [];
+      }
+
+      // Then get user profiles for those members
+      const userIds = packMembers.map(member => member.user_id);
+      const { data: userProfiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, email')
+        .in('id', userIds);
+      
+      if (profilesError) throw profilesError;
+
+      // Combine the data
+      return packMembers.map(member => ({
+        ...member,
+        user_profile: userProfiles?.find(profile => profile.id === member.user_id) || null
+      }));
     },
     enabled: open,
   });
@@ -186,7 +202,9 @@ const PackSettingsModal = ({ pack, open, onOpenChange, onUpdate }: PackSettingsM
                 <div key={member.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                   <div className="flex items-center space-x-2">
                     <span className="font-medium">
-                      {member.user_profiles?.display_name || member.user_profiles?.email || 'Unknown User'}
+                      {member.user_profile?.display_name || 
+                       member.user_profile?.email || 
+                       'Unknown User'}
                     </span>
                     <Badge variant={member.role === 'admin' ? 'default' : 'secondary'}>
                       {member.role}
@@ -198,7 +216,9 @@ const PackSettingsModal = ({ pack, open, onOpenChange, onUpdate }: PackSettingsM
                       size="sm"
                       onClick={() => handleRemoveMember(
                         member.id, 
-                        member.user_profiles?.display_name || member.user_profiles?.email || 'User'
+                        member.user_profile?.display_name || 
+                        member.user_profile?.email || 
+                        'User'
                       )}
                     >
                       <UserMinus className="w-4 h-4" />
