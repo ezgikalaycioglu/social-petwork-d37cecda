@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { handleAuthError } from '@/utils/authErrorHandler';
 import analyticsService from '@/services/AnalyticsService';
 
 interface AuthContextType {
@@ -24,12 +25,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Get initial session
     const getSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (session) {
-        setSession(session);
-        setUser(session.user);
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting initial session:', error);
+          const authErrorHandled = await handleAuthError(error);
+          if (authErrorHandled.shouldSignOut) {
+            setSession(null);
+            setUser(null);
+            setLoading(false);
+            return;
+          }
+        }
+        
+        if (session) {
+          setSession(session);
+          setUser(session.user);
+        }
+      } catch (error) {
+        console.error('Unexpected error getting session:', error);
+        await handleAuthError(error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     getSession();
@@ -49,18 +68,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             email: session.user.email || undefined,
           });
 
-          // Identify user for analytics
+          // Identify user for analytics with error handling
           try {
-            const { data: userProfile } = await supabase
+            const { data: userProfile, error: profileError } = await supabase
               .from('user_profiles')
               .select('display_name, city, neighborhood')
               .eq('id', session.user.id)
               .single();
 
-            const { count: petCount } = await supabase
+            // Handle potential auth errors in profile fetch
+            if (profileError) {
+              const authErrorHandled = await handleAuthError(profileError);
+              if (authErrorHandled.shouldSignOut) {
+                setSession(null);
+                setUser(null);
+                setLoading(false);
+                return;
+              }
+            }
+
+            const { count: petCount, error: petCountError } = await supabase
               .from('pet_profiles')
               .select('*', { count: 'exact', head: true })
               .eq('user_id', session.user.id);
+
+            // Handle potential auth errors in pet count fetch
+            if (petCountError) {
+              const authErrorHandled = await handleAuthError(petCountError);
+              if (authErrorHandled.shouldSignOut) {
+                setSession(null);
+                setUser(null);
+                setLoading(false);
+                return;
+              }
+            }
 
             analyticsService.identifyUser(session.user.id, {
               $email: session.user.email || undefined,
@@ -72,6 +113,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               user_type: 'pet_owner',
             });
           } catch (error) {
+            console.error('Error fetching user data for analytics:', error);
+            // Fallback analytics identification
             analyticsService.identifyUser(session.user.id, {
               $email: session.user.email || undefined,
               $created: session.user.created_at,
@@ -93,7 +136,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+      // Force clean logout even if API call fails
+      setSession(null);
+      setUser(null);
+    }
   };
 
   return (

@@ -1,9 +1,10 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PawPrint } from 'lucide-react';
+import { handleAuthError } from '@/utils/authErrorHandler';
 import NewPetCard from './feed/NewPetCard';
 import AdventureCard from './feed/AdventureCard';
 import GroupWalkCard from './feed/GroupWalkCard';
@@ -24,6 +25,7 @@ interface FeedItem {
 const ITEMS_PER_PAGE = 10;
 
 const SocialFeed: React.FC = () => {
+  const navigate = useNavigate();
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -48,7 +50,14 @@ const SocialFeed: React.FC = () => {
         .order('created_at', { ascending: false })
         .range(currentOffset, currentOffset + ITEMS_PER_PAGE - 1);
 
-      if (error) throw error;
+      if (error) {
+        // Check for authentication errors
+        const authErrorHandled = await handleAuthError(error, navigate);
+        if (authErrorHandled.shouldSignOut) {
+          return; // Exit early as user is being redirected
+        }
+        throw error;
+      }
 
       const newItems = (data || []) as FeedItem[];
 
@@ -64,16 +73,23 @@ const SocialFeed: React.FC = () => {
 
     } catch (error) {
       console.error('Error fetching feed items:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load feed items. Please try again.",
-        variant: "destructive",
-      });
+      
+      // Double-check for auth errors
+      const authErrorHandled = await handleAuthError(error, navigate);
+      
+      if (!authErrorHandled.shouldSignOut) {
+        // Only show error toast if it's not an auth error
+        toast({
+          title: "Error",
+          description: "Failed to load feed items. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [offset, toast]);
+  }, [offset, toast, navigate]);
 
   // Load more items for infinite scroll
   const loadMore = useCallback(() => {

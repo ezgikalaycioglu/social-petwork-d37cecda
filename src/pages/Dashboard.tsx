@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +10,7 @@ import { Plus, Heart, Eye, Edit, PawPrint, Users, MapPin } from 'lucide-react';
 import Layout from '@/components/Layout';
 import SocialFeed from '@/components/SocialFeed';
 import UpcomingPlaydates from '@/components/UpcomingPlaydates';
+import { handleAuthError } from '@/utils/authErrorHandler';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -35,12 +35,20 @@ const Dashboard = () => {
 
   const checkAuthAndFetchData = async () => {
     try {
+      setLoading(true);
       const { data, error: authError } = await supabase.auth.getUser(); 
 
       console.log("Auth response:", { data, authError });
 
-      if (authError || !data?.user) {
-        console.error('Authentication error or no user:', authError?.message || 'No user found');
+      if (authError) {
+        const authErrorHandled = await handleAuthError(authError, navigate);
+        if (authErrorHandled.shouldSignOut) {
+          return; // Exit early as user is being redirected
+        }
+      }
+
+      if (!data?.user) {
+        console.error('No user found');
         navigate('/auth');
         return;
       }
@@ -51,19 +59,26 @@ const Dashboard = () => {
 
     } catch (outerError) {
       console.error('Caught an unexpected error during auth/fetch process:', outerError);
-      toast({
-        title: "An Unexpected Error Occurred",
-        description: "Please try logging in again.",
-        variant: "destructive",
-      });
-      navigate('/auth');
+      
+      // Check if this is an auth error
+      const authErrorHandled = await handleAuthError(outerError, navigate);
+      
+      if (!authErrorHandled.shouldSignOut) {
+        // Only show generic error if it's not an auth error
+        toast({
+          title: "An Unexpected Error Occurred",
+          description: "Please try logging in again.",
+          variant: "destructive",
+        });
+        navigate('/auth');
+      }
     } finally {
       setLoading(false); 
     }
   };
 
   const fetchPets = async (userId: string) => {
-    console.log(userId)
+    console.log(userId);
     try {
       const { data, error } = await supabase
         .from('pet_profiles')
@@ -71,22 +86,36 @@ const Dashboard = () => {
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(3);
-      console.log(data)
+      
+      console.log(data);
       
       if (error) {
-        console.log("Failed fetching pets")
+        // Check for authentication errors in pet fetching
+        const authErrorHandled = await handleAuthError(error, navigate);
+        if (authErrorHandled.shouldSignOut) {
+          return; // Exit early as user is being redirected
+        }
+        
+        console.log("Failed fetching pets");
         throw error;
       }
 
       setPets(data || []);
-      console.log("pets are set")
+      console.log("pets are set");
     } catch (error) {
       console.error('Error fetching pets:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load your pets.",
-        variant: "destructive",
-      });
+      
+      // Double-check for auth errors
+      const authErrorHandled = await handleAuthError(error, navigate);
+      
+      if (!authErrorHandled.shouldSignOut) {
+        // Only show error toast if it's not an auth error
+        toast({
+          title: "Error",
+          description: "Failed to load your pets.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
