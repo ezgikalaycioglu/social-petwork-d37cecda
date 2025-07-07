@@ -1,3 +1,4 @@
+
 import { ArrowRight, Menu } from 'lucide-react';
 import AuthButton from '../AuthButton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -5,12 +6,33 @@ import { Button } from '@/components/ui/button';
 
 const Hero = () => {
   const scrollToSection = (sectionId: string) => {
-    const section = document.querySelector(`[data-section="${sectionId}"]`);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      console.log(`Section with data-section="${sectionId}" not found`);
-    }
+    console.log(`Attempting to scroll to section: ${sectionId}`);
+    
+    // Add a small delay to ensure the dropdown closes first
+    setTimeout(() => {
+      const section = document.querySelector(`[data-section="${sectionId}"]`);
+      console.log(`Found section:`, section);
+      
+      if (section) {
+        section.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest'
+        });
+      } else {
+        console.error(`Section with data-section="${sectionId}" not found`);
+        // Fallback: try to find by ID
+        const fallbackSection = document.getElementById(sectionId);
+        if (fallbackSection) {
+          console.log(`Found fallback section by ID:`, fallbackSection);
+          fallbackSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest'
+          });
+        }
+      }
+    }, 100);
   };
 
   const navigationItems = [
