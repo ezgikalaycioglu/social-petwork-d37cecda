@@ -1,77 +1,125 @@
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Heart, Users } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { MapPin } from 'lucide-react';
+import BoopButton from './BoopButton';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
 
 interface PetCardProps {
   pet: PetProfile;
-  isLoading: boolean;
-  onSendFriendRequest: (petId: string) => void;
-  onRequestPlaydate: (petId: string, userId: string) => void;
+  onClick?: () => void;
+  showLocation?: boolean;
+  showBoopButton?: boolean;
 }
 
-const PetCard = ({ pet, isLoading, onSendFriendRequest, onRequestPlaydate }: PetCardProps) => {
+const PetCard: React.FC<PetCardProps> = ({ 
+  pet, 
+  onClick, 
+  showLocation = true,
+  showBoopButton = true 
+}) => {
+  const [currentBoopCount, setCurrentBoopCount] = useState(pet.boop_count || 0);
+
+  const handleBoopUpdate = (newCount: number) => {
+    setCurrentBoopCount(newCount);
+  };
+
+  const formatDistance = (lat: number, lon: number) => {
+    // This would typically calculate distance from user's location
+    // For now, we'll show approximate distance
+    return "~2.5 km away";
+  };
+
   return (
-    <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-200">
-      <CardContent className="p-6">
-        <div className="flex flex-col items-center text-center">
-          <Avatar className="w-20 h-20 mb-4 border-4 border-green-200">
-            <AvatarImage src={pet.profile_photo_url || ''} alt={pet.name} />
-            <AvatarFallback className="bg-green-100 text-green-600 text-xl">
+    <Card 
+      className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer bg-white"
+      onClick={onClick}
+    >
+      <CardContent className="p-4">
+        <div className="flex items-start space-x-4">
+          {/* Pet Avatar */}
+          <Avatar className="w-16 h-16 border-2 border-green-200">
+            <AvatarImage 
+              src={pet.profile_photo_url || ''} 
+              alt={pet.name}
+              className="object-cover"
+            />
+            <AvatarFallback className="bg-green-100 text-green-600 text-lg font-semibold">
               {pet.name.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          
-          <h3 className="text-lg font-bold text-gray-800 mb-2">{pet.name}</h3>
-          
-          <div className="text-sm text-gray-600 mb-4 space-y-1">
-            <p><span className="font-medium">Breed:</span> {pet.breed}</p>
-            {pet.age && <p><span className="font-medium">Age:</span> {pet.age} years old</p>}
-            {pet.gender && <p><span className="font-medium">Gender:</span> {pet.gender}</p>}
-          </div>
 
-          {pet.personality_traits && pet.personality_traits.length > 0 && (
-            <div className="mb-4">
-              <div className="flex flex-wrap gap-1 justify-center">
-                {pet.personality_traits.slice(0, 3).map((trait, index) => (
-                  <span key={index} className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
-                    {trait}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          <div className="flex gap-2 w-full">
-            <Button
-              size="sm"
-              onClick={() => onSendFriendRequest(pet.id)}
-              disabled={isLoading}
-              className="bg-green-600 hover:bg-green-700 text-white flex-1"
-            >
-              {isLoading ? (
-                'Sending...'
-              ) : (
-                <>
-                  <Heart className="w-4 h-4 mr-1" />
-                  Add Friend
-                </>
+          {/* Pet Info */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="font-semibold text-gray-800 truncate">{pet.name}</h3>
+              {pet.age && (
+                <Badge variant="secondary" className="text-xs">
+                  {pet.age} {pet.age === 1 ? 'year' : 'years'}
+                </Badge>
               )}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onRequestPlaydate(pet.id, pet.user_id)}
-              className="border-blue-500 text-blue-600 hover:bg-blue-50 flex-1"
-            >
-              <Users className="w-4 h-4 mr-1" />
-              Playdate
-            </Button>
+            </div>
+            
+            <p className="text-sm text-gray-600 mb-2">{pet.breed}</p>
+            
+            {pet.bio && (
+              <p className="text-xs text-gray-500 line-clamp-2 mb-2">
+                {pet.bio}
+              </p>
+            )}
+
+            {/* Location */}
+            {showLocation && pet.latitude && pet.longitude && (
+              <div className="flex items-center text-xs text-gray-500 mb-2">
+                <MapPin className="w-3 h-3 mr-1" />
+                <span>{formatDistance(pet.latitude, pet.longitude)}</span>
+              </div>
+            )}
+
+            {/* Personality Traits */}
+            {pet.personality_traits && pet.personality_traits.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-2">
+                {pet.personality_traits.slice(0, 3).map((trait, index) => (
+                  <Badge 
+                    key={index} 
+                    variant="outline" 
+                    className="text-xs py-0 px-2"
+                  >
+                    {trait}
+                  </Badge>
+                ))}
+                {pet.personality_traits.length > 3 && (
+                  <Badge variant="outline" className="text-xs py-0 px-2">
+                    +{pet.personality_traits.length - 3}
+                  </Badge>
+                )}
+              </div>
+            )}
+
+            {/* Boop Button */}
+            {showBoopButton && (
+              <div className="flex items-center justify-between mt-3">
+                <BoopButton
+                  petId={pet.id}
+                  currentBoopCount={currentBoopCount}
+                  onBoopUpdate={handleBoopUpdate}
+                  size="sm"
+                />
+                
+                {pet.vaccination_status && (
+                  <Badge 
+                    variant={pet.vaccination_status === 'Up-to-date' ? 'default' : 'secondary'}
+                    className="text-xs"
+                  >
+                    {pet.vaccination_status === 'Up-to-date' ? '✓ Vaccinated' : pet.vaccination_status}
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

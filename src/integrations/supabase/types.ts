@@ -441,6 +441,7 @@ export type Database = {
           about: string | null
           age: number | null
           bio: string | null
+          boop_count: number
           breed: string
           created_at: string
           gender: string | null
@@ -461,6 +462,7 @@ export type Database = {
           about?: string | null
           age?: number | null
           bio?: string | null
+          boop_count?: number
           breed: string
           created_at?: string
           gender?: string | null
@@ -481,6 +483,7 @@ export type Database = {
           about?: string | null
           age?: number | null
           bio?: string | null
+          boop_count?: number
           breed?: string
           created_at?: string
           gender?: string | null
