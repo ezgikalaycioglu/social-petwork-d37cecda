@@ -5,10 +5,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { PawPrint } from 'lucide-react';
 import Layout from '@/components/Layout';
-import MapLayout from '@/components/MapLayout';
+import PetMapInterface from '@/components/PetMapInterface';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
+
+export interface PetMapFilters {
+  readyToPlay: boolean;
+  petSizes: string[];
+  personalities: string[];
+  openForAdoption: boolean;
+  searchQuery: string;
+}
 
 const PetMap = () => {
   const navigate = useNavigate();
@@ -16,6 +24,13 @@ const PetMap = () => {
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [filters, setFilters] = useState<PetMapFilters>({
+    readyToPlay: false,
+    petSizes: [],
+    personalities: [],
+    openForAdoption: false,
+    searchQuery: ''
+  });
 
   useEffect(() => {
     checkAuthAndFetchData();
@@ -162,7 +177,7 @@ const PetMap = () => {
                 </div>
               </div>
             ) : (
-              <MapLayout 
+              <PetMapInterface 
                 userPets={pets}
                 onLocationPermissionChange={handleLocationPermissionChange}
               />

@@ -16,6 +16,7 @@ type PetProfile = Tables<'pet_profiles'>;
 
 interface InteractiveMapProps {
   userPets: PetProfile[];
+  filteredPets?: PetProfile[];
   onLocationPermissionChange?: (granted: boolean) => void;
 }
 
@@ -74,6 +75,7 @@ const LocationTracker: React.FC<{ onLocationUpdate: (lat: number, lng: number) =
 
 const InteractiveMap: React.FC<InteractiveMapProps> = ({ 
   userPets, 
+  filteredPets,
   onLocationPermissionChange 
 }) => {
   const { toast } = useToast();
@@ -97,10 +99,10 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   }, []);
 
   useEffect(() => {
-    if (locationPermission) {
+    if (locationPermission && !filteredPets) {
       setupRealtimeListener();
     }
-  }, [locationPermission]);
+  }, [locationPermission, filteredPets]);
 
   const initializeLocation = async () => {
     try {
@@ -286,15 +288,17 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         </CardContent>
       </Card>
 
-      {/* Pet Counter */}
-      <Card className="absolute top-4 right-4 z-[1000] bg-white shadow-lg">
-        <CardContent className="p-3">
-          <div className="flex items-center space-x-2">
-            <PawPrint className="w-4 h-4 text-green-600" />
-            <span className="text-sm font-medium">{nearbyPets.length} pets nearby</span>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Pet Counter - Only show if no filtered pets (not using filter interface) */}
+      {!filteredPets && (
+        <Card className="absolute top-4 right-4 z-[1000] bg-white shadow-lg">
+          <CardContent className="p-3">
+            <div className="flex items-center space-x-2">
+              <PawPrint className="w-4 h-4 text-green-600" />
+              <span className="text-sm font-medium">{nearbyPets.length} pets nearby</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Map */}
       <MapContainer
@@ -332,7 +336,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         )}
 
         {/* Pet markers - only show pets that have location data and are not user's pets */}
-        {nearbyPets
+        {(filteredPets || nearbyPets)
           .filter(pet => 
             !userPets.some(userPet => userPet.id === pet.id) && 
             pet.latitude !== null && 
@@ -345,23 +349,37 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               icon={createPetMarker(pet.profile_photo_url || undefined)}
             >
               <Popup>
-                <div className="text-center space-y-3 min-w-[200px]">
-                  <Avatar className="w-16 h-16 mx-auto">
+                <div className="text-center space-y-4 min-w-[240px] p-2">
+                  <Avatar className="w-20 h-20 mx-auto border-4 border-primary/20">
                     <AvatarImage src={pet.profile_photo_url || ''} alt={pet.name} />
-                    <AvatarFallback className="bg-green-100 text-green-600 text-lg">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xl font-bold">
                       {pet.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   
-                  <div>
-                    <h3 className="font-bold text-lg">{pet.name}</h3>
-                    <p className="text-gray-600">{pet.breed}</p>
-                    {pet.age && <p className="text-sm text-gray-500">{pet.age} years old</p>}
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-xl text-foreground">{pet.name}</h3>
+                    <p className="text-muted-foreground font-medium">{pet.breed}</p>
+                    {pet.age && <p className="text-sm text-muted-foreground">{pet.age} years old</p>}
                   </div>
+
+                  {/* Personality Traits */}
+                  {pet.personality_traits && pet.personality_traits.length > 0 && (
+                    <div className="flex flex-wrap gap-1 justify-center">
+                      {pet.personality_traits.slice(0, 2).map((trait) => (
+                        <span
+                          key={trait}
+                          className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium"
+                        >
+                          {trait}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   
                   <Button
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full px-6"
                     onClick={() => console.log('View profile for pet:', pet.id)}
                   >
                     View Profile
