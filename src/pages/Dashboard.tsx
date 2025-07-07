@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +10,7 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import { Plus, Heart, Eye, Edit, PawPrint, Users, MapPin } from 'lucide-react';
 import Layout from '@/components/Layout';
 import SocialFeed from '@/components/SocialFeed';
+import UpcomingPlaydates from '@/components/UpcomingPlaydates';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -31,41 +33,34 @@ const Dashboard = () => {
     checkAuthAndFetchData();
   }, []);
 
-   const checkAuthAndFetchData = async () => {
-      try {
-        // 1. Önce üst seviye objeleri güvenli bir şekilde al
-        const { data, error: authError } = await supabase.auth.getUser(); 
-  
-        console.log("Auth response:", { data, authError });
-  
-        // 2. Hata varsa veya kullanıcı bilgisi (data.user) yoksa kontrol et
-        // data?.user kullanımı, 'data' null ise hata vermesini engeller (optional chaining)
-        if (authError || !data?.user) {
-          console.error('Authentication error or no user:', authError?.message || 'No user found');
-          navigate('/auth');
-          return; // Fonksiyonun devam etmesini engelle
-        }
-  
-        // 3. Artık 'user' objesinin varlığından eminiz, şimdi kullanabiliriz.
-        const { user } = data;
-    
-        setUserEmail(user.email || '');
-        await fetchPets(user.id);
-  
-      } catch (outerError) {
-        // Bu catch bloğu, kodunuzdaki diğer beklenmedik hataları yakalar (örn: fetchPets içindeki bir hata)
-        console.error('Caught an unexpected error during auth/fetch process:', outerError);
-        toast({
-          title: "An Unexpected Error Occurred",
-          description: "Please try logging in again.",
-          variant: "destructive",
-        });
+  const checkAuthAndFetchData = async () => {
+    try {
+      const { data, error: authError } = await supabase.auth.getUser(); 
+
+      console.log("Auth response:", { data, authError });
+
+      if (authError || !data?.user) {
+        console.error('Authentication error or no user:', authError?.message || 'No user found');
         navigate('/auth');
-      } finally {
-        // Bu blok her zaman çalışır (return kullanılsa bile)
-        setLoading(false); 
+        return;
       }
-    };
+
+      const { user } = data;
+      setUserEmail(user.email || '');
+      await fetchPets(user.id);
+
+    } catch (outerError) {
+      console.error('Caught an unexpected error during auth/fetch process:', outerError);
+      toast({
+        title: "An Unexpected Error Occurred",
+        description: "Please try logging in again.",
+        variant: "destructive",
+      });
+      navigate('/auth');
+    } finally {
+      setLoading(false); 
+    }
+  };
 
   const fetchPets = async (userId: string) => {
     console.log(userId)
@@ -75,7 +70,7 @@ const Dashboard = () => {
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
-        .limit(3); // Show only first 3 pets on dashboard
+        .limit(3);
       console.log(data)
       
       if (error) {
@@ -122,21 +117,31 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-              🐾 Welcome to Social Petwork
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 px-4 py-6">
+          <div className="max-w-6xl mx-auto">
+            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+              🐾 Social Petwork
             </h1>
-            <p className="text-gray-600 mt-1">Hello {userEmail}! Stay connected with the pet community.</p>
+            <p className="text-gray-600 mt-1">Hello {userEmail}! Welcome back to your pet community.</p>
           </div>
+        </div>
 
+        {/* Upcoming Playdates Horizontal Scroller */}
+        <div className="bg-white">
+          <div className="max-w-6xl mx-auto">
+            <UpcomingPlaydates />
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Feed - Takes up 2/3 on large screens */}
             <div className="lg:col-span-2">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">Community Feed</h2>
+                <h2 className="text-xl font-bold text-gray-800 mb-2">Community Feed</h2>
                 <p className="text-gray-600">See what's happening in your pet network</p>
               </div>
               <SocialFeed />
@@ -145,8 +150,8 @@ const Dashboard = () => {
             {/* Sidebar - Takes up 1/3 on large screens */}
             <div className="space-y-6">
               {/* Quick Actions */}
-              <Card className="bg-white shadow-lg">
-                <CardHeader>
+              <Card className="bg-white shadow-sm border border-gray-200">
+                <CardHeader className="pb-4">
                   <CardTitle className="text-lg">Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -189,8 +194,8 @@ const Dashboard = () => {
 
               {/* Recent Pets */}
               {pets.length > 0 && (
-                <Card className="bg-white shadow-lg">
-                  <CardHeader>
+                <Card className="bg-white shadow-sm border border-gray-200">
+                  <CardHeader className="pb-4">
                     <CardTitle className="text-lg flex items-center gap-2">
                       Your Pets
                       <Heart className="h-4 w-4 text-red-500" />
@@ -236,7 +241,7 @@ const Dashboard = () => {
 
               {/* Welcome Message for New Users */}
               {pets.length === 0 && (
-                <Card className="bg-white shadow-lg">
+                <Card className="bg-white shadow-sm border border-gray-200">
                   <CardContent className="p-6 text-center">
                     <PawPrint className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                     <h3 className="text-lg font-semibold text-gray-700 mb-2">Get Started!</h3>
