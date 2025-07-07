@@ -5,18 +5,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { PawPrint } from 'lucide-react';
 import Layout from '@/components/Layout';
-import PetMapInterface from '@/components/PetMapInterface';
+import InteractiveMap from '@/components/InteractiveMap';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
-
-export interface PetMapFilters {
-  readyToPlay: boolean;
-  petSizes: string[];
-  personalities: string[];
-  openForAdoption: boolean;
-  searchQuery: string;
-}
 
 const PetMap = () => {
   const navigate = useNavigate();
@@ -24,13 +16,6 @@ const PetMap = () => {
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
-  const [filters, setFilters] = useState<PetMapFilters>({
-    readyToPlay: false,
-    petSizes: [],
-    personalities: [],
-    openForAdoption: false,
-    searchQuery: ''
-  });
 
   useEffect(() => {
     checkAuthAndFetchData();
@@ -146,43 +131,74 @@ const PetMap = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen" style={{ backgroundColor: '#F8FAFC' }}>
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="mb-8 text-center">
-              <h1 className="text-4xl font-bold text-gray-800 mb-2">
-                🗺️ Pet Discovery Map
-              </h1>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Find amazing pets near you, schedule playdates, and join the local pet community!
-              </p>
-            </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
+              🗺️ Pet Map
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Find pets near you and share your location when ready to play!
+            </p>
+          </div>
 
-            {pets.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="bg-white rounded-2xl shadow-lg p-12 max-w-md mx-auto">
-                  <PawPrint className="w-20 h-20 mx-auto mb-6 text-gray-300" />
-                  <h2 className="text-2xl font-semibold text-gray-700 mb-4">Create Your First Pet Profile</h2>
-                  <p className="text-gray-600 mb-8 leading-relaxed">
-                    Start your pet's social journey by creating a profile. Once you have a pet profile, 
-                    you can discover other pets, schedule playdates, and join the community!
-                  </p>
-                  <button
-                    onClick={() => navigate('/create-pet-profile')}
-                    className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg transform hover:scale-105 transition-all duration-200"
-                  >
-                    Create Pet Profile
-                  </button>
+          {pets.length === 0 ? (
+            <div className="text-center py-12">
+              <PawPrint className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+              <h2 className="text-2xl font-semibold text-gray-700 mb-2">No pets yet!</h2>
+              <p className="text-gray-600 mb-6">Create a pet profile first to use the pet map.</p>
+              <button
+                onClick={() => navigate('/create-pet-profile')}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium"
+              >
+                Create Pet Profile
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Privacy Notice */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-white text-xs font-bold">i</span>
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-blue-900 mb-1">Privacy Notice</h3>
+                    <p className="text-sm text-blue-800">
+                      Your location will only be shared with others when you toggle "Ready to Play" ON. 
+                      You can turn it off anytime to stop sharing your location.
+                    </p>
+                  </div>
                 </div>
               </div>
-            ) : (
-              <PetMapInterface 
-                userPets={pets}
-                onLocationPermissionChange={handleLocationPermissionChange}
-              />
-            )}
-          </div>
+
+              {/* Interactive Map */}
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <InteractiveMap 
+                  userPets={pets}
+                  onLocationPermissionChange={handleLocationPermissionChange}
+                />
+              </div>
+
+              {/* Instructions */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h3 className="font-medium text-green-900 mb-2">🟢 Ready to Play</h3>
+                  <p className="text-sm text-green-800">
+                    Toggle this ON to share your location and appear on the map for other pet owners to see.
+                  </p>
+                </div>
+                
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <h3 className="font-medium text-orange-900 mb-2">🐾 Find Friends</h3>
+                  <p className="text-sm text-orange-800">
+                    Click on pet markers to see their profiles and connect with nearby pet owners.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Layout>
