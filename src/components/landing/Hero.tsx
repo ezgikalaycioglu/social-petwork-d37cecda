@@ -2,6 +2,7 @@
 
 import { ArrowRight, Menu } from 'lucide-react';
 import AuthButton from '../AuthButton';
+import WaitlistForm from '../WaitlistForm';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -124,6 +125,16 @@ const Hero = () => {
                 >
                   Learn More <ArrowRight className="ml-2 h-5 w-5" />
                 </button>
+              </div>
+              
+              {/* Waitlist Form */}
+              <div className="mt-8 max-w-md mx-auto lg:mx-0">
+                <div className="text-center lg:text-left mb-4">
+                  <p className="text-gray-600 text-sm">
+                    Get notified when we launch and receive exclusive updates!
+                  </p>
+                </div>
+                <WaitlistForm />
               </div>
             </div>
           </div>
