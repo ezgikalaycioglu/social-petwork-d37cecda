@@ -6,9 +6,52 @@ import WaitlistForm from '../WaitlistForm';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 const Hero = () => {
   const navigate = useNavigate();
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallButton, setShowInstallButton] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Save the event so it can be triggered later
+      setDeferredPrompt(e);
+      setShowInstallButton(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) {
+      // Fallback to auth page if PWA not available
+      navigate('/auth');
+      return;
+    }
+
+    // Show the install prompt
+    deferredPrompt.prompt();
+
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+    } else {
+      console.log('User dismissed the install prompt');
+      // Redirect to auth page if they dismiss the install
+      navigate('/auth');
+    }
+
+    // Clear the deferredPrompt so it can only be used once
+    setDeferredPrompt(null);
+    setShowInstallButton(false);
+  };
 
   const scrollToSection = (sectionId: string) => {
     console.log(`Attempting to scroll to section: ${sectionId}`);
@@ -109,14 +152,14 @@ const Hero = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
                 <Button
                   size="lg"
-                  onClick={() => navigate('/auth')}
+                  onClick={handleInstallClick}
                   className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold text-lg px-8 py-6 rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300 border-0 min-w-[240px]"
                   style={{ 
                     background: 'linear-gradient(135deg, #FFB3A7 0%, #A8DAB5 100%)',
                     boxShadow: '0 10px 30px rgba(255, 179, 167, 0.4)'
                   }}
                 >
-                  Get Started for Free
+                  {showInstallButton ? "Start Your Pet's Journey" : "Get Started for Free"}
                 </Button>
                 
                 <button 
