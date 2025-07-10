@@ -36,11 +36,32 @@ const Dashboard = () => {
   const checkAuthAndFetchData = async () => {
     try {
       setLoading(true);
+
+      // First check for existing session
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        const authErrorHandled = await handleAuthError(sessionError, navigate);
+        if (authErrorHandled.shouldSignOut) {
+          return;
+        }
+      }
+
+      // If no session, redirect to auth
+      if (!sessionData?.session) {
+        console.log('No active session found');
+        navigate('/auth');
+        return;
+      }
+
+      // Validate the session by getting user
       const { data, error: authError } = await supabase.auth.getUser(); 
 
       console.log("Auth response:", { data, authError });
 
       if (authError) {
+        console.error('Auth error during getUser:', authError);
         const authErrorHandled = await handleAuthError(authError, navigate);
         if (authErrorHandled.shouldSignOut) {
           return; // Exit early as user is being redirected
@@ -48,7 +69,9 @@ const Dashboard = () => {
       }
 
       if (!data?.user) {
-        console.error('No user found');
+        console.error('No user found after getUser call');
+        // Clear any invalid session and redirect
+        await supabase.auth.signOut();
         navigate('/auth');
         return;
       }
@@ -66,10 +89,16 @@ const Dashboard = () => {
       if (!authErrorHandled.shouldSignOut) {
         // Only show generic error if it's not an auth error
         toast({
-          title: "An Unexpected Error Occurred",
-          description: "Please try logging in again.",
+          title: "Authentication Error",
+          description: "Your session has expired. Please log in again.",
           variant: "destructive",
         });
+        // Clear any invalid session and redirect
+        try {
+          await supabase.auth.signOut();
+        } catch (signOutError) {
+          console.error('Error signing out:', signOutError);
+        }
         navigate('/auth');
       }
     } finally {
