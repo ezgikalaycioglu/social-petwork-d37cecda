@@ -25,6 +25,15 @@ const Auth = () => {
       }
     };
     checkAuth();
+
+    // Listen for auth state changes to handle navigation
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        navigate('/dashboard');
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -60,8 +69,7 @@ const Auth = () => {
           description: "You have been successfully signed in.",
         });
         
-        // Redirect to dashboard after successful login
-        navigate('/dashboard');
+        // Navigation will be handled by the auth state change listener
       }
     } catch (error: any) {
       toast({
