@@ -1,5 +1,6 @@
 
 import Hero from '../components/landing/Hero';
+import AppShowcase from '../components/landing/AppShowcase';
 import Benefits from '../components/landing/Benefits';
 import FeatureShowcase from '../components/landing/FeatureShowcase';
 import ProblemSolution from '../components/landing/ProblemSolution';
@@ -12,6 +13,7 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Hero />
+      <AppShowcase />
       <Benefits />
       <FeatureShowcase />
       <ProblemSolution />
