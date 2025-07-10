@@ -62,8 +62,13 @@ const Auth = () => {
         });
         
         // Force navigation to dashboard after successful login
+        console.log('Login successful, data:', data);
         if (data.session) {
-          navigate('/dashboard', { replace: true });
+          console.log('Session exists, navigating to dashboard...');
+          // Use window.location for a hard redirect to ensure proper navigation
+          window.location.href = '/dashboard';
+        } else {
+          console.log('No session found in login response');
         }
       }
     } catch (error: any) {
