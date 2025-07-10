@@ -42,23 +42,6 @@ const SocialFeed: React.FC = () => {
         setLoadingMore(true);
       }
 
-      // First verify auth session before making data requests
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error('Session error in SocialFeed:', sessionError);
-        const authErrorHandled = await handleAuthError(sessionError, navigate);
-        if (authErrorHandled.shouldSignOut) {
-          return;
-        }
-      }
-
-      if (!sessionData?.session) {
-        console.log('No active session in SocialFeed');
-        navigate('/auth');
-        return;
-      }
-
       const currentOffset = isInitial ? 0 : offset;
 
       const { data, error } = await supabase
@@ -68,7 +51,6 @@ const SocialFeed: React.FC = () => {
         .range(currentOffset, currentOffset + ITEMS_PER_PAGE - 1);
 
       if (error) {
-        console.error('Feed fetch error:', error);
         // Check for authentication errors
         const authErrorHandled = await handleAuthError(error, navigate);
         if (authErrorHandled.shouldSignOut) {
@@ -98,17 +80,10 @@ const SocialFeed: React.FC = () => {
       if (!authErrorHandled.shouldSignOut) {
         // Only show error toast if it's not an auth error
         toast({
-          title: "Session Error",
-          description: "Your session has expired. Please log in again.",
+          title: "Error",
+          description: "Failed to load feed items. Please try again.",
           variant: "destructive",
         });
-        // Clear session and redirect
-        try {
-          await supabase.auth.signOut();
-        } catch (signOutError) {
-          console.error('Error signing out from SocialFeed:', signOutError);
-        }
-        navigate('/auth');
       }
     } finally {
       setLoading(false);

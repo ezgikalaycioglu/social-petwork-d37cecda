@@ -36,32 +36,11 @@ const Dashboard = () => {
   const checkAuthAndFetchData = async () => {
     try {
       setLoading(true);
-
-      // First check for existing session
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error('Session error:', sessionError);
-        const authErrorHandled = await handleAuthError(sessionError, navigate);
-        if (authErrorHandled.shouldSignOut) {
-          return;
-        }
-      }
-
-      // If no session, redirect to auth
-      if (!sessionData?.session) {
-        console.log('No active session found');
-        navigate('/auth');
-        return;
-      }
-
-      // Validate the session by getting user
       const { data, error: authError } = await supabase.auth.getUser(); 
 
       console.log("Auth response:", { data, authError });
 
       if (authError) {
-        console.error('Auth error during getUser:', authError);
         const authErrorHandled = await handleAuthError(authError, navigate);
         if (authErrorHandled.shouldSignOut) {
           return; // Exit early as user is being redirected
@@ -69,9 +48,7 @@ const Dashboard = () => {
       }
 
       if (!data?.user) {
-        console.error('No user found after getUser call');
-        // Clear any invalid session and redirect
-        await supabase.auth.signOut();
+        console.error('No user found');
         navigate('/auth');
         return;
       }
@@ -89,16 +66,10 @@ const Dashboard = () => {
       if (!authErrorHandled.shouldSignOut) {
         // Only show generic error if it's not an auth error
         toast({
-          title: "Authentication Error",
-          description: "Your session has expired. Please log in again.",
+          title: "An Unexpected Error Occurred",
+          description: "Please try logging in again.",
           variant: "destructive",
         });
-        // Clear any invalid session and redirect
-        try {
-          await supabase.auth.signOut();
-        } catch (signOutError) {
-          console.error('Error signing out:', signOutError);
-        }
         navigate('/auth');
       }
     } finally {
@@ -176,25 +147,19 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-gray-50">
-        {/* Hero Header */}
-        <div className="bg-gradient-to-br from-pink-100 to-orange-100 px-4 py-8">
-          <div className="max-w-6xl mx-auto text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-              Welcome back! 🐾
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 px-4 py-6">
+          <div className="max-w-6xl mx-auto">
+            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+              🐾 Social Petwork
             </h1>
-            <p className="text-gray-600 text-lg">Your pet community is waiting for you</p>
+            <p className="text-gray-600 mt-1">Hello {userEmail}! Welcome back to your pet community.</p>
           </div>
         </div>
 
-        {/* Upcoming Playdates - Enhanced */}
-        <div className="bg-white shadow-sm">
-          <div className="max-w-6xl mx-auto px-4 py-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-800">Upcoming Adventures</h2>
-              <Button variant="ghost" size="sm" className="text-green-600">
-                View All
-              </Button>
-            </div>
+        {/* Upcoming Playdates Horizontal Scroller */}
+        <div className="bg-white">
+          <div className="max-w-6xl mx-auto">
             <UpcomingPlaydates />
           </div>
         </div>

@@ -13,30 +13,19 @@ export const checkAuthError = (error: any): AuthError => {
   // Check for common authentication error patterns
   const isJWTExpired = error.message?.includes('JWT expired') || 
                        error.message?.includes('invalid JWT') ||
-                       error.message?.includes('token has expired') ||
-                       error.message?.includes('JWT is expired') ||
-                       error.message?.includes('jwt expired');
+                       error.message?.includes('token has expired');
   
   const isAuthCode = error.code === 'PGRST301' || // JWT expired
                      error.code === 'PGRST302' || // JWT invalid
-                     error.code === 'PGRST116' || // JWT invalid
                      error.status === 401;        // Unauthorized
 
   const isAuthMessage = error.message?.toLowerCase().includes('invalid session') ||
                         error.message?.toLowerCase().includes('unauthorized') ||
-                        error.message?.toLowerCase().includes('authentication') ||
-                        error.message?.toLowerCase().includes('invalid jwt') ||
-                        error.message?.toLowerCase().includes('token is expired') ||
-                        error.message?.toLowerCase().includes('session not found');
-
-  // Check for PostgreSQL auth errors
-  const isPostgresAuthError = error.details?.includes('JWT') || 
-                             error.hint?.includes('JWT') ||
-                             error.message?.includes('permission denied');
+                        error.message?.toLowerCase().includes('authentication');
 
   return {
-    isAuthError: isJWTExpired || isAuthCode || isAuthMessage || isPostgresAuthError,
-    shouldSignOut: isJWTExpired || isAuthCode || isAuthMessage || isPostgresAuthError
+    isAuthError: isJWTExpired || isAuthCode || isAuthMessage,
+    shouldSignOut: isJWTExpired || isAuthCode || isAuthMessage
   };
 };
 

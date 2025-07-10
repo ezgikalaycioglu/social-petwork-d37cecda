@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -49,7 +48,7 @@ const Auth = () => {
           description: "Please check your email to verify your account.",
         });
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -61,15 +60,8 @@ const Auth = () => {
           description: "You have been successfully signed in.",
         });
         
-        // Force navigation to dashboard after successful login
-        console.log('Login successful, data:', data);
-        if (data.session) {
-          console.log('Session exists, navigating to dashboard...');
-          // Use window.location for a hard redirect to ensure proper navigation
-          window.location.href = '/dashboard';
-        } else {
-          console.log('No session found in login response');
-        }
+        // Redirect to dashboard after successful login
+        navigate('/dashboard');
       }
     } catch (error: any) {
       toast({

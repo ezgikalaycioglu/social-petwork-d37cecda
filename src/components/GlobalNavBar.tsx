@@ -102,12 +102,6 @@ const GlobalNavBar = () => {
               Map
             </Link>
             <Link 
-              to="/packs" 
-              className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              Packs
-            </Link>
-            <Link 
               to="/business-dashboard" 
               className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             >
