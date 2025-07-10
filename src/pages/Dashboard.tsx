@@ -147,19 +147,25 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-4 py-6">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              🐾 Social Petwork
+        {/* Hero Header */}
+        <div className="bg-gradient-to-br from-pink-100 to-orange-100 px-4 py-8">
+          <div className="max-w-6xl mx-auto text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+              Welcome back! 🐾
             </h1>
-            <p className="text-gray-600 mt-1">Hello {userEmail}! Welcome back to your pet community.</p>
+            <p className="text-gray-600 text-lg">Your pet community is waiting for you</p>
           </div>
         </div>
 
-        {/* Upcoming Playdates Horizontal Scroller */}
-        <div className="bg-white">
-          <div className="max-w-6xl mx-auto">
+        {/* Upcoming Playdates - Enhanced */}
+        <div className="bg-white shadow-sm">
+          <div className="max-w-6xl mx-auto px-4 py-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-800">Upcoming Adventures</h2>
+              <Button variant="ghost" size="sm" className="text-green-600">
+                View All
+              </Button>
+            </div>
             <UpcomingPlaydates />
           </div>
         </div>

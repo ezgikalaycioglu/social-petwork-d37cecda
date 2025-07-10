@@ -5,6 +5,7 @@ import FeatureShowcase from '../components/landing/FeatureShowcase';
 import ProblemSolution from '../components/landing/ProblemSolution';
 import Features from '../components/landing/Features';
 import AppPreview from '../components/landing/AppPreview';
+import PWAInstructions from '../components/landing/PWAInstructions';
 import FinalCTA from '../components/landing/FinalCTA';
 import Footer from '../components/landing/Footer';
 
@@ -17,6 +18,7 @@ const Index = () => {
       <ProblemSolution />
       <Features />
       <AppPreview />
+      <PWAInstructions />
       <FinalCTA />
       <Footer />
     </div>
