@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { useLocation } from '@/hooks/useLocation';
 import { MapPin, Navigation, PawPrint } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import type { Tables } from '@/integrations/supabase/types';
@@ -77,58 +78,43 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   onLocationPermissionChange 
 }) => {
   const { toast } = useToast();
-  const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
+  const { loading, coordinates, error } = useLocation();
   const [isReady, setIsReady] = useState(false);
   const [nearbyPets, setNearbyPets] = useState<PetProfile[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [locationPermission, setLocationPermission] = useState<boolean>(false);
   const channelRef = useRef<any>(null);
 
   // Default location (San Francisco)
   const defaultLocation: [number, number] = [37.7749, -122.4194];
+  
+  // Convert coordinates to map format
+  const currentLocation: [number, number] | null = coordinates 
+    ? [coordinates.lat, coordinates.lng] 
+    : null;
+  
+  const locationPermission = !!coordinates;
 
   useEffect(() => {
-    initializeLocation();
-    return () => {
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
+    // Notify parent about location permission status
+    onLocationPermissionChange?.(locationPermission);
+    
     if (locationPermission) {
       setupRealtimeListener();
-    }
-  }, [locationPermission]);
-
-  const initializeLocation = async () => {
-    try {
-      if (!navigator.geolocation) {
-        throw new Error('Geolocation not supported');
-      }
-
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000,
-        });
-      });
-
-      const { latitude, longitude } = position.coords;
-      setCurrentLocation([latitude, longitude]);
-      setLocationPermission(true);
-      onLocationPermissionChange?.(true);
       
       toast({
         title: "Location Access Granted",
         description: "Your location will only be shared when you're 'Ready to Play'.",
       });
-    } catch (error) {
-      console.error('Location error:', error);
-      setCurrentLocation(defaultLocation);
-      setLocationPermission(false);
+    }
+    
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
+    };
+  }, [locationPermission, onLocationPermissionChange]);
+
+  useEffect(() => {
+    if (error) {
       onLocationPermissionChange?.(false);
       
       toast({
@@ -136,10 +122,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         description: "Using default location. Enable location access for better experience.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [error, onLocationPermissionChange]);
 
   const setupRealtimeListener = () => {
     fetchNearbyPets();
@@ -246,10 +230,9 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   };
 
   const handleLocationUpdate = (lat: number, lng: number) => {
-    setCurrentLocation([lat, lng]);
-    
+    // Location is now managed by the useLocation hook
+    // We only need to update availability if ready to play
     if (isReady) {
-      // Update pets location in real-time if ready to play
       updateAvailabilityStatus(true);
     }
   };
