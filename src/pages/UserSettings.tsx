@@ -8,10 +8,11 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, User, Bell, Loader2 } from 'lucide-react';
+import { Settings, User, Bell, Loader2, LogOut } from 'lucide-react';
 import Layout from '@/components/Layout';
 import type { Tables } from '@/integrations/supabase/types';
 import PushNotificationSettings from '@/components/PushNotificationSettings';
+import { useAuth } from '@/contexts/AuthContext';
 
 type UserProfile = Tables<'user_profiles'>;
 type NotificationPreferences = Tables<'notification_preferences'>;
@@ -30,6 +31,7 @@ interface SettingsFormData {
 const UserSettings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signOut } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -161,6 +163,23 @@ const UserSettings = () => {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out.",
+      });
+      navigate('/');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -371,6 +390,22 @@ const UserSettings = () => {
                   />
                 </CardContent>
               </Card>
+
+              {/* Mobile Sign Out Button */}
+              <div className="block md:hidden">
+                <Card>
+                  <CardContent className="pt-6">
+                    <Button
+                      onClick={handleSignOut}
+                      variant="destructive"
+                      className="w-full flex items-center justify-center gap-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
 
               {/* Save Button */}
               <div className="flex justify-end">
