@@ -82,6 +82,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [isReady, setIsReady] = useState(false);
   const [nearbyPets, setNearbyPets] = useState<PetProfile[]>([]);
   const channelRef = useRef<any>(null);
+  const locationUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Default location (San Francisco)
   const defaultLocation: [number, number] = [37.7749, -122.4194];
@@ -174,6 +175,72 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     }
   };
 
+  // Function to update location in database (throttled)
+  const updateLocationInDatabase = async () => {
+    if (!currentLocation || !isReady || userPets.length === 0) {
+      return;
+    }
+
+    try {
+      const [latitude, longitude] = currentLocation;
+      
+      console.log('Updating pet locations in database:', { latitude, longitude, petCount: userPets.length });
+      
+      // Update all user's pets with new location
+      const updates = userPets.map(pet => 
+        supabase
+          .from('pet_profiles')
+          .update({
+            latitude,
+            longitude,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', pet.id)
+      );
+
+      const results = await Promise.all(updates);
+      
+      // Check for errors in any of the updates
+      const errors = results.filter(result => result.error);
+      if (errors.length > 0) {
+        console.error('Location update errors:', errors);
+      } else {
+        console.log('Successfully updated pet locations');
+      }
+    } catch (error) {
+      console.error('Error updating pet locations:', error);
+    }
+  };
+
+  // Start/stop location update interval based on "Ready to Play" status
+  useEffect(() => {
+    if (isReady && currentLocation && userPets.length > 0) {
+      // Start 60-second interval for location updates
+      console.log('Starting location update interval (60 seconds)');
+      locationUpdateIntervalRef.current = setInterval(() => {
+        updateLocationInDatabase();
+      }, 60000); // 60 seconds
+
+      // Update immediately when starting
+      updateLocationInDatabase();
+    } else {
+      // Clear interval when not ready to play
+      if (locationUpdateIntervalRef.current) {
+        console.log('Stopping location update interval');
+        clearInterval(locationUpdateIntervalRef.current);
+        locationUpdateIntervalRef.current = null;
+      }
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (locationUpdateIntervalRef.current) {
+        clearInterval(locationUpdateIntervalRef.current);
+        locationUpdateIntervalRef.current = null;
+      }
+    };
+  }, [isReady, currentLocation, userPets]);
+
   const updateAvailabilityStatus = async (available: boolean) => {
     if (!currentLocation || userPets.length === 0) {
       toast({
@@ -216,7 +283,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       toast({
         title: available ? "Ready to Play!" : "No longer available",
         description: available 
-          ? "Your pets are now visible to others on the map" 
+          ? "Your pets are now visible to others on the map (location updates every 60 seconds)" 
           : "Your pets have been removed from the map",
       });
     } catch (error) {
@@ -230,11 +297,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   };
 
   const handleLocationUpdate = (lat: number, lng: number) => {
-    // Location is now managed by the useLocation hook
-    // We only need to update availability if ready to play
-    if (isReady) {
-      updateAvailabilityStatus(true);
-    }
+    // Location updates for map display only - database updates are handled by interval
+    // No database operations here to prevent excessive updates
   };
 
   if (loading) {
