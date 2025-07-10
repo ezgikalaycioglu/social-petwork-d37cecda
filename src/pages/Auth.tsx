@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -25,15 +26,6 @@ const Auth = () => {
       }
     };
     checkAuth();
-
-    // Listen for auth state changes to handle navigation
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        navigate('/dashboard');
-      }
-    });
-
-    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -57,7 +49,7 @@ const Auth = () => {
           description: "Please check your email to verify your account.",
         });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -69,7 +61,10 @@ const Auth = () => {
           description: "You have been successfully signed in.",
         });
         
-        // Navigation will be handled by the auth state change listener
+        // Force navigation to dashboard after successful login
+        if (data.session) {
+          navigate('/dashboard', { replace: true });
+        }
       }
     } catch (error: any) {
       toast({
