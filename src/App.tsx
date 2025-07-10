@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import Layout from "@/components/Layout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -41,80 +42,82 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/changelog" element={<ChangelogPage />} />
-              
-              {/* Protected Routes */}
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/coming-soon" element={
-                <ProtectedRoute>
-                  <ComingSoon />
-                </ProtectedRoute>
-              } />
-              <Route path="/create-pet-profile" element={
-                <ProtectedRoute>
-                  <CreatePetProfile />
-                </ProtectedRoute>
-              } />
-              <Route path="/my-pets" element={
-                <ProtectedRoute>
-                  <MyPets />
-                </ProtectedRoute>
-              } />
-              <Route path="/edit-pet-profile/:petId" element={
-                <ProtectedRoute>
-                  <EditPetProfile />
-                </ProtectedRoute>
-              } />
-              <Route path="/pet-social" element={
-                <ProtectedRoute>
-                  <PetSocial />
-                </ProtectedRoute>
-              } />
-              <Route path="/pet-map" element={
-                <ProtectedRoute>
-                  <PetMap />
-                </ProtectedRoute>
-              } />
-              <Route path="/events" element={
-                <ProtectedRoute>
-                  <Events />
-                </ProtectedRoute>
-              } />
-              <Route path="/deals" element={
-                <ProtectedRoute>
-                  <Deals />
-                </ProtectedRoute>
-              } />
-              <Route path="/business-dashboard" element={
-                <ProtectedRoute>
-                  <BusinessDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/packs" element={
-                <ProtectedRoute>
-                  <Packs />
-                </ProtectedRoute>
-              } />
-              <Route path="/pet-adventures/:petId" element={
-                <ProtectedRoute>
-                  <PetAdventures />
-                </ProtectedRoute>
-              } />
-              <Route path="/settings" element={
-                <ProtectedRoute>
-                  <UserSettings />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/changelog" element={<ChangelogPage />} />
+                
+                {/* Protected Routes */}
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/coming-soon" element={
+                  <ProtectedRoute>
+                    <ComingSoon />
+                  </ProtectedRoute>
+                } />
+                <Route path="/create-pet-profile" element={
+                  <ProtectedRoute>
+                    <CreatePetProfile />
+                  </ProtectedRoute>
+                } />
+                <Route path="/my-pets" element={
+                  <ProtectedRoute>
+                    <MyPets />
+                  </ProtectedRoute>
+                } />
+                <Route path="/edit-pet-profile/:petId" element={
+                  <ProtectedRoute>
+                    <EditPetProfile />
+                  </ProtectedRoute>
+                } />
+                <Route path="/pet-social" element={
+                  <ProtectedRoute>
+                    <PetSocial />
+                  </ProtectedRoute>
+                } />
+                <Route path="/pet-map" element={
+                  <ProtectedRoute>
+                    <PetMap />
+                  </ProtectedRoute>
+                } />
+                <Route path="/events" element={
+                  <ProtectedRoute>
+                    <Events />
+                  </ProtectedRoute>
+                } />
+                <Route path="/deals" element={
+                  <ProtectedRoute>
+                    <Deals />
+                  </ProtectedRoute>
+                } />
+                <Route path="/business-dashboard" element={
+                  <ProtectedRoute>
+                    <BusinessDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/packs" element={
+                  <ProtectedRoute>
+                    <Packs />
+                  </ProtectedRoute>
+                } />
+                <Route path="/pet-adventures/:petId" element={
+                  <ProtectedRoute>
+                    <PetAdventures />
+                  </ProtectedRoute>
+                } />
+                <Route path="/settings" element={
+                  <ProtectedRoute>
+                    <UserSettings />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Layout>
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
