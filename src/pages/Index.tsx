@@ -14,8 +14,8 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Hero />
-      <AppShowcase />
       <PWAInstallInstructions />
+      <AppShowcase />
       <Benefits />
       <FeatureShowcase />
       <ProblemSolution />
