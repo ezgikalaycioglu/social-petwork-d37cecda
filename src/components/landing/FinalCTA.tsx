@@ -1,12 +1,46 @@
 
-import { ArrowRight, Star, Users, Heart } from 'lucide-react';
+import { ArrowRight, Users, Heart } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { supabase } from '../../integrations/supabase/client';
 
 const FinalCTA = () => {
-  const stats = [
-    { icon: <Users className="w-6 h-6" />, number: "10,000+", label: "Happy Pet Parents" },
-    { icon: <Heart className="w-6 h-6" />, number: "25,000+", label: "Pet Friendships" },
-    { icon: <Star className="w-6 h-6" />, number: "4.9/5", label: "App Store Rating" }
-  ];
+  const [stats, setStats] = useState([
+    { icon: <Users className="w-6 h-6" />, number: "0", label: "Happy Pet Parents" },
+    { icon: <Heart className="w-6 h-6" />, number: "0", label: "Pet Friendships" }
+  ]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Get count of happy pet parents (users with profiles)
+        const { count: userCount } = await supabase
+          .from('user_profiles')
+          .select('*', { count: 'exact', head: true });
+
+        // Get count of pet friendships
+        const { count: friendshipCount } = await supabase
+          .from('pet_friendships')
+          .select('*', { count: 'exact', head: true });
+
+        setStats([
+          { 
+            icon: <Users className="w-6 h-6" />, 
+            number: userCount ? `${userCount.toLocaleString()}+` : "0", 
+            label: "Happy Pet Parents" 
+          },
+          { 
+            icon: <Heart className="w-6 h-6" />, 
+            number: friendshipCount ? `${friendshipCount.toLocaleString()}+` : "0", 
+            label: "Pet Friendships" 
+          }
+        ]);
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <section data-section="final-cta" className="py-20 px-4 bg-gradient-to-br from-green-600 to-blue-600 text-white">
@@ -21,7 +55,7 @@ const FinalCTA = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 max-w-2xl mx-auto">
           {stats.map((stat, index) => (
             <div key={index} className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
               <div className="flex items-center justify-center mb-2">
@@ -41,18 +75,8 @@ const FinalCTA = () => {
           </button>
           
           <p className="text-lg opacity-80">
-            Free to download • No credit card required • Available on iOS & Android
+            Free to use • No credit card required
           </p>
-        </div>
-
-        {/* Trust badges */}
-        <div className="mt-16 pt-12 border-t border-white/20">
-          <p className="text-sm opacity-70 mb-4">Trusted by pet parents worldwide</p>
-          <div className="flex justify-center items-center space-x-8 opacity-60">
-            <div className="text-2xl font-bold">App Store</div>
-            <div className="text-2xl font-bold">Google Play</div>
-            <div className="text-2xl font-bold">Product Hunt</div>
-          </div>
         </div>
       </div>
     </section>
