@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, Clock, MapPin, Plus, Users, Heart, PawPrint } from 'lucide-react';
 import Layout from '@/components/Layout';
-import PageHeader from '@/components/PageHeader';
 import PlaydateRequestModal from '@/components/PlaydateRequestModal';
 import GroupWalkModal from '@/components/GroupWalkModal';
 import type { Tables } from '@/integrations/supabase/types';
@@ -173,62 +172,52 @@ const Events = () => {
 
   return (
     <Layout>
-      <PageHeader
-        title="My Events"
-        subtitle="Manage your playdates and group walks"
-        icon={<Calendar className="w-6 h-6 text-primary" />}
-        actions={
-          userPets.length > 0 && (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
+              🗓️ My Events
+            </h1>
+            <p className="text-gray-600 mt-1">Manage your playdates and group walks</p>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <Button
               onClick={() => setShowGroupWalkModal(true)}
-              className="bg-primary hover:bg-primary/90"
+              className="bg-green-600 hover:bg-green-700 text-white h-16 text-lg"
+              disabled={userPets.length === 0}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-6 h-6 mr-2" />
               Create Group Walk
             </Button>
-          )
-        }
-      />
+            <Button
+              onClick={() => navigate('/pet-social')}
+              variant="outline"
+              className="h-16 text-lg border-green-500 text-green-600 hover:bg-green-50"
+            >
+              <Users className="w-6 h-6 mr-2" />
+              Find Pets for Playdates
+            </Button>
+          </div>
 
-      <div className="bg-background min-h-screen">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-6xl mx-auto">
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              <Button
-                onClick={() => setShowGroupWalkModal(true)}
-                className="bg-primary hover:bg-primary/90 h-16 text-lg"
-                disabled={userPets.length === 0}
-              >
-                <Plus className="w-6 h-6 mr-2" />
-                Create Group Walk
-              </Button>
-              <Button
-                onClick={() => navigate('/pet-social')}
-                variant="outline"
-                className="h-16 text-lg"
-              >
-                <Users className="w-6 h-6 mr-2" />
-                Find Pets for Playdates
-              </Button>
-            </div>
-
-            {userPets.length === 0 ? (
-              <Card className="shadow-lg">
-                <CardContent className="p-12 text-center">
-                  <PawPrint className="w-16 h-16 mx-auto mb-6 text-muted-foreground" />
-                  <h2 className="text-2xl font-semibold text-foreground mb-4">No pets found!</h2>
-                  <p className="text-muted-foreground mb-8">
-                    You need to create a pet profile before you can schedule playdates or group walks.
-                  </p>
-                  <Button
-                    onClick={() => navigate('/create-pet-profile')}
-                    className="bg-primary hover:bg-primary/90"
-                  >
-                    Create Pet Profile
-                  </Button>
-                </CardContent>
-              </Card>
+          {userPets.length === 0 ? (
+            <Card className="bg-white shadow-lg">
+              <CardContent className="p-12 text-center">
+                <PawPrint className="w-16 h-16 mx-auto mb-6 text-gray-400" />
+                <h2 className="text-2xl font-semibold text-gray-700 mb-4">No pets found!</h2>
+                <p className="text-gray-600 mb-8">
+                  You need to create a pet profile before you can schedule playdates or group walks.
+                </p>
+                <Button
+                  onClick={() => navigate('/create-pet-profile')}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Create Pet Profile
+                </Button>
+              </CardContent>
+            </Card>
           ) : (
             <Tabs defaultValue="incoming" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
@@ -413,8 +402,7 @@ const Events = () => {
                 )}
               </TabsContent>
             </Tabs>
-            )}
-          </div>
+          )}
         </div>
       </div>
 
