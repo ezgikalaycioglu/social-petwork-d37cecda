@@ -5,9 +5,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Heart, Plus, Edit, Trash2, Camera, PawPrint, Home, LogOut } from 'lucide-react';
+import { Heart, Plus, Edit, Trash2, Camera, PawPrint } from 'lucide-react';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
+import GlobalNavBar from '@/components/GlobalNavBar';
 
 interface PetProfile {
   id: string;
@@ -141,26 +142,10 @@ const MyPets = () => {
     }
   };
 
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to sign out. Please try again.",
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Signed out",
-        description: "You have been successfully signed out.",
-      });
-      navigate('/');
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
+        <GlobalNavBar />
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
             <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
@@ -174,6 +159,7 @@ const MyPets = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50">
+        <GlobalNavBar />
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
             <PawPrint className="w-16 h-16 mx-auto mb-4 text-gray-400" />
@@ -192,7 +178,8 @@ const MyPets = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gray-50">
+      <GlobalNavBar />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">My Pets</h1>
@@ -297,30 +284,6 @@ const MyPets = () => {
             </div>
           </>
         )}
-
-        {/* Bottom Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-          <div className="flex justify-center space-x-4">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => navigate('/dashboard')}
-              className="flex items-center space-x-2"
-            >
-              <Home className="w-4 h-4" />
-              <span>Dashboard</span>
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleSignOut}
-              className="flex items-center space-x-2 text-red-600 hover:bg-red-50"
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Sign Out</span>
-            </Button>
-          </div>
-        </div>
       </div>
     </div>
   );
