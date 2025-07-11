@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Gift, MapPin, Clock, Percent, DollarSign } from 'lucide-react';
 import Layout from '@/components/Layout';
+import PageHeader from '@/components/PageHeader';
 import ClaimDealModal from '@/components/ClaimDealModal';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -109,43 +110,41 @@ const Deals = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-              <Gift className="w-8 h-8 text-green-600" />
-              Exclusive Pet Deals
-            </h1>
-            <p className="text-gray-600 mt-1">Special offers from trusted pet businesses in your area!</p>
-          </div>
+      <PageHeader
+        title="Exclusive Pet Deals"
+        subtitle="Special offers from trusted pet businesses in your area!"
+        icon={<Gift className="w-6 h-6 text-primary" />}
+      />
 
-          {/* Category Filter */}
-          <div className="mb-8">
-            <div className="flex flex-wrap gap-2">
+      <div className="bg-background min-h-screen">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-6xl mx-auto">
+            {/* Category Filter */}
+            <div className="mb-8">
+              <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
                 <Button
                   key={category.value}
                   variant={filterCategory === category.value ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterCategory(category.value)}
-                  className={filterCategory === category.value ? "bg-green-600 hover:bg-green-700" : ""}
+                  className={filterCategory === category.value ? "bg-primary hover:bg-primary/90" : ""}
                 >
                   {category.label}
                 </Button>
               ))}
             </div>
-          </div>
-
-          {/* Deals Grid */}
-          {filteredDeals.length === 0 ? (
-            <div className="text-center py-12">
-              <Gift className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <h2 className="text-2xl font-semibold text-gray-700 mb-2">No deals available</h2>
-              <p className="text-gray-600">Check back soon for new exclusive offers!</p>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            {/* Deals Grid */}
+            {filteredDeals.length === 0 ? (
+              <div className="text-center py-12">
+                <Gift className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h2 className="text-2xl font-semibold text-foreground mb-2">No deals available</h2>
+                <p className="text-muted-foreground">Check back soon for new exclusive offers!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredDeals.map((deal) => (
                 <Card key={deal.id} className="hover:shadow-lg transition-shadow duration-200">
                   <CardHeader className="pb-4">
@@ -215,11 +214,11 @@ const Deals = () => {
                       )}
                     </div>
 
-                    <Button
-                      onClick={() => handleClaimDeal(deal)}
-                      className="w-full bg-green-600 hover:bg-green-700"
-                      disabled={deal.max_redemptions ? (deal.current_redemptions || 0) >= deal.max_redemptions : false}
-                    >
+                  <Button
+                    onClick={() => handleClaimDeal(deal)}
+                    className="w-full bg-primary hover:bg-primary/90"
+                    disabled={deal.max_redemptions ? (deal.current_redemptions || 0) >= deal.max_redemptions : false}
+                  >
                       {deal.max_redemptions && (deal.current_redemptions || 0) >= deal.max_redemptions 
                         ? 'Deal Fully Claimed' 
                         : 'Claim Deal'
@@ -229,7 +228,8 @@ const Deals = () => {
                 </Card>
               ))}
             </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
