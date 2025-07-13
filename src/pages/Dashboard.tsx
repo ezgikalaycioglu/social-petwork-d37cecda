@@ -9,7 +9,9 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import { Plus, Heart, Eye, Edit, PawPrint, Users, MapPin } from 'lucide-react';
 import Layout from '@/components/Layout';
 import SocialFeed from '@/components/SocialFeed';
+import { TweetFeed } from '@/components/TweetFeed';
 import UpcomingPlaydates from '@/components/UpcomingPlaydates';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { handleAuthError } from '@/utils/authErrorHandler';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -173,7 +175,21 @@ const Dashboard = () => {
                 <h2 className="text-xl font-bold text-gray-800 mb-2">Community Feed</h2>
                 <p className="text-gray-600">See what's happening in your pet network</p>
               </div>
-              <SocialFeed />
+              
+              <Tabs defaultValue="tweets" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="tweets">Pet Tweets</TabsTrigger>
+                  <TabsTrigger value="feed">Activities</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="tweets">
+                  <TweetFeed />
+                </TabsContent>
+                
+                <TabsContent value="feed">
+                  <SocialFeed />
+                </TabsContent>
+              </Tabs>
             </div>
 
             {/* Sidebar - Takes up 1/3 on large screens */}

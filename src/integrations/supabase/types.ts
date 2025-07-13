@@ -507,6 +507,51 @@ export type Database = {
         }
         Relationships: []
       }
+      pet_tweets: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          owner_id: string
+          pet_id: string
+          photo_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          owner_id: string
+          pet_id: string
+          photo_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          owner_id?: string
+          pet_id?: string
+          photo_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pet_tweets_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pet_tweets_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -554,6 +599,107 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      tweet_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          owner_id: string
+          pet_id: string
+          reaction_type: string
+          tweet_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          owner_id: string
+          pet_id: string
+          reaction_type: string
+          tweet_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          owner_id?: string
+          pet_id?: string
+          reaction_type?: string
+          tweet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tweet_reactions_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tweet_reactions_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tweet_reactions_tweet_id_fkey"
+            columns: ["tweet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_tweets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tweet_replies: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          owner_id: string
+          pet_id: string
+          tweet_id: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          owner_id: string
+          pet_id: string
+          tweet_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          owner_id?: string
+          pet_id?: string
+          tweet_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tweet_replies_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tweet_replies_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tweet_replies_tweet_id_fkey"
+            columns: ["tweet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_tweets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_profiles: {
         Row: {
