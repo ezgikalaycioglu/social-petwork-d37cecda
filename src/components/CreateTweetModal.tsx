@@ -34,8 +34,8 @@ export const CreateTweetModal: React.FC<CreateTweetModalProps> = ({
   const handleSubmit = async () => {
     if (!content.trim() || !selectedPetId) {
       toast({
-        title: "Hata",
-        description: "Lütfen içerik yazın ve bir pet seçin",
+        title: "Error",
+        description: "Please write content and select a pet",
         variant: "destructive",
       });
       return;
@@ -58,8 +58,8 @@ export const CreateTweetModal: React.FC<CreateTweetModalProps> = ({
       if (error) throw error;
 
       toast({
-        title: "Başarılı!",
-        description: "Tweet paylaşıldı",
+        title: "Success!",
+        description: "Tweet posted",
       });
 
       setContent('');
@@ -70,8 +70,8 @@ export const CreateTweetModal: React.FC<CreateTweetModalProps> = ({
     } catch (error) {
       console.error('Error creating tweet:', error);
       toast({
-        title: "Hata",
-        description: "Tweet paylaşılırken bir hata oluştu",
+        title: "Error",
+        description: "Error posting tweet",
         variant: "destructive",
       });
     } finally {
@@ -85,14 +85,14 @@ export const CreateTweetModal: React.FC<CreateTweetModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Send className="h-5 w-5" />
-            Yeni Tweet
+            New Tweet
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
           <Select value={selectedPetId} onValueChange={setSelectedPetId}>
             <SelectTrigger>
-              <SelectValue placeholder="Hangi petiniz adına tweet atıyor?" />
+              <SelectValue placeholder="Which pet is tweeting?" />
             </SelectTrigger>
             <SelectContent>
               {pets.map((pet) => (
@@ -104,7 +104,7 @@ export const CreateTweetModal: React.FC<CreateTweetModalProps> = ({
           </Select>
 
           <Textarea
-            placeholder="Ne düşünüyorsun? (örn: Dışarı çıkıyorum! 🐕)"
+            placeholder="What's happening? (e.g., Going out for a walk! 🐕)"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="min-h-[100px] resize-none"
@@ -118,7 +118,7 @@ export const CreateTweetModal: React.FC<CreateTweetModalProps> = ({
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Camera className="h-4 w-4" />
-              Fotoğraf Ekle (İsteğe bağlı)
+              Add Photo (Optional)
             </div>
             <PhotoUpload
               currentPhotoUrl={photoUrl}
@@ -130,14 +130,14 @@ export const CreateTweetModal: React.FC<CreateTweetModalProps> = ({
 
           <div className="flex gap-2 pt-4">
             <Button variant="outline" onClick={onClose} className="flex-1">
-              İptal
+              Cancel
             </Button>
             <Button 
               onClick={handleSubmit} 
               disabled={isLoading || !content.trim() || !selectedPetId}
               className="flex-1"
             >
-              {isLoading ? "Paylaşılıyor..." : "Tweet At"}
+              {isLoading ? "Posting..." : "Tweet"}
             </Button>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Heart, MessageCircle, Smile, Laugh, Frown, Eye, Send } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { tr } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 interface TweetCardProps {
   tweet: {
@@ -134,8 +134,8 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
   const handleReaction = async (reactionType: string) => {
     if (!selectedPetId) {
       toast({
-        title: "Pet Seçin",
-        description: "Lütfen önce hangi petiniz adına tepki vereceğinizi seçin",
+        title: "Select Pet",
+        description: "Please first select which pet is reacting",
         variant: "destructive",
       });
       return;
@@ -176,8 +176,8 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
     } catch (error) {
       console.error('Error handling reaction:', error);
       toast({
-        title: "Hata",
-        description: "Tepki eklenirken bir hata oluştu",
+        title: "Error",
+        description: "Error adding reaction",
         variant: "destructive",
       });
     }
@@ -186,8 +186,8 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
   const handleReply = async () => {
     if (!replyContent.trim() || !selectedPetId) {
       toast({
-        title: "Hata",
-        description: "Lütfen cevap yazın ve bir pet seçin",
+        title: "Error",
+        description: "Please write a reply and select a pet",
         variant: "destructive",
       });
       return;
@@ -215,14 +215,14 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
       setShowReplies(true);
 
       toast({
-        title: "Başarılı!",
-        description: "Cevap gönderildi",
+        title: "Success!",
+        description: "Reply posted",
       });
     } catch (error) {
       console.error('Error creating reply:', error);
       toast({
-        title: "Hata",
-        description: "Cevap gönderilirken bir hata oluştu",
+        title: "Error",
+        description: "Error posting reply",
         variant: "destructive",
       });
     } finally {
@@ -256,7 +256,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
             <p className="text-sm text-muted-foreground">
               {formatDistanceToNow(new Date(tweet.created_at), { 
                 addSuffix: true, 
-                locale: tr 
+                locale: enUS 
               })}
             </p>
           </div>
@@ -269,7 +269,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
         {tweet.photo_url && (
           <img
             src={tweet.photo_url}
-            alt="Tweet fotoğrafı"
+            alt="Tweet photo"
             className="rounded-lg max-h-64 w-full object-cover mb-3"
           />
         )}
@@ -277,7 +277,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
         {/* Pet Selection for User Actions */}
         {userPets.length > 0 && (
           <div className="mb-3 p-2 bg-muted rounded-lg">
-            <p className="text-xs text-muted-foreground mb-2">Hangi petiniz adına?</p>
+            <p className="text-xs text-muted-foreground mb-2">Which pet?</p>
             <div className="flex gap-2 flex-wrap">
               {userPets.map((pet) => (
                 <Button
@@ -326,7 +326,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
                 className="text-xs"
               >
                 <Icon className={`h-3 w-3 mr-1 ${hasReacted ? 'text-white' : reactionColors[type as keyof typeof reactionColors]}`} />
-                {type === 'like' ? 'Beğen' : type === 'love' ? 'Sevdim' : type === 'laugh' ? 'Gülümse' : type === 'wow' ? 'Şaşırdım' : 'Üzüldüm'}
+                {type === 'like' ? 'Like' : type === 'love' ? 'Love' : type === 'laugh' ? 'Laugh' : type === 'wow' ? 'Wow' : 'Sad'}
               </Button>
             );
           })}
@@ -337,7 +337,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
             className="text-xs"
           >
             <MessageCircle className="h-3 w-3 mr-1" />
-            Cevapla
+            Reply
           </Button>
         </div>
 
@@ -345,7 +345,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
         {showReplyForm && (
           <div className="mb-3 p-3 border rounded-lg">
             <Textarea
-              placeholder="Cevabınızı yazın..."
+              placeholder="Write your reply..."
               value={replyContent}
               onChange={(e) => setReplyContent(e.target.value)}
               className="mb-2"
@@ -358,14 +358,14 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
                 disabled={isLoading || !replyContent.trim() || !selectedPetId}
               >
                 <Send className="h-3 w-3 mr-1" />
-                {isLoading ? "Gönderiliyor..." : "Gönder"}
+                {isLoading ? "Posting..." : "Post"}
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowReplyForm(false)}
               >
-                İptal
+                Cancel
               </Button>
             </div>
           </div>
@@ -380,7 +380,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
               onClick={() => setShowReplies(!showReplies)}
               className="text-xs mb-2"
             >
-              {replies.length} cevap {showReplies ? 'gizle' : 'göster'}
+              {replies.length} {replies.length === 1 ? 'reply' : 'replies'} {showReplies ? 'hide' : 'show'}
             </Button>
             
             {showReplies && (
@@ -397,7 +397,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
                         <span className="text-xs text-muted-foreground">
                           {formatDistanceToNow(new Date(reply.created_at), { 
                             addSuffix: true, 
-                            locale: tr 
+                            locale: enUS 
                           })}
                         </span>
                       </div>

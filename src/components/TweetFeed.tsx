@@ -112,8 +112,8 @@ export const TweetFeed: React.FC = () => {
       
       if (!authErrorHandled.shouldSignOut) {
         toast({
-          title: "Hata",
-          description: "Tweetler yüklenirken bir hata oluştu",
+          title: "Error",
+          description: "Error loading tweets",
           variant: "destructive",
         });
       }
@@ -199,14 +199,14 @@ export const TweetFeed: React.FC = () => {
       {tweets.length === 0 ? (
         <div className="text-center py-12">
           <PawPrint className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-          <h2 className="text-2xl font-semibold mb-2">Henüz Tweet Yok</h2>
+          <h2 className="text-2xl font-semibold mb-2">No Tweets Yet</h2>
           <p className="text-muted-foreground mb-4">
-            İlk tweeti atan siz olun! Petiniz ne yapıyor?
+            Be the first to tweet! What's your pet up to?
           </p>
           {userPets.length > 0 && (
             <Button onClick={() => setShowCreateModal(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              İlk Tweet'i At
+              First Tweet
             </Button>
           )}
         </div>
@@ -237,7 +237,7 @@ export const TweetFeed: React.FC = () => {
           
           {!hasMore && tweets.length > 0 && (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">Tüm tweetleri gördünüz!</p>
+              <p className="text-muted-foreground">You've seen all tweets!</p>
             </div>
           )}
         </div>
