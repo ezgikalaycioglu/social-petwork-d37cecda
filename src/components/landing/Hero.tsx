@@ -1,8 +1,9 @@
 
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Menu } from 'lucide-react';
 import AuthButton from '../AuthButton';
 import WaitlistForm from '../WaitlistForm';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -48,65 +49,45 @@ const Hero = () => {
   ];
 
   return (
-    <section className="relative overflow-hidden" style={{ backgroundColor: '#F3FCF6' }}>
-      {/* Top Navigation Bar */}
-      <nav className="w-full px-6 py-4 bg-white/90 backdrop-blur-sm border-b border-green-100">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center">
-            <img 
-              src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
-              alt="Social Petwork Logo"
-              className="w-10 h-10 mr-3"
-            />
-            <span className="text-xl font-bold text-gray-800">Social Petwork</span>
-          </div>
-          
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-8">
+    <section className="px-4 py-12 lg:py-20 relative overflow-hidden" style={{ backgroundColor: '#F3FCF6' }}>
+      {/* Navigation Dropdown */}
+      <div className="absolute top-4 right-4 z-10">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="bg-white backdrop-blur-sm border-green-200 hover:bg-white/90 p-2 shadow-lg"
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="end" 
+            className="w-48 bg-white backdrop-blur-sm border-green-200 shadow-lg z-50"
+          >
             {navigationItems.map((item) => (
-              <button
+              <DropdownMenuItem 
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className="text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200 hover:underline underline-offset-4"
+                className="cursor-pointer hover:bg-green-50 py-2 px-3"
               >
                 {item.label}
-              </button>
+              </DropdownMenuItem>
             ))}
-          </div>
-          
-          {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
-            <AuthButton />
-          </div>
-        </div>
-        
-        {/* Mobile Navigation */}
-        <div className="md:hidden mt-4 flex flex-wrap gap-4 justify-center">
-          {navigationItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => scrollToSection(item.id)}
-              className="text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200"
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      </nav>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
-      {/* Hero Content */}
-      <div className="px-4 py-12 lg:py-20">
-
-        <div className="max-w-6xl mx-auto text-center">
-          {/* Main Logo - Larger for hero section */}
-          <div className="flex justify-center mb-8">
-            <img 
-              src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
-              alt="Social Petwork Logo"
-              className="w-32 h-32 md:w-40 md:h-40"
-            />
-          </div>
+      <div className="max-w-6xl mx-auto text-center">
+        {/* Logo */}
+        <div className="flex justify-center mb-8">
+          <img 
+            src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
+            alt="Social Petwork Logo"
+            className="w-32 h-32 md:w-40 md:h-40"
+          />
+        </div>
 
         {/* Main Headline */}
         <div className="max-w-4xl mx-auto">
@@ -149,7 +130,6 @@ const Hero = () => {
               </p>
             </div>
             <WaitlistForm />
-          </div>
           </div>
         </div>
       </div>
