@@ -116,7 +116,7 @@ const Footer = () => {
         
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm mb-4 md:mb-0">
-            © 2024 Social Petwork. All rights reserved.
+            © 2025 Social Petwork. All rights reserved.
           </p>
           <div className="flex items-center text-gray-400 text-sm">
             Made with <Heart className="h-4 w-4 text-red-500 mx-1" /> for pets and their families
