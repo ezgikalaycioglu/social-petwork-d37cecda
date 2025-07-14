@@ -11,6 +11,7 @@ import Layout from '@/components/Layout';
 import SocialFeed from '@/components/SocialFeed';
 import { TweetFeed } from '@/components/TweetFeed';
 import UpcomingPlaydates from '@/components/UpcomingPlaydates';
+import { AICoach } from '@/components/AICoach';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { handleAuthError } from '@/utils/authErrorHandler';
 import type { Tables } from '@/integrations/supabase/types';
@@ -288,6 +289,14 @@ const Dashboard = () => {
                     </Button>
                   </CardContent>
                 </Card>
+              )}
+
+              {/* AI Coach for existing pet owners */}
+              {pets.length > 0 && (
+                <AICoach 
+                  petId={pets[0].id} 
+                  petName={pets[0].name} 
+                />
               )}
 
               {/* Welcome Message for New Users */}

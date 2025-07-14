@@ -53,6 +53,42 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_generated_content: {
+        Row: {
+          content_type: string
+          created_at: string
+          generated_text: string
+          id: string
+          pet_id: string | null
+          prompt_data: Json | null
+          updated_at: string
+          used: boolean | null
+          user_id: string
+        }
+        Insert: {
+          content_type: string
+          created_at?: string
+          generated_text: string
+          id?: string
+          pet_id?: string | null
+          prompt_data?: Json | null
+          updated_at?: string
+          used?: boolean | null
+          user_id: string
+        }
+        Update: {
+          content_type?: string
+          created_at?: string
+          generated_text?: string
+          id?: string
+          pet_id?: string | null
+          prompt_data?: Json | null
+          updated_at?: string
+          used?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       business_profiles: {
         Row: {
           address: string | null
