@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, PawPrint, Users, MapPin, Calendar, Gift, Building, Settings, User } from 'lucide-react';
+import { Home, PawPrint, Users, MapPin, Calendar, Gift, Building, Settings, User, Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ const DesktopSidebar = () => {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'My Pets', href: '/my-pets', icon: PawPrint },
     { name: 'Social', href: '/pet-social', icon: Users },
+    { name: 'Find Friends', href: '/find-friends', icon: Heart },
     { name: 'Map', href: '/pet-map', icon: MapPin },
     { name: 'Events', href: '/events', icon: Calendar },
     { name: 'Deals', href: '/deals', icon: Gift },

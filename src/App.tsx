@@ -24,6 +24,7 @@ import Deals from "./pages/Deals";
 import BusinessDashboard from "./pages/BusinessDashboard";
 import ChangelogPage from "./pages/ChangelogPage";
 import Packs from "./pages/Packs";
+import FindFriends from "./pages/FindFriends";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -77,6 +78,11 @@ const App = () => {
                 <Route path="/pet-social" element={
                   <ProtectedRoute>
                     <PetSocial />
+                  </ProtectedRoute>
+                } />
+                <Route path="/find-friends" element={
+                  <ProtectedRoute>
+                    <FindFriends />
                   </ProtectedRoute>
                 } />
                 <Route path="/pet-map" element={

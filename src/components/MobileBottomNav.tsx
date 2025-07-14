@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, PawPrint, Users, MapPin, User } from 'lucide-react';
+import { Home, PawPrint, Users, MapPin, User, Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const MobileBottomNav = () => {
@@ -8,10 +8,10 @@ const MobileBottomNav = () => {
   const { user } = useAuth();
 
   const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'My Pets', href: '/my-pets', icon: PawPrint },
+    { name: 'Home', href: '/dashboard', icon: Home },
+    { name: 'Pets', href: '/my-pets', icon: PawPrint },
     { name: 'Social', href: '/pet-social', icon: Users },
-    { name: 'Map', href: '/pet-map', icon: MapPin },
+    { name: 'Friends', href: '/find-friends', icon: Heart },
     { name: 'Profile', href: '/settings', icon: User },
   ];
 
