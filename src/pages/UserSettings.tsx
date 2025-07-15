@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, User, Bell, Loader2, LogOut } from 'lucide-react';
+import { Settings, User, Bell, Loader2, LogOut, Globe } from 'lucide-react';
 import Layout from '@/components/Layout';
 import type { Tables } from '@/integrations/supabase/types';
 import PushNotificationSettings from '@/components/PushNotificationSettings';
@@ -32,6 +34,7 @@ const UserSettings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { signOut } = useAuth();
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -166,11 +169,19 @@ const UserSettings = () => {
     }
   };
 
+  const handleLanguageChange = (languageCode: string) => {
+    i18n.changeLanguage(languageCode);
+    toast({
+      title: t('common.save'),
+      description: t('settings.language') + ' changed successfully!',
+    });
+  };
+
   const handleSignOut = async () => {
     try {
       await signOut();
       toast({
-        title: "Signed out",
+        title: t('settings.signOut'),
         description: "You have been successfully signed out.",
       });
       navigate('/');
@@ -187,10 +198,10 @@ const UserSettings = () => {
     return (
       <Layout>
         <div className="flex items-center justify-center py-32">
-          <div className="text-center">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
-            <p className="text-gray-600">Loading your settings...</p>
-          </div>
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
+          <p className="text-gray-600">{t('common.loading')}</p>
+        </div>
         </div>
       </Layout>
     );
@@ -204,7 +215,7 @@ const UserSettings = () => {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
               <Settings className="w-8 h-8" />
-              Settings
+              {t('settings.title')}
             </h1>
             <p className="text-gray-600 mt-1">Manage your account and notification preferences</p>
           </div>
@@ -216,7 +227,7 @@ const UserSettings = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <User className="w-5 h-5" />
-                    Profile Information
+                    {t('settings.profileInformation')}
                   </CardTitle>
                   <CardDescription>
                     Update your personal information and location details
@@ -228,7 +239,7 @@ const UserSettings = () => {
                     name="displayName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Display Name</FormLabel>
+                        <FormLabel>{t('settings.displayName')}</FormLabel>
                         <FormControl>
                           <Input placeholder="Enter your display name" {...field} />
                         </FormControl>
@@ -243,7 +254,7 @@ const UserSettings = () => {
                       name="city"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>City</FormLabel>
+                          <FormLabel>{t('settings.city')}</FormLabel>
                           <FormControl>
                             <Input placeholder="Enter your city" {...field} />
                           </FormControl>
@@ -257,7 +268,7 @@ const UserSettings = () => {
                       name="neighborhood"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Neighborhood</FormLabel>
+                          <FormLabel>{t('settings.neighborhood')}</FormLabel>
                           <FormControl>
                             <Input placeholder="Enter your neighborhood" {...field} />
                           </FormControl>
@@ -265,6 +276,38 @@ const UserSettings = () => {
                         </FormItem>
                       )}
                     />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Regional Settings Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Globe className="w-5 h-5" />
+                    {t('settings.regionalSettings')}
+                  </CardTitle>
+                  <CardDescription>
+                    {t('settings.selectLanguage')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">{t('settings.language')}</label>
+                      <Select value={i18n.language} onValueChange={handleLanguageChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={t('settings.selectLanguage')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="en">{t('languages.en')}</SelectItem>
+                          <SelectItem value="tr">{t('languages.tr')}</SelectItem>
+                          <SelectItem value="sv">{t('languages.sv')}</SelectItem>
+                          <SelectItem value="es">{t('languages.es')}</SelectItem>
+                          <SelectItem value="fr">{t('languages.fr')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -277,7 +320,7 @@ const UserSettings = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Bell className="w-5 h-5" />
-                    Notification Preferences
+                    {t('settings.notificationPreferences')}
                   </CardTitle>
                   <CardDescription>
                     Choose which notifications you'd like to receive
@@ -290,7 +333,7 @@ const UserSettings = () => {
                     render={({ field }) => (
                       <FormItem className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base">Playdate Requests</FormLabel>
+                          <FormLabel className="text-base">{t('settings.playdateRequests')}</FormLabel>
                           <div className="text-sm text-gray-600">
                             Get notified when someone sends your pet a playdate request
                           </div>
@@ -311,7 +354,7 @@ const UserSettings = () => {
                     render={({ field }) => (
                       <FormItem className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base">Playdate Confirmations</FormLabel>
+                          <FormLabel className="text-base">{t('settings.playdateConfirmations')}</FormLabel>
                           <div className="text-sm text-gray-600">
                             Get notified when your playdate requests are accepted or declined
                           </div>
@@ -332,7 +375,7 @@ const UserSettings = () => {
                     render={({ field }) => (
                       <FormItem className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base">Upcoming Event Reminders</FormLabel>
+                          <FormLabel className="text-base">{t('settings.eventReminders')}</FormLabel>
                           <div className="text-sm text-gray-600">
                             Get reminded about upcoming events and activities
                           </div>
@@ -353,7 +396,7 @@ const UserSettings = () => {
                     render={({ field }) => (
                       <FormItem className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base">New Follower Alerts</FormLabel>
+                          <FormLabel className="text-base">{t('settings.newFollowerAlerts')}</FormLabel>
                           <div className="text-sm text-gray-600">
                             Get notified when someone follows you or your pets
                           </div>
@@ -374,7 +417,7 @@ const UserSettings = () => {
                     render={({ field }) => (
                       <FormItem className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base">Weekly Newsletter</FormLabel>
+                          <FormLabel className="text-base">{t('settings.weeklyNewsletter')}</FormLabel>
                           <div className="text-sm text-gray-600">
                             Receive weekly updates and pet care tips
                           </div>
@@ -401,7 +444,7 @@ const UserSettings = () => {
                       className="w-full flex items-center justify-center gap-2"
                     >
                       <LogOut className="w-4 h-4" />
-                      Sign Out
+                      {t('settings.signOut')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -420,7 +463,7 @@ const UserSettings = () => {
                       Saving Changes...
                     </>
                   ) : (
-                    'Save Changes'
+                    t('settings.saveChanges')
                   )}
                 </Button>
               </div>

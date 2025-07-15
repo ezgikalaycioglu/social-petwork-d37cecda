@@ -1,0 +1,106 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "myPets": "Mina Husdjur",
+    "findFriends": "Hitta Vänner",
+    "petMap": "Husdjurskarta",
+    "events": "Evenemang",
+    "deals": "Erbjudanden",
+    "packs": "Grupper",
+    "petSocial": "Husdjur Social",
+    "settings": "Inställningar"
+  },
+  "settings": {
+    "title": "Användarinställningar",
+    "profileInformation": "Profilinformation",
+    "displayName": "Visningsnamn",
+    "email": "E-post",
+    "city": "Stad",
+    "neighborhood": "Stadsdel",
+    "regionalSettings": "Regionala Inställningar",
+    "language": "Språk",
+    "selectLanguage": "Välj ditt föredragna språk",
+    "pushNotifications": "Push-notifikationer",
+    "enablePushNotifications": "Aktivera Push-notifikationer",
+    "notificationPreferences": "Notifikationsinställningar",
+    "playdateRequests": "Lekträff-förfrågningar",
+    "playdateConfirmations": "Lekträff-bekräftelser",
+    "eventReminders": "Evenemangspåminnelser",
+    "newFollowerAlerts": "Nya följare-varningar",
+    "weeklyNewsletter": "Veckonyhetsbrev",
+    "saveChanges": "Spara Ändringar",
+    "signOut": "Logga Ut"
+  },
+  "languages": {
+    "en": "English",
+    "tr": "Türkçe",
+    "sv": "Svenska",
+    "es": "Español",
+    "fr": "Français"
+  },
+  "common": {
+    "loading": "Laddar...",
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "edit": "Redigera",
+    "delete": "Radera",
+    "add": "Lägg till",
+    "create": "Skapa",
+    "update": "Uppdatera",
+    "back": "Tillbaka",
+    "next": "Nästa",
+    "previous": "Föregående",
+    "close": "Stäng",
+    "confirm": "Bekräfta",
+    "yes": "Ja",
+    "no": "Nej"
+  },
+  "auth": {
+    "signIn": "Logga In",
+    "signUp": "Registrera",
+    "signOut": "Logga Ut",
+    "email": "E-post",
+    "password": "Lösenord",
+    "forgotPassword": "Glömt lösenord?",
+    "createAccount": "Skapa Konto",
+    "alreadyHaveAccount": "Har du redan ett konto?",
+    "dontHaveAccount": "Har du inget konto?"
+  },
+  "pets": {
+    "myPets": "Mina Husdjur",
+    "createPet": "Skapa Husdjursprofil",
+    "editPet": "Redigera Husdjursprofil",
+    "petName": "Husdjursnamn",
+    "breed": "Ras",
+    "age": "Ålder",
+    "gender": "Kön",
+    "bio": "Biografi",
+    "photos": "Foton"
+  },
+  "social": {
+    "findFriends": "Hitta Vänner",
+    "friendRequests": "Vänförfrågningar",
+    "followers": "Följare",
+    "following": "Följer",
+    "posts": "Inlägg",
+    "comments": "Kommentarer",
+    "likes": "Gilla-markeringar"
+  },
+  "landing": {
+    "hero": {
+      "title": "Anslut Dina Husdjur Med Världen",
+      "subtitle": "Det sociala nätverket designat för husdjursälskare. Skapa profiler, hitta lekträffar och bygg en gemenskap runt dina pälsiga vänner.",
+      "getStarted": "Kom Igång",
+      "joinCommunity": "Gå med i Gemenskapen"
+    },
+    "features": {
+      "title": "Allt Ditt Husdjur Behöver för att Socialisera",
+      "petProfiles": "Husdjursprofiler",
+      "petProfilesDesc": "Skapa detaljerade profiler för vart och ett av dina husdjur",
+      "findPlaydates": "Hitta Lekträffar",
+      "findPlaydatesDesc": "Anslut med närliggande husdjur för roliga aktiviteter",
+      "localEvents": "Lokala Evenemang",
+      "localEventsDesc": "Upptäck husdjursvänliga evenemang i ditt område"
+    }
+  }
+}

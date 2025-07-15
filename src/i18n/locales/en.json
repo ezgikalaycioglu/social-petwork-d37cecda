@@ -1,0 +1,106 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "myPets": "My Pets",
+    "findFriends": "Find Friends",
+    "petMap": "Pet Map",
+    "events": "Events",
+    "deals": "Deals",
+    "packs": "Packs",
+    "petSocial": "Pet Social",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "User Settings",
+    "profileInformation": "Profile Information",
+    "displayName": "Display Name",
+    "email": "Email",
+    "city": "City",
+    "neighborhood": "Neighborhood",
+    "regionalSettings": "Regional Settings",
+    "language": "Language",
+    "selectLanguage": "Select your preferred language",
+    "pushNotifications": "Push Notifications",
+    "enablePushNotifications": "Enable Push Notifications",
+    "notificationPreferences": "Notification Preferences",
+    "playdateRequests": "Playdate Requests",
+    "playdateConfirmations": "Playdate Confirmations",
+    "eventReminders": "Event Reminders",
+    "newFollowerAlerts": "New Follower Alerts",
+    "weeklyNewsletter": "Weekly Newsletter",
+    "saveChanges": "Save Changes",
+    "signOut": "Sign Out"
+  },
+  "languages": {
+    "en": "English",
+    "tr": "Türkçe",
+    "sv": "Svenska",
+    "es": "Español",
+    "fr": "Français"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "create": "Create",
+    "update": "Update",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "createAccount": "Create Account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?"
+  },
+  "pets": {
+    "myPets": "My Pets",
+    "createPet": "Create Pet Profile",
+    "editPet": "Edit Pet Profile",
+    "petName": "Pet Name",
+    "breed": "Breed",
+    "age": "Age",
+    "gender": "Gender",
+    "bio": "Bio",
+    "photos": "Photos"
+  },
+  "social": {
+    "findFriends": "Find Friends",
+    "friendRequests": "Friend Requests",
+    "followers": "Followers",
+    "following": "Following",
+    "posts": "Posts",
+    "comments": "Comments",
+    "likes": "Likes"
+  },
+  "landing": {
+    "hero": {
+      "title": "Connect Your Pets with the World",
+      "subtitle": "The social network designed for pet lovers. Create profiles, find playdates, and build a community around your furry friends.",
+      "getStarted": "Get Started",
+      "joinCommunity": "Join the Community"
+    },
+    "features": {
+      "title": "Everything Your Pet Needs to Socialize",
+      "petProfiles": "Pet Profiles",
+      "petProfilesDesc": "Create detailed profiles for each of your pets",
+      "findPlaydates": "Find Playdates",
+      "findPlaydatesDesc": "Connect with nearby pets for fun activities",
+      "localEvents": "Local Events",
+      "localEventsDesc": "Discover pet-friendly events in your area"
+    }
+  }
+}

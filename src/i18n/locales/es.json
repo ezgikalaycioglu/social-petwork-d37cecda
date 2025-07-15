@@ -1,0 +1,106 @@
+{
+  "navigation": {
+    "dashboard": "Panel",
+    "myPets": "Mis Mascotas",
+    "findFriends": "Buscar Amigos",
+    "petMap": "Mapa de Mascotas",
+    "events": "Eventos",
+    "deals": "Ofertas",
+    "packs": "Grupos",
+    "petSocial": "Mascotas Social",
+    "settings": "Configuración"
+  },
+  "settings": {
+    "title": "Configuración de Usuario",
+    "profileInformation": "Información del Perfil",
+    "displayName": "Nombre Visible",
+    "email": "Correo Electrónico",
+    "city": "Ciudad",
+    "neighborhood": "Barrio",
+    "regionalSettings": "Configuración Regional",
+    "language": "Idioma",
+    "selectLanguage": "Selecciona tu idioma preferido",
+    "pushNotifications": "Notificaciones Push",
+    "enablePushNotifications": "Habilitar Notificaciones Push",
+    "notificationPreferences": "Preferencias de Notificación",
+    "playdateRequests": "Solicitudes de Citas de Juego",
+    "playdateConfirmations": "Confirmaciones de Citas de Juego",
+    "eventReminders": "Recordatorios de Eventos",
+    "newFollowerAlerts": "Alertas de Nuevos Seguidores",
+    "weeklyNewsletter": "Boletín Semanal",
+    "saveChanges": "Guardar Cambios",
+    "signOut": "Cerrar Sesión"
+  },
+  "languages": {
+    "en": "English",
+    "tr": "Türkçe",
+    "sv": "Svenska",
+    "es": "Español",
+    "fr": "Français"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "add": "Añadir",
+    "create": "Crear",
+    "update": "Actualizar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar Sesión",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "createAccount": "Crear Cuenta",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "dontHaveAccount": "¿No tienes una cuenta?"
+  },
+  "pets": {
+    "myPets": "Mis Mascotas",
+    "createPet": "Crear Perfil de Mascota",
+    "editPet": "Editar Perfil de Mascota",
+    "petName": "Nombre de Mascota",
+    "breed": "Raza",
+    "age": "Edad",
+    "gender": "Género",
+    "bio": "Biografía",
+    "photos": "Fotos"
+  },
+  "social": {
+    "findFriends": "Buscar Amigos",
+    "friendRequests": "Solicitudes de Amistad",
+    "followers": "Seguidores",
+    "following": "Siguiendo",
+    "posts": "Publicaciones",
+    "comments": "Comentarios",
+    "likes": "Me Gusta"
+  },
+  "landing": {
+    "hero": {
+      "title": "Conecta a Tus Mascotas con el Mundo",
+      "subtitle": "La red social diseñada para amantes de mascotas. Crea perfiles, encuentra citas de juego y construye una comunidad alrededor de tus amigos peludos.",
+      "getStarted": "Comenzar",
+      "joinCommunity": "Únete a la Comunidad"
+    },
+    "features": {
+      "title": "Todo lo que Tu Mascota Necesita para Socializar",
+      "petProfiles": "Perfiles de Mascotas",
+      "petProfilesDesc": "Crea perfiles detallados para cada una de tus mascotas",
+      "findPlaydates": "Encuentra Citas de Juego",
+      "findPlaydatesDesc": "Conecta con mascotas cercanas para actividades divertidas",
+      "localEvents": "Eventos Locales",
+      "localEventsDesc": "Descubre eventos amigables para mascotas en tu área"
+    }
+  }
+}

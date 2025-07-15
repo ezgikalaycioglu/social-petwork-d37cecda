@@ -1,18 +1,20 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Home, PawPrint, Users, MapPin, User, Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const MobileBottomNav = () => {
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const navItems = [
-    { name: 'Home', href: '/dashboard', icon: Home },
-    { name: 'Pets', href: '/my-pets', icon: PawPrint },
-    { name: 'Social', href: '/pet-social', icon: Users },
-    { name: 'Friends', href: '/find-friends', icon: Heart },
-    { name: 'Profile', href: '/settings', icon: User },
+    { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
+    { name: t('navigation.myPets'), href: '/my-pets', icon: PawPrint },
+    { name: t('navigation.petSocial'), href: '/pet-social', icon: Users },
+    { name: t('navigation.findFriends'), href: '/find-friends', icon: Heart },
+    { name: t('navigation.settings'), href: '/settings', icon: User },
   ];
 
   const isActive = (href: string) => location.pathname === href;

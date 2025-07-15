@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Home, PawPrint, Users, MapPin, Calendar, Gift, Building, Settings, User, Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,16 +11,17 @@ import AuthButton from './AuthButton';
 const DesktopSidebar = () => {
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'My Pets', href: '/my-pets', icon: PawPrint },
-    { name: 'Social', href: '/pet-social', icon: Users },
-    { name: 'Find Friends', href: '/find-friends', icon: Heart },
-    { name: 'Map', href: '/pet-map', icon: MapPin },
-    { name: 'Events', href: '/events', icon: Calendar },
-    { name: 'Deals', href: '/deals', icon: Gift },
-    { name: 'Packs', href: '/packs', icon: Users },
+    { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
+    { name: t('navigation.myPets'), href: '/my-pets', icon: PawPrint },
+    { name: t('navigation.petSocial'), href: '/pet-social', icon: Users },
+    { name: t('navigation.findFriends'), href: '/find-friends', icon: Heart },
+    { name: t('navigation.petMap'), href: '/pet-map', icon: MapPin },
+    { name: t('navigation.events'), href: '/events', icon: Calendar },
+    { name: t('navigation.deals'), href: '/deals', icon: Gift },
+    { name: t('navigation.packs'), href: '/packs', icon: Users },
     { name: 'Business', href: '/business-dashboard', icon: Building },
   ];
 
@@ -85,7 +87,7 @@ const DesktopSidebar = () => {
               }`}
             >
               <Settings className="w-4 h-4" />
-              <span>Settings</span>
+              <span>{t('navigation.settings')}</span>
             </Link>
             
             <div className="pt-2">
