@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -309,8 +310,8 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex gap-2 mb-3">
+        {/* Action Buttons - Updated layout with icons above text */}
+        <div className="grid grid-cols-6 gap-1 mb-3">
           {Object.keys(reactionIcons).map((type) => {
             const Icon = reactionIcons[type as keyof typeof reactionIcons];
             const hasReacted = reactions.some(
@@ -323,10 +324,12 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
                 size="sm"
                 onClick={() => handleReaction(type)}
                 disabled={!selectedPetId}
-                className="text-xs"
+                className="flex flex-col items-center p-2 h-auto text-xs"
               >
-                <Icon className={`h-3 w-3 mr-1 ${hasReacted ? 'text-white' : reactionColors[type as keyof typeof reactionColors]}`} />
-                {type === 'like' ? 'Like' : type === 'love' ? 'Love' : type === 'laugh' ? 'Laugh' : type === 'wow' ? 'Wow' : 'Sad'}
+                <Icon className={`h-4 w-4 mb-1 ${hasReacted ? 'text-white' : reactionColors[type as keyof typeof reactionColors]}`} />
+                <span className="leading-none">
+                  {type === 'like' ? 'Like' : type === 'love' ? 'Love' : type === 'laugh' ? 'Laugh' : type === 'wow' ? 'Wow' : 'Sad'}
+                </span>
               </Button>
             );
           })}
@@ -334,10 +337,10 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
             variant="ghost"
             size="sm"
             onClick={() => setShowReplyForm(!showReplyForm)}
-            className="text-xs"
+            className="flex flex-col items-center p-2 h-auto text-xs"
           >
-            <MessageCircle className="h-3 w-3 mr-1" />
-            Reply
+            <MessageCircle className="h-4 w-4 mb-1" />
+            <span className="leading-none">Reply</span>
           </Button>
         </div>
 
