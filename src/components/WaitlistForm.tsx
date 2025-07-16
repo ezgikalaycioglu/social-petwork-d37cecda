@@ -25,7 +25,7 @@ const WaitlistForm = () => {
     }
 
     if (!validateEmail(email)) {
-      setError('Please enter a valid email address with "@" and "." characters');
+      setError('Your email address seems not correct. Please check it.');
       return;
     }
 
