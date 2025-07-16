@@ -11,8 +11,8 @@ const WaitlistForm = () => {
   const [error, setError] = useState('');
 
   const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    // Check if email contains both "@" and "." characters
+    return email.includes('@') && email.includes('.');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,7 +25,7 @@ const WaitlistForm = () => {
     }
 
     if (!validateEmail(email)) {
-      setError('Please enter a valid email address');
+      setError('Please enter a valid email address with "@" and "." characters');
       return;
     }
 
