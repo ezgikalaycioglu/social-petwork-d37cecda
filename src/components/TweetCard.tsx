@@ -344,6 +344,15 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
           </Button>
         </div>
 
+        {/* Total Reactions Count - Instagram style */}
+        {reactions.length > 0 && (
+          <div className="mb-3">
+            <p className="text-sm text-muted-foreground">
+              {reactions.length} {reactions.length === 1 ? 'reaction' : 'reactions'}
+            </p>
+          </div>
+        )}
+
         {/* Reply Form */}
         {showReplyForm && (
           <div className="mb-3 p-3 border rounded-lg">
