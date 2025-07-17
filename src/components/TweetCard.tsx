@@ -68,6 +68,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
   const [replies, setReplies] = useState<Reply[]>([]);
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
+  const [showReactionsDetail, setShowReactionsDetail] = useState(false);
   const [replyContent, setReplyContent] = useState('');
   const [selectedPetId, setSelectedPetId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -347,9 +348,36 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
         {/* Total Reactions Count - Instagram style */}
         {reactions.length > 0 && (
           <div className="mb-3">
-            <p className="text-sm text-muted-foreground">
+            <button
+              onClick={() => setShowReactionsDetail(!showReactionsDetail)}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
               {reactions.length} {reactions.length === 1 ? 'reaction' : 'reactions'}
-            </p>
+            </button>
+            
+            {/* Reactions Detail */}
+            {showReactionsDetail && (
+              <div className="mt-2 p-3 bg-muted rounded-lg animate-fade-in">
+                <div className="space-y-2">
+                  {Object.entries(groupedReactions).map(([type, reactionList]) => {
+                    const Icon = reactionIcons[type as keyof typeof reactionIcons];
+                    return (
+                      <div key={type} className="flex items-center gap-2">
+                        <Icon className={`h-4 w-4 ${reactionColors[type as keyof typeof reactionColors]}`} />
+                        <span className="text-sm font-medium capitalize">{type}</span>
+                        <div className="flex gap-1 flex-wrap">
+                          {reactionList.map((reaction) => (
+                            <Badge key={reaction.id} variant="outline" className="text-xs">
+                              {reaction.pet_name}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
