@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import DesktopSidebar from './DesktopSidebar';
 import MobileBottomNav from './MobileBottomNav';
+import MobileTopNav from './MobileTopNav';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,13 +17,16 @@ const Layout = ({ children }: LayoutProps) => {
 
   return (
     <div className="min-h-screen bg-gray-50 w-full">
+      {/* Mobile Top Navigation */}
+      {showNavigation && <MobileTopNav />}
+      
       {/* Desktop Sidebar */}
       {showNavigation && <DesktopSidebar />}
       
       {/* Main Content */}
       <main className={`${
         showNavigation 
-          ? 'md:ml-64 pb-20 md:pb-0' // Add left margin for desktop sidebar, bottom padding for mobile nav
+          ? 'md:ml-64 pt-14 pb-20 md:pt-0 md:pb-0' // Add top padding for mobile top nav, left margin for desktop sidebar, bottom padding for mobile nav
           : ''
       }`}>
         {children}
