@@ -22,21 +22,19 @@ const DesktopSidebar = () => {
     { name: t('navigation.events'), href: '/events', icon: Calendar },
     { name: t('navigation.deals'), href: '/deals', icon: Gift },
     { name: t('navigation.packs'), href: '/packs', icon: Users },
+    { name: 'Pet Sitters', href: '/pet-sitters', icon: Search },
     { name: 'Business', href: '/business-dashboard', icon: Building },
   ];
 
-  const sitterNavItems = [
-    { name: 'Pet Sitters', href: '/pet-sitters', icon: Search },
-  ];
-
-  const isSitterActive = () => {
-    return sitterNavItems.some(item => location.pathname === item.href) || 
-           location.pathname.startsWith('/sitter/') ||
-           location.pathname === '/become-sitter' ||
-           location.pathname === '/my-bookings';
+  const isActive = (href: string) => {
+    if (href === '/pet-sitters') {
+      return location.pathname === href || 
+             location.pathname.startsWith('/sitter/') ||
+             location.pathname === '/become-sitter' ||
+             location.pathname === '/my-bookings';
+    }
+    return location.pathname === href;
   };
-
-  const isActive = (href: string) => location.pathname === href;
 
   if (!user) {
     return null;
@@ -71,32 +69,6 @@ const DesktopSidebar = () => {
             );
           })}
 
-          {/* Pet Sitter Section */}
-          <div className="pt-4">
-            <div className="px-3 mb-2">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pet Sitter</h3>
-            </div>
-            {sitterNavItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                    isActive(item.href) || (item.href === '/pet-sitters' && 
-                      (location.pathname.startsWith('/sitter/') || 
-                       location.pathname === '/become-sitter' || 
-                       location.pathname === '/my-bookings'))
-                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.name}</span>
-                </Link>
-              );
-            })}
-          </div>
         </nav>
 
         {/* User Section */}
