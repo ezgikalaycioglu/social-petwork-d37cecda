@@ -1,9 +1,11 @@
 
 import { ArrowRight, Users, Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../integrations/supabase/client';
 
 const FinalCTA = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState([
     { icon: <Users className="w-6 h-6" />, number: "0", label: "Happy Pet Parents" },
     { icon: <Heart className="w-6 h-6" />, number: "0", label: "Pet Friendships" }
@@ -69,7 +71,10 @@ const FinalCTA = () => {
 
         {/* Main CTA */}
         <div className="space-y-8">
-          <button className="bg-white text-green-600 font-bold text-xl px-12 py-4 rounded-full hover:bg-gray-100 transition-colors duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105">
+          <button 
+            onClick={() => navigate('/auth')}
+            className="bg-white text-green-600 font-bold text-xl px-12 py-4 rounded-full hover:bg-gray-100 transition-colors duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
+          >
             Start Your Pet's Journey
             <ArrowRight className="inline-block ml-2 w-6 h-6" />
           </button>
