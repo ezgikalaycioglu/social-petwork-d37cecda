@@ -6,12 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { useAnalytics } from '@/hooks/useAnalytics';
-import { Plus, Heart, Eye, Edit, PawPrint, Users, MapPin } from 'lucide-react';
+import { Plus, Heart, Eye, Edit, PawPrint, Users, MapPin, Send } from 'lucide-react';
 import Layout from '@/components/Layout';
 import SocialFeed from '@/components/SocialFeed';
 import { TweetFeed } from '@/components/TweetFeed';
 import UpcomingPlaydates from '@/components/UpcomingPlaydates';
 import { AICoach } from '@/components/AICoach';
+import { CreateTweetModal } from '@/components/CreateTweetModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { handleAuthError } from '@/utils/authErrorHandler';
 import type { Tables } from '@/integrations/supabase/types';
@@ -25,6 +26,8 @@ const Dashboard = () => {
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState<string>('');
+  const [isCreateTweetModalOpen, setIsCreateTweetModalOpen] = useState(false);
+  const [tweetFeedKey, setTweetFeedKey] = useState(0);
 
   useEffect(() => {
     // Track page view safely
@@ -134,6 +137,10 @@ const Dashboard = () => {
     navigate(path);
   };
 
+  const handleTweetCreated = () => {
+    setTweetFeedKey(prev => prev + 1); // Force refresh of tweet feed
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -178,13 +185,23 @@ const Dashboard = () => {
               </div>
               
               <Tabs defaultValue="tweets" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
                   <TabsTrigger value="tweets">Pet Tweets</TabsTrigger>
                   <TabsTrigger value="feed">Activities</TabsTrigger>
                 </TabsList>
                 
+                {pets.length > 0 && (
+                  <Button
+                    onClick={() => setIsCreateTweetModalOpen(true)}
+                    className="w-full mb-6 bg-primary hover:bg-primary/90"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Create New Tweet
+                  </Button>
+                )}
+                
                 <TabsContent value="tweets">
-                  <TweetFeed />
+                  <TweetFeed key={tweetFeedKey} />
                 </TabsContent>
                 
                 <TabsContent value="feed">
@@ -323,6 +340,13 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      <CreateTweetModal
+        isOpen={isCreateTweetModalOpen}
+        onClose={() => setIsCreateTweetModalOpen(false)}
+        pets={pets}
+        onTweetCreated={handleTweetCreated}
+      />
     </Layout>
   );
 };
