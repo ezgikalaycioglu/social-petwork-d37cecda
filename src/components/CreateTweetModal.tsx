@@ -81,54 +81,60 @@ export const CreateTweetModal: React.FC<CreateTweetModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Send className="h-5 w-5" />
-            New Tweet
-          </DialogTitle>
-        </DialogHeader>
-        
-        <div className="space-y-4 pb-4">
-          <Select value={selectedPetId} onValueChange={setSelectedPetId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Which pet is tweeting?" />
-            </SelectTrigger>
-            <SelectContent>
-              {pets.map((pet) => (
-                <SelectItem key={pet.id} value={pet.id}>
-                  {pet.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <DialogContent className="max-w-md max-h-[90vh] p-0">
+        <div className="flex flex-col h-full">
+          {/* Scrollable content */}
+          <div className="overflow-y-auto p-6 flex-1">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Send className="h-5 w-5" />
+                New Tweet
+              </DialogTitle>
+            </DialogHeader>
 
-          <Textarea
-            placeholder="What's happening? (e.g., Going out for a walk! 🐕)"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="min-h-[80px] sm:min-h-[100px] resize-none"
-            maxLength={280}
-          />
+            <div className="space-y-4 pt-4">
+              <Select value={selectedPetId} onValueChange={setSelectedPetId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Which pet is tweeting?" />
+                </SelectTrigger>
+                <SelectContent>
+                  {pets.map((pet) => (
+                    <SelectItem key={pet.id} value={pet.id}>
+                      {pet.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-          <div className="text-right text-sm text-muted-foreground">
-            {content.length}/280
-          </div>
+              <Textarea
+                placeholder="What's happening? (e.g., Going out for a walk! 🐕)"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                className="min-h-[80px] sm:min-h-[100px] resize-none"
+                maxLength={280}
+              />
 
-          <div className="space-y-2 mb-6">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <Camera className="h-4 w-4" />
-              Add Photo (Optional)
+              <div className="text-right text-sm text-muted-foreground">
+                {content.length}/280
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Camera className="h-4 w-4" />
+                  Add Photo (Optional)
+                </div>
+                <PhotoUpload
+                  currentPhotoUrl={photoUrl}
+                  onPhotoUploaded={setPhotoUrl}
+                  bucketName="pet-photos"
+                  className="h-24 sm:h-32"
+                />
+              </div>
             </div>
-            <PhotoUpload
-              currentPhotoUrl={photoUrl}
-              onPhotoUploaded={setPhotoUrl}
-              bucketName="pet-photos"
-              className="h-24 sm:h-32"
-            />
           </div>
 
-          <div className="flex gap-2 pt-6 border-t">
+          {/* Sticky footer buttons */}
+          <div className="p-4 border-t flex gap-2">
             <Button variant="outline" onClick={onClose} className="flex-1">
               Cancel
             </Button>
