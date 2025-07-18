@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import type { DateRange } from "react-day-picker";
 
 interface SitterData {
   id: string;
@@ -22,9 +23,7 @@ interface SitterData {
   bio: string;
   location: string;
   rate_per_day: number;
-  user_profiles: {
-    display_name: string;
-  } | null;
+  display_name?: string;
   sitter_services: {
     service_type: string;
   }[];
@@ -39,14 +38,8 @@ interface Review {
   rating: number;
   comment: string;
   created_at: string;
-  user_profiles: {
-    display_name: string;
-  } | null;
-  sitter_bookings: {
-    pet_profiles: {
-      name: string;
-    } | null;
-  } | null;
+  reviewer_name?: string;
+  pet_name?: string;
 }
 
 interface Pet {
@@ -55,8 +48,8 @@ interface Pet {
 }
 
 function ReviewCard({ review }: { review: Review }) {
-  const reviewerName = review.user_profiles?.display_name || 'Anonymous';
-  const petName = review.sitter_bookings?.pet_profiles?.name || 'Pet';
+  const reviewerName = review.reviewer_name || 'Anonymous';
+  const petName = review.pet_name || 'Pet';
 
   return (
     <Card className="rounded-xl">
@@ -105,13 +98,7 @@ export default function SitterProfile() {
 
   // Booking form state
   const [selectedPet, setSelectedPet] = useState("");
-  const [dateRange, setDateRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
-    from: undefined,
-    to: undefined
-  });
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   useEffect(() => {
     if (sitterId) {
@@ -129,7 +116,6 @@ export default function SitterProfile() {
         .from('sitter_profiles')
         .select(`
           *,
-          user_profiles(display_name),
           sitter_services(service_type),
           sitter_photos(photo_url, is_primary)
         `)
@@ -138,7 +124,20 @@ export default function SitterProfile() {
         .single();
 
       if (error) throw error;
-      setSitter(data);
+
+      // Get user profile separately
+      const { data: userProfile } = await supabase
+        .from('user_profiles')
+        .select('display_name')
+        .eq('id', data.user_id)
+        .single();
+
+      const enrichedSitter = {
+        ...data,
+        display_name: userProfile?.display_name || 'Sitter'
+      };
+
+      setSitter(enrichedSitter);
     } catch (error) {
       console.error('Error fetching sitter:', error);
       toast({
@@ -154,20 +153,45 @@ export default function SitterProfile() {
 
   const fetchReviews = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: reviewsData, error } = await supabase
         .from('sitter_reviews')
         .select(`
           *,
-          user_profiles(display_name),
           sitter_bookings(
-            pet_profiles(name)
+            pet_id,
+            owner_id
           )
         `)
         .eq('sitter_id', sitterId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setReviews(data || []);
+
+      // Get user profiles and pet names separately
+      if (reviewsData && reviewsData.length > 0) {
+        const ownerIds = reviewsData.map(review => review.owner_id);
+        const petIds = reviewsData.map(review => review.sitter_bookings?.pet_id).filter(Boolean);
+
+        const { data: ownerProfiles } = await supabase
+          .from('user_profiles')
+          .select('id, display_name')
+          .in('id', ownerIds);
+
+        const { data: petProfiles } = await supabase
+          .from('pet_profiles')
+          .select('id, name')
+          .in('id', petIds);
+
+        const enrichedReviews = reviewsData.map(review => ({
+          ...review,
+          reviewer_name: ownerProfiles?.find(p => p.id === review.owner_id)?.display_name,
+          pet_name: petProfiles?.find(p => p.id === review.sitter_bookings?.pet_id)?.name
+        }));
+
+        setReviews(enrichedReviews);
+      } else {
+        setReviews([]);
+      }
     } catch (error) {
       console.error('Error fetching reviews:', error);
     }
@@ -190,13 +214,13 @@ export default function SitterProfile() {
   };
 
   const calculateTotal = () => {
-    if (!dateRange.from || !dateRange.to || !sitter) return 0;
+    if (!dateRange?.from || !dateRange?.to || !sitter) return 0;
     const days = differenceInDays(dateRange.to, dateRange.from) + 1;
     return days * sitter.rate_per_day;
   };
 
   const handleBookingRequest = async () => {
-    if (!user || !sitter || !selectedPet || !dateRange.from || !dateRange.to) {
+    if (!user || !sitter || !selectedPet || !dateRange?.from || !dateRange?.to) {
       toast({
         title: "Missing Information",
         description: "Please select a pet and dates for your booking.",
@@ -255,7 +279,7 @@ export default function SitterProfile() {
     );
   }
 
-  const displayName = sitter.user_profiles?.display_name || 'Sitter';
+  const displayName = sitter.display_name || 'Sitter';
   const primaryPhoto = sitter.sitter_photos.find(p => p.is_primary)?.photo_url || 
                        sitter.sitter_photos[0]?.photo_url;
   const averageRating = reviews.length > 0 
@@ -395,12 +419,12 @@ export default function SitterProfile() {
                               variant="outline"
                               className={cn(
                                 "w-full justify-start text-left font-normal",
-                                !dateRange.from && "text-muted-foreground"
+                                !dateRange?.from && "text-muted-foreground"
                               )}
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
-                              {dateRange.from ? (
-                                dateRange.to ? (
+                              {dateRange?.from ? (
+                                dateRange?.to ? (
                                   <>
                                     {format(dateRange.from, "LLL dd")} -{" "}
                                     {format(dateRange.to, "LLL dd")}
@@ -417,9 +441,9 @@ export default function SitterProfile() {
                             <Calendar
                               initialFocus
                               mode="range"
-                              defaultMonth={dateRange.from}
+                              defaultMonth={dateRange?.from}
                               selected={dateRange}
-                              onSelect={(range) => setDateRange(range || { from: undefined, to: undefined })}
+                              onSelect={setDateRange}
                               numberOfMonths={1}
                               className="pointer-events-auto"
                               disabled={(date) => date < new Date()}
@@ -428,11 +452,11 @@ export default function SitterProfile() {
                         </Popover>
                       </div>
 
-                      {dateRange.from && dateRange.to && (
+                      {dateRange?.from && dateRange?.to && (
                         <div className="bg-muted/50 p-3 rounded-lg">
                           <div className="flex justify-between text-sm">
                             <span>
-                              {differenceInDays(dateRange.to, dateRange.from) + 1} days
+                              {differenceInDays(dateRange.to!, dateRange.from!) + 1} days
                             </span>
                             <span className="font-medium">
                               ${calculateTotal()}
@@ -443,7 +467,7 @@ export default function SitterProfile() {
 
                       <Button
                         onClick={handleBookingRequest}
-                        disabled={!selectedPet || !dateRange.from || !dateRange.to || submitting}
+                        disabled={!selectedPet || !dateRange?.from || !dateRange?.to || submitting}
                         className="w-full bg-coral hover:bg-coral/90"
                       >
                         {submitting ? "Sending..." : "Request to Book"}

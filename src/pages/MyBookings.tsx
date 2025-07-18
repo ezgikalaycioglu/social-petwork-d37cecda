@@ -21,18 +21,14 @@ interface Booking {
   created_at: string;
   
   // For bookings as owner
-  sitter_user_profiles?: {
-    display_name: string;
-  } | null;
+  sitter_display_name?: string;
   sitter_photos?: {
     photo_url: string;
     is_primary: boolean;
   }[];
   
   // For bookings as sitter
-  owner_user_profiles?: {
-    display_name: string;
-  } | null;
+  owner_display_name?: string;
   
   // Pet info
   pet_profiles: {
@@ -50,8 +46,8 @@ interface BookingCardProps {
 
 function BookingCard({ booking, userRole, onStatusUpdate, onReview }: BookingCardProps) {
   const otherPersonName = userRole === 'owner' 
-    ? booking.sitter_user_profiles?.display_name || 'Sitter'
-    : booking.owner_user_profiles?.display_name || 'Pet Owner';
+    ? booking.sitter_display_name || 'Sitter'
+    : booking.owner_display_name || 'Pet Owner';
   
   const otherPersonPhoto = userRole === 'owner'
     ? booking.sitter_photos?.find(p => p.is_primary)?.photo_url || booking.sitter_photos?.[0]?.photo_url
@@ -189,42 +185,67 @@ export default function MyBookings() {
         .from('sitter_bookings')
         .select(`
           *,
-          pet_profiles(name, profile_photo_url),
-          user_profiles(display_name)
+          pet_profiles(name, profile_photo_url)
         `)
         .eq('owner_id', user.id)
         .order('created_at', { ascending: false });
 
       if (ownerError) throw ownerError;
 
-      // Transform the data for owner bookings
-      const transformedOwnerData = ownerData?.map(booking => ({
-        ...booking,
-        sitter_user_profiles: booking.user_profiles
-      })) || [];
+      // Get sitter profiles for owner bookings
+      let enrichedOwnerData: Booking[] = [];
+      if (ownerData && ownerData.length > 0) {
+        const sitterIds = [...new Set(ownerData.map(booking => booking.sitter_id))];
+        const { data: sitterProfiles } = await supabase
+          .from('user_profiles')
+          .select('id, display_name')
+          .in('id', sitterIds);
 
-      setOwnerBookings(transformedOwnerData);
+        const { data: sitterPhotos } = await supabase
+          .from('sitter_profiles')
+          .select(`
+            user_id,
+            sitter_photos(photo_url, is_primary)
+          `)
+          .in('user_id', sitterIds);
+
+        enrichedOwnerData = ownerData.map(booking => ({
+          ...booking,
+          sitter_display_name: sitterProfiles?.find(p => p.id === booking.sitter_id)?.display_name,
+          sitter_photos: sitterPhotos?.find(sp => sp.user_id === booking.sitter_id)?.sitter_photos || []
+        }));
+      }
+
+      setOwnerBookings(enrichedOwnerData);
 
       // Fetch bookings as sitter
       const { data: sitterData, error: sitterError } = await supabase
         .from('sitter_bookings')
         .select(`
           *,
-          pet_profiles(name, profile_photo_url),
-          user_profiles(display_name)
+          pet_profiles(name, profile_photo_url)
         `)
         .eq('sitter_id', user.id)
         .order('created_at', { ascending: false });
 
       if (sitterError) throw sitterError;
 
-      // Transform the data for sitter bookings
-      const transformedSitterData = sitterData?.map(booking => ({
-        ...booking,
-        owner_user_profiles: booking.user_profiles
-      })) || [];
+      // Get owner profiles for sitter bookings
+      let enrichedSitterData: Booking[] = [];
+      if (sitterData && sitterData.length > 0) {
+        const ownerIds = [...new Set(sitterData.map(booking => booking.owner_id))];
+        const { data: ownerProfiles } = await supabase
+          .from('user_profiles')
+          .select('id, display_name')
+          .in('id', ownerIds);
 
-      setSitterBookings(transformedSitterData);
+        enrichedSitterData = sitterData.map(booking => ({
+          ...booking,
+          owner_display_name: ownerProfiles?.find(p => p.id === booking.owner_id)?.display_name
+        }));
+      }
+
+      setSitterBookings(enrichedSitterData);
     } catch (error) {
       console.error('Error fetching bookings:', error);
       toast({

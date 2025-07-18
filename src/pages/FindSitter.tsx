@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import type { DateRange } from "react-day-picker";
 
 interface SitterData {
   id: string;
@@ -20,9 +21,7 @@ interface SitterData {
   location: string;
   rate_per_day: number;
   is_active: boolean;
-  user_profiles: {
-    display_name: string;
-  } | null;
+  display_name?: string;
   sitter_services: {
     service_type: string;
   }[];
@@ -42,7 +41,7 @@ function SitterCard({ sitter, onViewProfile }: SitterCardProps) {
   const primaryPhoto = sitter.sitter_photos.find(p => p.is_primary)?.photo_url || 
                        sitter.sitter_photos[0]?.photo_url;
   
-  const displayName = sitter.user_profiles?.display_name || 'Sitter';
+  const displayName = sitter.display_name || 'Sitter';
   const firstName = displayName.split(' ')[0];
 
   return (
@@ -103,13 +102,7 @@ export default function FindSitter() {
   // Search filters
   const [location, setLocation] = useState("");
   const [service, setService] = useState("");
-  const [dateRange, setDateRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
-    from: undefined,
-    to: undefined
-  });
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   const services = [
     "Dog Walking",
@@ -130,19 +123,37 @@ export default function FindSitter() {
 
   const fetchSitters = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: sittersData, error } = await supabase
         .from('sitter_profiles')
         .select(`
           *,
-          user_profiles(display_name),
           sitter_services(service_type),
           sitter_photos(photo_url, is_primary)
         `)
         .eq('is_active', true);
 
       if (error) throw error;
-      setSitters(data || []);
-      setFilteredSitters(data || []);
+
+      // Fetch user profiles separately
+      if (sittersData && sittersData.length > 0) {
+        const userIds = sittersData.map(sitter => sitter.user_id);
+        const { data: profilesData } = await supabase
+          .from('user_profiles')
+          .select('id, display_name')
+          .in('id', userIds);
+
+        // Combine the data
+        const enrichedSitters = sittersData.map(sitter => ({
+          ...sitter,
+          display_name: profilesData?.find(p => p.id === sitter.user_id)?.display_name || 'Sitter'
+        }));
+
+        setSitters(enrichedSitters);
+        setFilteredSitters(enrichedSitters);
+      } else {
+        setSitters([]);
+        setFilteredSitters([]);
+      }
     } catch (error) {
       console.error('Error fetching sitters:', error);
     } finally {
@@ -208,12 +219,12 @@ export default function FindSitter() {
                       variant="outline"
                       className={cn(
                         "w-full justify-start text-left font-normal",
-                        !dateRange.from && "text-muted-foreground"
+                        !dateRange?.from && "text-muted-foreground"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateRange.from ? (
-                        dateRange.to ? (
+                      {dateRange?.from ? (
+                        dateRange?.to ? (
                           <>
                             {format(dateRange.from, "LLL dd")} -{" "}
                             {format(dateRange.to, "LLL dd")}
@@ -230,9 +241,9 @@ export default function FindSitter() {
                     <Calendar
                       initialFocus
                       mode="range"
-                      defaultMonth={dateRange.from}
+                      defaultMonth={dateRange?.from}
                       selected={dateRange}
-                      onSelect={(range) => setDateRange(range || { from: undefined, to: undefined })}
+                      onSelect={setDateRange}
                       numberOfMonths={2}
                       className="pointer-events-auto"
                     />
