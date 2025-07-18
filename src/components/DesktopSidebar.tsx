@@ -26,14 +26,14 @@ const DesktopSidebar = () => {
   ];
 
   const sitterNavItems = [
-    { name: 'Find Sitters', href: '/find-sitter', icon: Search },
-    { name: 'Become Sitter', href: '/become-sitter', icon: UserCheck },
-    { name: 'My Bookings', href: '/my-bookings', icon: CalendarCheck },
+    { name: 'Pet Sitters', href: '/pet-sitters', icon: Search },
   ];
 
   const isSitterActive = () => {
     return sitterNavItems.some(item => location.pathname === item.href) || 
-           location.pathname.startsWith('/sitter/');
+           location.pathname.startsWith('/sitter/') ||
+           location.pathname === '/become-sitter' ||
+           location.pathname === '/my-bookings';
   };
 
   const isActive = (href: string) => location.pathname === href;
@@ -83,7 +83,10 @@ const DesktopSidebar = () => {
                   key={item.name}
                   to={item.href}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                    isActive(item.href) || (item.href === '/find-sitter' && location.pathname.startsWith('/sitter/'))
+                    isActive(item.href) || (item.href === '/pet-sitters' && 
+                      (location.pathname.startsWith('/sitter/') || 
+                       location.pathname === '/become-sitter' || 
+                       location.pathname === '/my-bookings'))
                       ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
                       : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
                   }`}

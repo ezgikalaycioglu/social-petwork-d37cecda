@@ -13,12 +13,12 @@ const MobileTopNav = () => {
     { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
     { name: t('navigation.myPets'), href: '/my-pets', icon: PawPrint },
     { name: t('navigation.petSocial'), href: '/pet-social', icon: Users },
-    { name: 'Sitters', href: '/find-sitter', icon: UserCheck },
+    { name: 'Sitters', href: '/pet-sitters', icon: UserCheck },
     { name: t('navigation.settings'), href: '/settings', icon: User },
   ];
 
   const isActive = (href: string) => {
-    if (href === '/find-sitter') {
+    if (href === '/pet-sitters') {
       return location.pathname === href || location.pathname.startsWith('/sitter/') || 
              location.pathname === '/become-sitter' || location.pathname === '/my-bookings';
     }
@@ -40,7 +40,7 @@ const MobileTopNav = () => {
               to={item.href}
               className={`flex-1 flex flex-col items-center justify-center py-2 px-1 transition-colors ${
                 isActive(item.href)
-                  ? item.href === '/find-sitter' 
+                  ? item.href === '/pet-sitters' 
                     ? 'text-blue-600 bg-blue-50' 
                     : 'text-green-600 bg-green-50'
                   : 'text-gray-600 hover:text-green-600 hover:bg-green-50'

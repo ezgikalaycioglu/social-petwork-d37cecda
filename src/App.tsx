@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Layout from "@/components/Layout";
@@ -26,9 +26,9 @@ import ChangelogPage from "./pages/ChangelogPage";
 import Packs from "./pages/Packs";
 import FindFriends from "./pages/FindFriends";
 import BecomeSitter from "./pages/BecomeSitter";
-import FindSitter from "./pages/FindSitter";
+import PetSitters from "./pages/PetSitters";
 import SitterProfile from "./pages/SitterProfile";
-import MyBookings from "./pages/MyBookings";
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -129,13 +129,10 @@ const App = () => {
                     <BecomeSitter />
                   </ProtectedRoute>
                 } />
-                <Route path="/find-sitter" element={<FindSitter />} />
+                <Route path="/pet-sitters" element={<PetSitters />} />
+                <Route path="/find-sitter" element={<Navigate to="/pet-sitters" replace />} />
+                <Route path="/my-bookings" element={<Navigate to="/pet-sitters" replace />} />
                 <Route path="/sitter/:sitterId" element={<SitterProfile />} />
-                <Route path="/my-bookings" element={
-                  <ProtectedRoute>
-                    <MyBookings />
-                  </ProtectedRoute>
-                } />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
