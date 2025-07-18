@@ -35,7 +35,7 @@ interface SitterData {
   is_active: boolean;
   sitter_services: { service_type: string }[];
   sitter_photos: { photo_url: string; is_primary: boolean }[];
-  profiles: { full_name: string } | null;
+  user_profiles: { display_name: string } | null;
 }
 
 interface BookingData {
@@ -46,7 +46,7 @@ interface BookingData {
   total_price: number;
   pet_profiles: { name: string };
   sitter_profiles: { 
-    profiles: { full_name: string } | null; 
+    user_profiles: { display_name: string } | null; 
     location: string;
   } | null;
 }
@@ -93,7 +93,7 @@ const PetSitters = () => {
           *,
           sitter_services (service_type),
           sitter_photos (photo_url, is_primary),
-          profiles:user_id (full_name)
+          user_profiles!inner (display_name)
         `)
         .eq('is_active', true);
 
@@ -122,7 +122,7 @@ const PetSitters = () => {
           *,
           pet_profiles (name),
           sitter_profiles (
-            profiles:user_id (full_name),
+            user_profiles!inner (display_name),
             location
           )
         `)
@@ -196,16 +196,16 @@ const PetSitters = () => {
         <CardContent className="p-6">
           <div className="flex items-start space-x-4">
             <Avatar className="w-16 h-16 border-2 border-primary/20">
-              <AvatarImage src={primaryPhoto} alt={sitter.profiles?.full_name} />
+              <AvatarImage src={primaryPhoto} alt={sitter.user_profiles?.display_name} />
               <AvatarFallback className="bg-primary/10 text-primary">
-                {sitter.profiles?.full_name?.charAt(0)}
+                {sitter.user_profiles?.display_name?.charAt(0)}
               </AvatarFallback>
             </Avatar>
             
             <div className="flex-1 space-y-3">
               <div>
                 <h3 className="font-semibold text-lg text-foreground">
-                  {sitter.profiles?.full_name || 'Unknown Sitter'}
+                  {sitter.user_profiles?.display_name || 'Unknown Sitter'}
                 </h3>
                 <div className="flex items-center text-muted-foreground text-sm">
                   <MapPin className="w-4 h-4 mr-1" />
@@ -412,7 +412,7 @@ const PetSitters = () => {
                                 </Badge>
                               </div>
                               <p className="text-sm text-muted-foreground">
-                                Sitter: {booking.sitter_profiles?.profiles?.full_name || 'Unknown Sitter'}
+                                Sitter: {booking.sitter_profiles?.user_profiles?.display_name || 'Unknown Sitter'}
                               </p>
                               <p className="text-sm text-muted-foreground">
                                 {booking.sitter_profiles?.location || 'Unknown Location'}
