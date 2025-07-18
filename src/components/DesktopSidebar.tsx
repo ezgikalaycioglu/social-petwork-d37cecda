@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, PawPrint, Users, MapPin, Calendar, Gift, Building, Settings, User, Heart } from 'lucide-react';
+import { Home, PawPrint, Users, MapPin, Calendar, Gift, Building, Settings, User, Heart, UserCheck, Search, Star, CalendarCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,17 @@ const DesktopSidebar = () => {
     { name: 'Business', href: '/business-dashboard', icon: Building },
   ];
 
+  const sitterNavItems = [
+    { name: 'Find Sitters', href: '/find-sitter', icon: Search },
+    { name: 'Become Sitter', href: '/become-sitter', icon: UserCheck },
+    { name: 'My Bookings', href: '/my-bookings', icon: CalendarCheck },
+  ];
+
+  const isSitterActive = () => {
+    return sitterNavItems.some(item => location.pathname === item.href) || 
+           location.pathname.startsWith('/sitter/');
+  };
+
   const isActive = (href: string) => location.pathname === href;
 
   if (!user) {
@@ -41,7 +52,7 @@ const DesktopSidebar = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -59,6 +70,30 @@ const DesktopSidebar = () => {
               </Link>
             );
           })}
+
+          {/* Pet Sitter Section */}
+          <div className="pt-4">
+            <div className="px-3 mb-2">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pet Sitter</h3>
+            </div>
+            {sitterNavItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    isActive(item.href) || (item.href === '/find-sitter' && location.pathname.startsWith('/sitter/'))
+                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
         {/* User Section */}

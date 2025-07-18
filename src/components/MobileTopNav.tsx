@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, PawPrint, Users, Heart, User } from 'lucide-react';
+import { Home, PawPrint, Users, Heart, User, UserCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const MobileTopNav = () => {
@@ -13,11 +13,17 @@ const MobileTopNav = () => {
     { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
     { name: t('navigation.myPets'), href: '/my-pets', icon: PawPrint },
     { name: t('navigation.petSocial'), href: '/pet-social', icon: Users },
-    { name: t('navigation.findFriends'), href: '/find-friends', icon: Heart },
+    { name: 'Sitters', href: '/find-sitter', icon: UserCheck },
     { name: t('navigation.settings'), href: '/settings', icon: User },
   ];
 
-  const isActive = (href: string) => location.pathname === href;
+  const isActive = (href: string) => {
+    if (href === '/find-sitter') {
+      return location.pathname === href || location.pathname.startsWith('/sitter/') || 
+             location.pathname === '/become-sitter' || location.pathname === '/my-bookings';
+    }
+    return location.pathname === href;
+  };
 
   if (!user) {
     return null;
@@ -34,7 +40,9 @@ const MobileTopNav = () => {
               to={item.href}
               className={`flex-1 flex flex-col items-center justify-center py-2 px-1 transition-colors ${
                 isActive(item.href)
-                  ? 'text-green-600 bg-green-50'
+                  ? item.href === '/find-sitter' 
+                    ? 'text-blue-600 bg-blue-50' 
+                    : 'text-green-600 bg-green-50'
                   : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
               }`}
             >
