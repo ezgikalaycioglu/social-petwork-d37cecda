@@ -243,16 +243,6 @@ export const TweetFeed: React.FC = () => {
         </div>
       )}
 
-      {/* Floating Action Button */}
-      {userPets.length > 0 && (
-        <Button
-          onClick={() => setShowCreateModal(true)}
-          className="fixed bottom-20 right-4 h-14 w-14 rounded-full shadow-lg z-50"
-          size="icon"
-        >
-          <Plus className="h-6 w-6" />
-        </Button>
-      )}
 
       {/* Create Tweet Modal */}
       <CreateTweetModal
