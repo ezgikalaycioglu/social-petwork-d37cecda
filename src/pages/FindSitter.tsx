@@ -170,7 +170,7 @@ export default function FindSitter() {
       );
     }
 
-    if (service) {
+    if (service && service !== "all") {
       filtered = filtered.filter(sitter =>
         sitter.sitter_services.some(s => s.service_type === service)
       );
@@ -258,7 +258,7 @@ export default function FindSitter() {
                     <SelectValue placeholder="Any service" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any service</SelectItem>
+                    <SelectItem value="all">Any service</SelectItem>
                     {services.map((s) => (
                       <SelectItem key={s} value={s}>{s}</SelectItem>
                     ))}
