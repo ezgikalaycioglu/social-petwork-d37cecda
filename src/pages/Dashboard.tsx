@@ -220,37 +220,37 @@ const Dashboard = () => {
                 <CardContent className="space-y-3">
                   <Button
                     onClick={() => handleQuickAction('Create Pet Profile', '/create-pet-profile')}
-                    className="w-full justify-start bg-green-600 hover:bg-green-700"
+                    className="w-full justify-start bg-green-600 hover:bg-green-700 h-auto py-3 px-4"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Pet Profile
+                    <Plus className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="text-sm leading-tight">Create Pet Profile</span>
                   </Button>
                   
                   <Button
                     onClick={() => handleQuickAction('My Pets Dashboard', '/my-pets')}
                     variant="outline"
-                    className="w-full justify-start border-blue-500 text-blue-600 hover:bg-blue-50"
+                    className="w-full justify-start border-blue-500 text-blue-600 hover:bg-blue-50 h-auto py-3 px-4"
                   >
-                    <Eye className="w-4 h-4 mr-2" />
-                    My Pets Dashboard
+                    <Eye className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="text-sm leading-tight">My Pets Dashboard</span>
                   </Button>
                   
                   <Button
                     onClick={() => handleQuickAction('Events & Meetups', '/events')}
                     variant="outline"
-                    className="w-full justify-start border-orange-500 text-orange-600 hover:bg-orange-50"
+                    className="w-full justify-start border-orange-500 text-orange-600 hover:bg-orange-50 h-auto py-3 px-4"
                   >
-                    <Users className="w-4 h-4 mr-2" />
-                    Events & Meetups
+                    <Users className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="text-sm leading-tight">Events & Meetups</span>
                   </Button>
                   
                   <Button
                     onClick={() => handleQuickAction('Pet Social Network', '/pet-social')}
                     variant="outline"
-                    className="w-full justify-start border-purple-500 text-purple-600 hover:bg-purple-50"
+                    className="w-full justify-start border-purple-500 text-purple-600 hover:bg-purple-50 h-auto py-3 px-4"
                   >
-                    <Users className="w-4 h-4 mr-2" />
-                    Pet Social Network
+                    <Users className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="text-sm leading-tight">Pet Social Network</span>
                   </Button>
                 </CardContent>
               </Card>
