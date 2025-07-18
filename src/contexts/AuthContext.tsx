@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,118 +18,53 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Initial session check
   useEffect(() => {
-    // Initialize analytics once
-    analyticsService.init();
-
-    // Get initial session
-    const getSession = async () => {
+    const initializeAuth = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
+        analyticsService.init();
+
+        const { data, error } = await supabase.auth.getSession();
         if (error) {
-          console.error('Error getting initial session:', error);
-          const authErrorHandled = await handleAuthError(error);
-          if (authErrorHandled.shouldSignOut) {
-            setSession(null);
-            setUser(null);
-            setLoading(false);
-            return;
-          }
+          console.error("Initial session error:", error);
+          await handleAuthError(error);
         }
-        
-        if (session) {
-          setSession(session);
-          setUser(session.user);
-        }
+
+        const activeSession = data?.session || null;
+        setSession(activeSession);
+        setUser(activeSession?.user || null);
       } catch (error) {
-        console.error('Unexpected error getting session:', error);
+        console.error("Unexpected error while initializing auth:", error);
         await handleAuthError(error);
       } finally {
         setLoading(false);
       }
     };
 
-    getSession();
+    initializeAuth();
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setLoading(true);
-        
-        if (event === 'SIGNED_IN' && session?.user) {
-          setSession(session);
-          setUser(session.user);
-          
-          // Track login event
+    // Auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      if (event === 'SIGNED_IN') {
+        setSession(newSession);
+        setUser(newSession?.user || null);
+
+        try {
           analyticsService.trackEvent('User Logged In', {
-            user_id: session.user.id,
-            email: session.user.email || undefined,
+            user_id: newSession?.user.id,
+            email: newSession?.user.email,
           });
-
-          // Identify user for analytics with error handling
-          try {
-            const { data: userProfile, error: profileError } = await supabase
-              .from('user_profiles')
-              .select('display_name, city, neighborhood')
-              .eq('id', session.user.id)
-              .single();
-
-            // Handle potential auth errors in profile fetch
-            if (profileError) {
-              const authErrorHandled = await handleAuthError(profileError);
-              if (authErrorHandled.shouldSignOut) {
-                setSession(null);
-                setUser(null);
-                setLoading(false);
-                return;
-              }
-            }
-
-            const { count: petCount, error: petCountError } = await supabase
-              .from('pet_profiles')
-              .select('*', { count: 'exact', head: true })
-              .eq('user_id', session.user.id);
-
-            // Handle potential auth errors in pet count fetch
-            if (petCountError) {
-              const authErrorHandled = await handleAuthError(petCountError);
-              if (authErrorHandled.shouldSignOut) {
-                setSession(null);
-                setUser(null);
-                setLoading(false);
-                return;
-              }
-            }
-
-            analyticsService.identifyUser(session.user.id, {
-              $email: session.user.email || undefined,
-              $name: userProfile?.display_name || undefined,
-              $created: session.user.created_at,
-              pet_count: petCount || 0,
-              city: userProfile?.city || undefined,
-              neighborhood: userProfile?.neighborhood || undefined,
-              user_type: 'pet_owner',
-            });
-          } catch (error) {
-            console.error('Error fetching user data for analytics:', error);
-            // Fallback analytics identification
-            analyticsService.identifyUser(session.user.id, {
-              $email: session.user.email || undefined,
-              $created: session.user.created_at,
-              user_type: 'pet_owner',
-            });
-          }
-        } else if (event === 'SIGNED_OUT') {
-          setSession(null);
-          setUser(null);
-          analyticsService.trackEvent('User Logged Out');
-          analyticsService.reset();
+        } catch (e) {
+          console.warn('Analytics login event failed');
         }
-        
-        setLoading(false);
+
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setUser(null);
+        analyticsService.trackEvent('User Logged Out');
+        analyticsService.reset();
       }
-    );
+    });
 
     return () => subscription.unsubscribe();
   }, []);
@@ -138,11 +72,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
-      // Force clean logout even if API call fails
       setSession(null);
       setUser(null);
+    } catch (error) {
+      console.error('Error during sign out:', error);
     }
   };
 
@@ -155,7 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
