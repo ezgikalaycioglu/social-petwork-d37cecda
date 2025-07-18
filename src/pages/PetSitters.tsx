@@ -168,7 +168,7 @@ const PetSitters = () => {
       );
     }
 
-    if (selectedService) {
+    if (selectedService && selectedService !== 'all') {
       filtered = filtered.filter(sitter =>
         sitter.sitter_services.some(service => service.service_type === selectedService)
       );
@@ -329,7 +329,7 @@ const PetSitters = () => {
                           <SelectValue placeholder="Select service" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Services</SelectItem>
+                          <SelectItem value="all">All Services</SelectItem>
                           <SelectItem value="House Sitting">House Sitting</SelectItem>
                           <SelectItem value="Dog Walking">Dog Walking</SelectItem>
                           <SelectItem value="Pet Boarding">Pet Boarding</SelectItem>
