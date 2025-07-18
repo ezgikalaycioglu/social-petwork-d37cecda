@@ -25,6 +25,10 @@ import BusinessDashboard from "./pages/BusinessDashboard";
 import ChangelogPage from "./pages/ChangelogPage";
 import Packs from "./pages/Packs";
 import FindFriends from "./pages/FindFriends";
+import BecomeSitter from "./pages/BecomeSitter";
+import FindSitter from "./pages/FindSitter";
+import SitterProfile from "./pages/SitterProfile";
+import MyBookings from "./pages/MyBookings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -118,6 +122,18 @@ const App = () => {
                 <Route path="/settings" element={
                   <ProtectedRoute>
                     <UserSettings />
+                  </ProtectedRoute>
+                } />
+                <Route path="/become-sitter" element={
+                  <ProtectedRoute>
+                    <BecomeSitter />
+                  </ProtectedRoute>
+                } />
+                <Route path="/find-sitter" element={<FindSitter />} />
+                <Route path="/sitter/:sitterId" element={<SitterProfile />} />
+                <Route path="/my-bookings" element={
+                  <ProtectedRoute>
+                    <MyBookings />
                   </ProtectedRoute>
                 } />
                 

@@ -636,6 +636,195 @@ export type Database = {
         }
         Relationships: []
       }
+      sitter_bookings: {
+        Row: {
+          created_at: string
+          end_date: string
+          id: string
+          owner_id: string
+          pet_id: string
+          sitter_id: string
+          special_instructions: string | null
+          start_date: string
+          status: string
+          total_price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          id?: string
+          owner_id: string
+          pet_id: string
+          sitter_id: string
+          special_instructions?: string | null
+          start_date: string
+          status?: string
+          total_price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          id?: string
+          owner_id?: string
+          pet_id?: string
+          sitter_id?: string
+          special_instructions?: string | null
+          start_date?: string
+          status?: string
+          total_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sitter_bookings_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sitter_bookings_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sitter_photos: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean | null
+          photo_url: string
+          sitter_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          photo_url: string
+          sitter_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          photo_url?: string
+          sitter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sitter_photos_sitter_id_fkey"
+            columns: ["sitter_id"]
+            isOneToOne: false
+            referencedRelation: "sitter_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sitter_profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          location: string | null
+          rate_per_day: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          rate_per_day?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          rate_per_day?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sitter_reviews: {
+        Row: {
+          booking_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          owner_id: string
+          rating: number
+          sitter_id: string
+        }
+        Insert: {
+          booking_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          owner_id: string
+          rating: number
+          sitter_id: string
+        }
+        Update: {
+          booking_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          owner_id?: string
+          rating?: number
+          sitter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sitter_reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "sitter_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sitter_services: {
+        Row: {
+          created_at: string
+          id: string
+          service_type: string
+          sitter_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          service_type: string
+          sitter_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          service_type?: string
+          sitter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sitter_services_sitter_id_fkey"
+            columns: ["sitter_id"]
+            isOneToOne: false
+            referencedRelation: "sitter_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tweet_reactions: {
         Row: {
           created_at: string

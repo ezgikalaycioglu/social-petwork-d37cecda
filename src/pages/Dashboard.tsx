@@ -252,6 +252,15 @@ const Dashboard = () => {
                     <Users className="w-4 h-4 mr-2 flex-shrink-0" />
                     <span className="text-sm leading-tight">Pet Social Network</span>
                   </Button>
+                  
+                  <Button
+                    onClick={() => handleQuickAction('Find Pet Sitter', '/find-sitter')}
+                    variant="outline"
+                    className="w-full justify-start border-teal-500 text-teal-600 hover:bg-teal-50 h-auto py-3 px-4"
+                  >
+                    <Users className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="text-sm leading-tight">Find Pet Sitter</span>
+                  </Button>
                 </CardContent>
               </Card>
 

@@ -14,7 +14,7 @@ const MobileBottomNav = () => {
     { name: t('navigation.events'), href: '/events', icon: Calendar },
     { name: t('navigation.deals'), href: '/deals', icon: Tag },
     { name: t('navigation.packs'), href: '/packs', icon: Users },
-    { name: 'Business', href: '/business-dashboard', icon: Building },
+    { name: 'Sitters', href: '/find-sitter', icon: Users },
   ];
 
   const isActive = (href: string) => location.pathname === href;
