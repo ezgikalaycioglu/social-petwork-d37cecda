@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 import { Building2 } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 import { 
@@ -191,13 +192,15 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
 
             <div>
               <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
+              <LocationAutocomplete
                 value={formData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
-                placeholder="123 Pet Street, Pet City, PC 12345"
-                maxLength={INPUT_LIMITS.ADDRESS.max}
+                onChange={(value) => handleInputChange('address', value)}
+                placeholder="Enter business address"
                 className={errors.address ? 'border-red-500' : ''}
+                onLocationSelect={(location) => {
+                  // Store the full address with coordinates for future use
+                  console.log('Selected business location:', location);
+                }}
               />
               {errors.address && (
                 <p className="text-sm text-red-500 mt-1">{errors.address}</p>

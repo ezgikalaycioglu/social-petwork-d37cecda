@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/Layout';
+import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 import { 
   Search, 
   UserCheck, 
@@ -314,12 +315,15 @@ const PetSitters = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="location">Location</Label>
-                      <Input
-                        id="location"
-                        placeholder="Enter city or area"
+                      <LocationAutocomplete
                         value={searchLocation}
-                        onChange={(e) => setSearchLocation(e.target.value)}
+                        onChange={setSearchLocation}
+                        placeholder="Enter city, area, or address"
                         className="bg-white"
+                        onLocationSelect={(location) => {
+                          // Optionally store coordinates for future use
+                          console.log('Selected location:', location);
+                        }}
                       />
                     </div>
                     <div>
