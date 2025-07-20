@@ -7,6 +7,7 @@ import { Users, Calendar, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import PackSettingsModal from '@/components/PackSettingsModal';
 
 interface PackCardProps {
@@ -32,6 +33,7 @@ const PackCard = ({ pack, onUpdate }: PackCardProps) => {
   const [showSettings, setShowSettings] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const isOwner = user?.id === pack.created_by;
   const isMember = pack.pack_members.some(member => member.user_id === user?.id);
@@ -98,7 +100,7 @@ const PackCard = ({ pack, onUpdate }: PackCardProps) => {
 
   return (
     <>
-      <Card className="hover:shadow-lg transition-shadow">
+      <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/packs/${pack.id}`)}>
         {pack.cover_image_url && (
           <div className="h-48 bg-cover bg-center rounded-t-lg" 
                style={{ backgroundImage: `url(${pack.cover_image_url})` }} />
@@ -115,7 +117,10 @@ const PackCard = ({ pack, onUpdate }: PackCardProps) => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setShowSettings(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowSettings(true);
+                }}
               >
                 <Settings className="w-4 h-4" />
               </Button>
@@ -140,7 +145,10 @@ const PackCard = ({ pack, onUpdate }: PackCardProps) => {
           <div className="flex space-x-2">
             {!isMember && !isOwner && (
               <Button
-                onClick={handleJoinPack}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleJoinPack();
+                }}
                 disabled={isJoining}
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white"
               >
@@ -149,19 +157,35 @@ const PackCard = ({ pack, onUpdate }: PackCardProps) => {
             )}
             {isMember && !isOwner && (
               <Button
-                onClick={handleLeavePack}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLeavePack();
+                }}
                 variant="outline"
                 className="flex-1"
               >
                 Leave Pack
               </Button>
             )}
+            {(isMember || isOwner) && (
+              <Button
+                onClick={() => navigate(`/packs/${pack.id}`)}
+                className="flex-1 bg-primary hover:bg-primary-hover text-primary-foreground"
+              >
+                View Pack
+              </Button>
+            )}
             {isOwner && (
               <Button
-                onClick={() => setShowSettings(true)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowSettings(true);
+                }}
+                variant="outline"
+                size="icon"
+                className="flex-shrink-0"
               >
-                Manage Pack
+                <Settings className="w-4 h-4" />
               </Button>
             )}
           </div>

@@ -24,6 +24,7 @@ import Deals from "./pages/Deals";
 import BusinessDashboard from "./pages/BusinessDashboard";
 import ChangelogPage from "./pages/ChangelogPage";
 import Packs from "./pages/Packs";
+import PackDetails from "./pages/PackDetails";
 import FindFriends from "./pages/FindFriends";
 import BecomeSitter from "./pages/BecomeSitter";
 import PetSitters from "./pages/PetSitters";
@@ -112,6 +113,11 @@ const App = () => {
                 <Route path="/packs" element={
                   <ProtectedRoute>
                     <Packs />
+                  </ProtectedRoute>
+                } />
+                <Route path="/packs/:packId" element={
+                  <ProtectedRoute>
+                    <PackDetails />
                   </ProtectedRoute>
                 } />
                 <Route path="/pet-adventures/:petId" element={

@@ -359,6 +359,144 @@ export type Database = {
         }
         Relationships: []
       }
+      pack_announcements: {
+        Row: {
+          created_at: string
+          creator_id: string
+          description: string | null
+          event_id: string | null
+          expires_at: string | null
+          id: string
+          is_pinned: boolean
+          pack_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          event_id?: string | null
+          expires_at?: string | null
+          id?: string
+          is_pinned?: boolean
+          pack_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          event_id?: string | null
+          expires_at?: string | null
+          id?: string
+          is_pinned?: boolean
+          pack_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pack_announcements_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pack_announcements_pack_id_fkey"
+            columns: ["pack_id"]
+            isOneToOne: false
+            referencedRelation: "packs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pack_contest_submissions: {
+        Row: {
+          contest_id: string
+          created_at: string
+          id: string
+          pet_id: string | null
+          pet_name: string
+          photo_url: string
+          user_id: string
+          vote_count: number
+        }
+        Insert: {
+          contest_id: string
+          created_at?: string
+          id?: string
+          pet_id?: string | null
+          pet_name: string
+          photo_url: string
+          user_id: string
+          vote_count?: number
+        }
+        Update: {
+          contest_id?: string
+          created_at?: string
+          id?: string
+          pet_id?: string | null
+          pet_name?: string
+          photo_url?: string
+          user_id?: string
+          vote_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pack_contest_submissions_contest_id_fkey"
+            columns: ["contest_id"]
+            isOneToOne: false
+            referencedRelation: "pack_photo_contests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pack_contest_submissions_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pack_contest_submissions_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pack_contest_votes: {
+        Row: {
+          created_at: string
+          id: string
+          submission_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          submission_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          submission_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pack_contest_votes_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "pack_contest_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pack_members: {
         Row: {
           id: string
@@ -384,6 +522,126 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "pack_members_pack_id_fkey"
+            columns: ["pack_id"]
+            isOneToOne: false
+            referencedRelation: "packs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pack_photo_contests: {
+        Row: {
+          created_at: string
+          creator_id: string
+          description: string | null
+          ends_at: string
+          id: string
+          is_active: boolean
+          pack_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          ends_at: string
+          id?: string
+          is_active?: boolean
+          pack_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          pack_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pack_photo_contests_pack_id_fkey"
+            columns: ["pack_id"]
+            isOneToOne: false
+            referencedRelation: "packs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pack_poll_votes: {
+        Row: {
+          created_at: string
+          id: string
+          option_index: number
+          poll_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          option_index: number
+          poll_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          option_index?: number
+          poll_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pack_poll_votes_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "pack_polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pack_polls: {
+        Row: {
+          created_at: string
+          creator_id: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          options: Json
+          pack_id: string
+          question: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          options?: Json
+          pack_id: string
+          question: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          options?: Json
+          pack_id?: string
+          question?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pack_polls_pack_id_fkey"
             columns: ["pack_id"]
             isOneToOne: false
             referencedRelation: "packs"
