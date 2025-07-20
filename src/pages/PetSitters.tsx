@@ -96,7 +96,8 @@ const PetSitters = () => {
           sitter_photos (photo_url, is_primary),
           user_profiles!inner (display_name)
         `)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .neq('user_id', user?.id || '');
 
       if (error) throw error;
       setSitters((data || []) as unknown as SitterData[]);
