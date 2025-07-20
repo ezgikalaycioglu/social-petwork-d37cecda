@@ -678,6 +678,34 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_sitter_bookings_owner_profiles"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_sitter_bookings_pet_profiles"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_sitter_bookings_pet_profiles"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pet_profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_sitter_bookings_sitter_profiles"
+            columns: ["sitter_id"]
+            isOneToOne: false
+            referencedRelation: "sitter_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "sitter_bookings_pet_id_fkey"
             columns: ["pet_id"]
             isOneToOne: false
@@ -756,7 +784,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_sitter_profiles_user_profiles"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sitter_reviews: {
         Row: {
