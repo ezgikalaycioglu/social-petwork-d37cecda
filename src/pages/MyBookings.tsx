@@ -185,7 +185,7 @@ export default function MyBookings() {
         .from('sitter_bookings')
         .select(`
           *,
-          pet_profiles(name, profile_photo_url)
+          pet_profiles!fk_sitter_bookings_pet_profiles(name, profile_photo_url)
         `)
         .eq('owner_id', user.id)
         .order('created_at', { ascending: false });
@@ -223,7 +223,7 @@ export default function MyBookings() {
         .from('sitter_bookings')
         .select(`
           *,
-          pet_profiles(name, profile_photo_url)
+          pet_profiles!fk_sitter_bookings_pet_profiles(name, profile_photo_url)
         `)
         .eq('sitter_id', user.id)
         .order('created_at', { ascending: false });

@@ -121,9 +121,9 @@ const PetSitters = () => {
         .from('sitter_bookings')
         .select(`
           *,
-          pet_profiles (name),
+          pet_profiles!fk_sitter_bookings_pet_profiles (name),
           sitter_profiles (
-            user_profiles!inner (display_name),
+            user_profiles!fk_sitter_profiles_user_profiles (display_name),
             location
           )
         `)
