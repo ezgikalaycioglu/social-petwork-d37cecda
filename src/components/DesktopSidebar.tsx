@@ -17,7 +17,6 @@ const DesktopSidebar = () => {
     { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
     { name: t('navigation.myPets'), href: '/my-pets', icon: PawPrint },
     { name: t('navigation.petSocial'), href: '/pet-social', icon: Users },
-    { name: t('navigation.findFriends'), href: '/find-friends', icon: Heart },
     { name: t('navigation.petMap'), href: '/pet-map', icon: MapPin },
     { name: t('navigation.events'), href: '/events', icon: Calendar },
     { name: t('navigation.deals'), href: '/deals', icon: Gift },

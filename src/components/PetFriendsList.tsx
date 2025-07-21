@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { Users, UserMinus, Heart } from 'lucide-react';
+import { Users, UserMinus, Heart, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -28,6 +29,7 @@ const PetFriendsList = ({ petId, petName, isOwner = false, onFriendRemoved }: Pe
   const [loading, setLoading] = useState(true);
   const [removingFriends, setRemovingFriends] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchFriends();
@@ -124,10 +126,22 @@ const PetFriendsList = ({ petId, petName, isOwner = false, onFriendRemoved }: Pe
   return (
     <Card className="bg-white shadow-lg">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-green-600" />
-          {petName}'s Friends ({friends.length})
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-green-600" />
+            {petName}'s Friends ({friends.length})
+          </CardTitle>
+          {isOwner && (
+            <Button 
+              onClick={() => navigate(`/find-friends?petId=${petId}`)}
+              size="sm"
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              Find Friends
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {friends.length === 0 ? (

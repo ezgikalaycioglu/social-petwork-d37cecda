@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import FindFriendsComponent from '@/components/FindFriends';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,10 +18,23 @@ const FindFriendsPage: React.FC = () => {
   const [showFinder, setShowFinder] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const petIdFromUrl = searchParams.get('petId');
 
   useEffect(() => {
     checkAuthAndFetchPets();
   }, []);
+
+  // If pet ID is provided in URL, show the finder immediately
+  useEffect(() => {
+    if (petIdFromUrl && userPets.length > 0) {
+      const pet = userPets.find(p => p.id === petIdFromUrl);
+      if (pet) {
+        setSelectedPetId(petIdFromUrl);
+        setShowFinder(true);
+      }
+    }
+  }, [petIdFromUrl, userPets]);
 
   const checkAuthAndFetchPets = async () => {
     try {

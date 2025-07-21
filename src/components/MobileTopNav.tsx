@@ -27,10 +27,9 @@ const MobileTopNav = () => {
       );
     }
 
-    // Discover tab - Pet Social, Events, Pet Map, Find Friends sections
+    // Discover tab - Pet Social, Events, Pet Map sections
     if (location.pathname === '/discover' || location.pathname === '/pet-social' || 
-        location.pathname === '/events' || location.pathname === '/pet-map' || 
-        location.pathname === '/find-friends') {
+        location.pathname === '/events' || location.pathname === '/pet-map') {
       return (
         <div className="flex items-center justify-center w-full">
           <nav className="flex space-x-1 overflow-x-auto">
@@ -43,16 +42,6 @@ const MobileTopNav = () => {
               }`}
             >
               Pet Social
-            </Link>
-            <Link
-              to="/find-friends"
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
-                location.pathname === '/find-friends'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              }`}
-            >
-              Find Friends
             </Link>
             <Link
               to="/events"
