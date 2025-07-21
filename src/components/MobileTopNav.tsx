@@ -27,15 +27,16 @@ const MobileTopNav = () => {
       );
     }
 
-    // Discover tab - Pet Social, Events, Pet Map sections
+    // Discover tab - Pet Social, Events, Pet Map, Find Friends sections
     if (location.pathname === '/discover' || location.pathname === '/pet-social' || 
-        location.pathname === '/events' || location.pathname === '/pet-map') {
+        location.pathname === '/events' || location.pathname === '/pet-map' || 
+        location.pathname === '/find-friends') {
       return (
         <div className="flex items-center justify-center w-full">
-          <nav className="flex space-x-1">
+          <nav className="flex space-x-1 overflow-x-auto">
             <Link
               to="/pet-social"
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
                 location.pathname === '/pet-social'
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
@@ -44,8 +45,18 @@ const MobileTopNav = () => {
               Pet Social
             </Link>
             <Link
+              to="/find-friends"
+              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
+                location.pathname === '/find-friends'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+            >
+              Find Friends
+            </Link>
+            <Link
               to="/events"
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
                 location.pathname === '/events'
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
@@ -55,7 +66,7 @@ const MobileTopNav = () => {
             </Link>
             <Link
               to="/pet-map"
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
                 location.pathname === '/pet-map'
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
