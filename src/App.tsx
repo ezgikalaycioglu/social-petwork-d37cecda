@@ -22,6 +22,7 @@ import Events from "./pages/Events";
 import PetAdventures from "./pages/PetAdventures";
 import Deals from "./pages/Deals";
 import BusinessDashboard from "./pages/BusinessDashboard";
+import Business from "./pages/Business";
 import ChangelogPage from "./pages/ChangelogPage";
 import Packs from "./pages/Packs";
 import PackDetails from "./pages/PackDetails";
@@ -107,6 +108,11 @@ const App = () => {
                 <Route path="/events" element={
                   <ProtectedRoute>
                     <Events />
+                  </ProtectedRoute>
+                } />
+                <Route path="/business" element={
+                  <ProtectedRoute>
+                    <Business />
                   </ProtectedRoute>
                 } />
                 <Route path="/deals" element={

@@ -171,6 +171,7 @@ const UserSettings = () => {
 
   const handleLanguageChange = (languageCode: string) => {
     i18n.changeLanguage(languageCode);
+    localStorage.setItem('preferred-language', languageCode);
     toast({
       title: t('common.save'),
       description: t('settings.language') + ' changed successfully!',
