@@ -320,31 +320,31 @@ const PetSitters = () => {
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 py-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="-mx-4 grid w-[calc(100%+2rem)] grid-cols-2 grid-rows-2 gap-x-4 gap-y-6 bg-white rounded-2xl p-4 shadow-sm md:grid-cols-4 md:grid-rows-1 md:gap-x-2 md:gap-y-0 md:mx-0 md:w-full">
-              <TabsTrigger 
-                value="find" 
-                className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            <TabsList className="-mx-4 w-[calc(100%+2rem)] min-h-[96px] grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-6 bg-white rounded-2xl p-4 shadow-sm md:mx-0 md:w-full md:grid-cols-4 md:grid-rows-1 md:gap-x-2 md:gap-y-0">
+              <TabsTrigger
+                value="find"
+                className="h-full flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <Search className="w-4 h-4 mr-2" />
                 Find Sitters
               </TabsTrigger>
               <TabsTrigger 
                 value="bookings"
-                className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="h-full flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 My Bookings
               </TabsTrigger>
               <TabsTrigger 
                 value="availability"
-                className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="h-full flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <CalendarCheck className="w-4 h-4 mr-2" />
                 Sitter Availability
               </TabsTrigger>
               <TabsTrigger 
                 value="become"
-                className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="h-full flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <UserCheck className="w-4 h-4 mr-2" />
                 Become a Sitter
