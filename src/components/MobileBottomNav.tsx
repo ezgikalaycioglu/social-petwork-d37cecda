@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { MapPin, Calendar, Tag, Users, Building, UserCheck } from 'lucide-react';
+import { Home, Search, Plus, Users, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const MobileBottomNav = () => {
@@ -10,20 +10,27 @@ const MobileBottomNav = () => {
   const { t } = useTranslation();
 
   const navItems = [
-    { name: t('navigation.petMap'), href: '/pet-map', icon: MapPin },
-    { name: t('navigation.events'), href: '/events', icon: Calendar },
-    { name: t('navigation.deals'), href: '/deals', icon: Tag },
-    { name: t('navigation.packs'), href: '/packs/discover', icon: Users },
-    { name: 'Sitters', href: '/pet-sitters', icon: UserCheck },
+    { name: 'Home', href: '/dashboard', icon: Home },
+    { name: 'Discover', href: '/discover', icon: Search },
+    { name: 'Create', href: '/create-post', icon: Plus, isCreateButton: true },
+    { name: 'Packs', href: '/packs/discover', icon: Users },
+    { name: 'Profile', href: '/profile', icon: User },
   ];
 
   const isActive = (href: string) => {
-    if (href === '/pet-sitters') {
-      return location.pathname === href || location.pathname.startsWith('/sitter/') || 
-             location.pathname === '/become-sitter' || location.pathname === '/my-bookings';
+    if (href === '/dashboard') {
+      return location.pathname === href || location.pathname === '/';
+    }
+    if (href === '/discover') {
+      return location.pathname === href || location.pathname === '/pet-social' || 
+             location.pathname === '/events' || location.pathname === '/pet-map';
     }
     if (href === '/packs/discover') {
       return location.pathname.startsWith('/packs');
+    }
+    if (href === '/profile') {
+      return location.pathname === href || location.pathname === '/my-pets' || 
+             location.pathname === '/settings';
     }
     return location.pathname === href;
   };
@@ -42,14 +49,14 @@ const MobileBottomNav = () => {
               key={item.name}
               to={item.href}
               className={`flex-1 flex flex-col items-center justify-center py-3 px-2 transition-colors ${
-                isActive(item.href)
-                  ? item.href === '/pet-sitters' 
-                    ? 'text-blue-600 bg-blue-50' 
-                    : 'text-green-600 bg-green-50'
-                  : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+                item.isCreateButton
+                  ? 'text-white bg-primary hover:bg-primary/90 rounded-lg mx-2 my-2'
+                  : isActive(item.href)
+                  ? 'text-primary bg-primary/10'
+                  : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
               }`}
             >
-              <Icon className="w-7 h-7 mb-1" />
+              <Icon className={`${item.isCreateButton ? 'w-6 h-6' : 'w-6 h-6'} mb-1`} />
               <span className="text-xs font-medium">{item.name}</span>
             </Link>
           );

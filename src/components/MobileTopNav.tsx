@@ -1,57 +1,114 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, PawPrint, Users, Heart, User, UserCheck } from 'lucide-react';
+import { Bell, PawPrint, Settings, Plus, MapPin, Calendar, Users as UsersIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import SocialPetworkLogo from './SocialPetworkLogo';
 
 const MobileTopNav = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useTranslation();
 
-  const navItems = [
-    { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
-    { name: t('navigation.myPets'), href: '/my-pets', icon: PawPrint },
-    { name: t('navigation.petSocial'), href: '/pet-social', icon: Users },
-    { name: 'Sitters', href: '/pet-sitters', icon: UserCheck },
-    { name: t('navigation.settings'), href: '/settings', icon: User },
-  ];
-
-  const isActive = (href: string) => {
-    if (href === '/pet-sitters') {
-      return location.pathname === href || location.pathname.startsWith('/sitter/') || 
-             location.pathname === '/become-sitter' || location.pathname === '/my-bookings';
-    }
-    return location.pathname === href;
-  };
-
   if (!user) {
     return null;
   }
 
-  return (
-    <div className="fixed top-0 left-0 w-full bg-white border-b border-gray-200 shadow-sm z-50 block md:hidden">
-      <nav className="flex h-14 px-4">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
+  const renderContent = () => {
+    // Home tab - Logo left, Notifications right
+    if (location.pathname === '/dashboard' || location.pathname === '/') {
+      return (
+        <div className="flex items-center justify-between w-full">
+          <SocialPetworkLogo />
+          <Link to="/notifications" className="p-2 hover:bg-gray-100 rounded-full">
+            <Bell className="w-6 h-6 text-gray-600" />
+          </Link>
+        </div>
+      );
+    }
+
+    // Discover tab - Pet Social, Events, Pet Map sections
+    if (location.pathname === '/discover' || location.pathname === '/pet-social' || 
+        location.pathname === '/events' || location.pathname === '/pet-map') {
+      return (
+        <div className="flex items-center justify-center w-full">
+          <nav className="flex space-x-1">
             <Link
-              key={item.name}
-              to={item.href}
-              className={`flex-1 flex flex-col items-center justify-center py-2 px-1 transition-colors ${
-                isActive(item.href)
-                  ? item.href === '/pet-sitters' 
-                    ? 'text-blue-600 bg-blue-50' 
-                    : 'text-green-600 bg-green-50'
-                  : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+              to="/pet-social"
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                location.pathname === '/pet-social'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
-              <Icon className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium truncate">{item.name}</span>
+              Pet Social
             </Link>
-          );
-        })}
-      </nav>
+            <Link
+              to="/events"
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                location.pathname === '/events'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+            >
+              Events
+            </Link>
+            <Link
+              to="/pet-map"
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                location.pathname === '/pet-map'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+            >
+              Pet Map
+            </Link>
+          </nav>
+        </div>
+      );
+    }
+
+    // Packs tab - Title left, Create pack right
+    if (location.pathname.startsWith('/packs')) {
+      return (
+        <div className="flex items-center justify-between w-full">
+          <h1 className="text-lg font-semibold">Packs</h1>
+          <Link to="/packs/create" className="p-2 hover:bg-gray-100 rounded-full">
+            <Plus className="w-6 h-6 text-gray-600" />
+          </Link>
+        </div>
+      );
+    }
+
+    // Profile tab - My Pets left, Settings right
+    if (location.pathname === '/profile' || location.pathname === '/my-pets' || 
+        location.pathname === '/settings') {
+      return (
+        <div className="flex items-center justify-between w-full">
+          <Link to="/my-pets" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg">
+            <PawPrint className="w-5 h-5 text-gray-600" />
+            <span className="text-sm font-medium">My Pets</span>
+          </Link>
+          <Link to="/settings" className="p-2 hover:bg-gray-100 rounded-full">
+            <Settings className="w-6 h-6 text-gray-600" />
+          </Link>
+        </div>
+      );
+    }
+
+    // Default - just show logo
+    return (
+      <div className="flex items-center justify-center w-full">
+        <SocialPetworkLogo />
+      </div>
+    );
+  };
+
+  return (
+    <div className="fixed top-0 left-0 w-full bg-white border-b border-gray-200 shadow-sm z-50 block md:hidden">
+      <div className="flex h-14 px-4 items-center">
+        {renderContent()}
+      </div>
     </div>
   );
 };

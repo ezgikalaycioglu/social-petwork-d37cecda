@@ -33,6 +33,10 @@ import BecomeSitter from "./pages/BecomeSitter";
 import PetSitters from "./pages/PetSitters";
 import SitterProfile from "./pages/SitterProfile";
 import SitterAvailability from "./pages/SitterAvailability";
+import Discover from "./pages/Discover";
+import Profile from "./pages/Profile";
+import CreatePost from "./pages/CreatePost";
+import Notifications from "./pages/Notifications";
 
 
 const queryClient = new QueryClient({
@@ -147,6 +151,26 @@ const App = () => {
                 <Route path="/settings" element={
                   <ProtectedRoute>
                     <UserSettings />
+                  </ProtectedRoute>
+                } />
+                <Route path="/discover" element={
+                  <ProtectedRoute>
+                    <Discover />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } />
+                <Route path="/create-post" element={
+                  <ProtectedRoute>
+                    <CreatePost />
+                  </ProtectedRoute>
+                } />
+                <Route path="/notifications" element={
+                  <ProtectedRoute>
+                    <Notifications />
                   </ProtectedRoute>
                 } />
                 <Route path="/become-sitter" element={
