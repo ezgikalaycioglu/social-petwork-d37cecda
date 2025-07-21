@@ -10,10 +10,10 @@ const MobileBottomNav = () => {
   const { t } = useTranslation();
 
   const navItems = [
-    { name: 'Home', href: '/dashboard', icon: Home },
     { name: 'Social', href: '/social', icon: Search },
     { name: 'Pet Sitters', href: '/find-sitter', icon: Heart },
-    { name: 'Businesses', href: '/business', icon: Building2 },
+    { name: 'Home', href: '/dashboard', icon: Home },
+    { name: 'Businesses', href: '/deals', icon: Building2 },
     { name: 'Packs', href: '/packs/discover', icon: Users },
     { name: 'Profile', href: '/profile', icon: User },
   ];
@@ -30,7 +30,7 @@ const MobileBottomNav = () => {
     if (href === '/packs/discover') {
       return location.pathname.startsWith('/packs');
     }
-    if (href === '/business') {
+    if (href === '/deals') {
       return location.pathname === href || location.pathname === '/deals' || 
              location.pathname === '/business-dashboard';
     }

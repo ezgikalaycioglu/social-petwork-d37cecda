@@ -153,92 +153,44 @@ const Social = () => {
       <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
         {/* Header */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-border/50">
-          <div className="max-w-4xl mx-auto px-4 py-6">
+          <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-foreground mb-2 font-dm-sans">
+              <h1 className="text-4xl font-bold text-foreground mb-2">
                 🐾 Social
               </h1>
-              <p className="text-lg text-muted-foreground font-dm-sans">
+              <p className="text-xl text-muted-foreground">
                 Connect, discover, and share with the pet community
               </p>
             </div>
           </div>
         </div>
 
-        {/* Main Navigation Cards */}
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {/* Pet Social Card */}
-            <Card 
-              className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-primary/10 bg-card border-0 shadow-sm"
-              onClick={() => setActiveTab('pet-social')}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Heart className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground mb-1 font-dm-sans">
-                      Pet Social
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Discover and connect with pet friends
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Events Card */}
-            <Card 
-              className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-primary/10 bg-card border-0 shadow-sm"
-              onClick={() => setActiveTab('events')}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                    <Calendar className="w-6 h-6 text-accent" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground mb-1 font-dm-sans">
-                      Events
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Schedule playdates and group walks
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Pet Map Card */}
-            <Card 
-              className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-primary/10 bg-card border-0 shadow-sm md:col-span-2 lg:col-span-1"
-              onClick={() => setActiveTab('pet-map')}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-coral/10 rounded-xl flex items-center justify-center group-hover:bg-coral/20 transition-colors">
-                    <MapPin className="w-6 h-6 text-coral" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground mb-1 font-dm-sans">
-                      Pet Map
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Find pets and activities nearby
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Content Area */}
-        <div className="max-w-4xl mx-auto px-4 pb-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+            <TabsList className="-mx-4 w-[calc(100%+2rem)] min-h-[120px] grid grid-cols-1 grid-rows-3 gap-x-4 gap-y-8 bg-white rounded-2xl p-6 shadow-sm md:mx-0 md:w-full md:grid-cols-3 md:grid-rows-1 md:gap-x-2 md:gap-y-0 md:min-h-[96px] md:p-4">{/* Increased mobile height and spacing */}
+              <TabsTrigger
+                value="pet-social"
+                className="h-12 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-base"
+              >
+                <Heart className="w-5 h-5 mr-2" />
+                Pet Social
+              </TabsTrigger>
+              <TabsTrigger 
+                value="events"
+                className="h-12 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-base"
+              >
+                <Calendar className="w-5 h-5 mr-2" />
+                Events
+              </TabsTrigger>
+              <TabsTrigger 
+                value="pet-map"
+                className="h-12 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-base"
+              >
+                <MapPin className="w-5 h-5 mr-2" />
+                Pet Map
+              </TabsTrigger>
+            </TabsList>
 
             {/* Pet Social Tab */}
             <TabsContent value="pet-social" className="space-y-6">
