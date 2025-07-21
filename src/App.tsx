@@ -37,7 +37,6 @@ import Discover from "./pages/Discover";
 import Profile from "./pages/Profile";
 import CreatePost from "./pages/CreatePost";
 import Notifications from "./pages/Notifications";
-import Social from "./pages/Social";
 
 
 const queryClient = new QueryClient({
@@ -156,12 +155,7 @@ const App = () => {
                 } />
                 <Route path="/discover" element={
                   <ProtectedRoute>
-                    <Social />
-                  </ProtectedRoute>
-                } />
-                <Route path="/social" element={
-                  <ProtectedRoute>
-                    <Social />
+                    <Discover />
                   </ProtectedRoute>
                 } />
                 <Route path="/profile" element={

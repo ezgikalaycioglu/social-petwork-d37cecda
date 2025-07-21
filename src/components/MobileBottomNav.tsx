@@ -11,7 +11,7 @@ const MobileBottomNav = () => {
 
   const navItems = [
     { name: 'Social', href: '/discover', icon: Search },
-    { name: 'Pet Sitters', href: '/pet-sitters', icon: Heart },
+    { name: 'Pet Sitters', href: '/find-sitter', icon: Heart },
     { name: 'Home', href: '/dashboard', icon: Home },
     { name: 'Businesses', href: '/deals', icon: Building2 },
     { name: 'Packs', href: '/packs/discover', icon: Users },
@@ -28,11 +28,6 @@ const MobileBottomNav = () => {
     }
     if (href === '/packs/discover') {
       return location.pathname.startsWith('/packs');
-    }
-    if (href === '/pet-sitters') {
-      return location.pathname === href || location.pathname === '/find-sitter' || 
-             location.pathname === '/my-bookings' || location.pathname === '/sitter-availability' || 
-             location.pathname === '/become-sitter' || location.pathname.startsWith('/sitter/');
     }
     if (href === '/deals') {
       return location.pathname === href || location.pathname === '/deals' || 
