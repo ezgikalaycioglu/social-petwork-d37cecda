@@ -69,11 +69,28 @@ const DesktopSidebar = () => {
             );
           })}
 
+          {/* Settings Link */}
+          <Link
+            to="/settings"
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+              isActive('/settings')
+                ? 'bg-green-50 text-green-700 border-r-2 border-green-600'
+                : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
+            }`}
+          >
+            <Settings className="w-5 h-5" />
+            <span>{t('navigation.settings')}</span>
+          </Link>
+
+          {/* Auth Buttons */}
+          <div className="pt-4">
+            <AuthButton />
+          </div>
         </nav>
 
         {/* User Section */}
         <div className="p-4 border-t border-gray-200">
-          <div className="flex items-center space-x-3 mb-3">
+          <div className="flex items-center space-x-3">
             <Avatar className="h-8 w-8">
               <AvatarImage src="" alt="User" />
               <AvatarFallback className="bg-green-100 text-green-600 text-sm">
@@ -84,24 +101,6 @@ const DesktopSidebar = () => {
               <p className="text-sm font-medium text-gray-900 truncate">
                 {user.email}
               </p>
-            </div>
-          </div>
-          
-          <div className="space-y-1">
-            <Link
-              to="/settings"
-              className={`flex items-center space-x-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive('/settings')
-                  ? 'bg-green-50 text-green-700'
-                  : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
-              }`}
-            >
-              <Settings className="w-4 h-4" />
-              <span>{t('navigation.settings')}</span>
-            </Link>
-            
-            <div className="pt-2">
-              <AuthButton />
             </div>
           </div>
         </div>
