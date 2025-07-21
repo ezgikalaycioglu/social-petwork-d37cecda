@@ -111,7 +111,7 @@ const MobileTopNav = () => {
 
   return (
     <div className="fixed top-0 left-0 w-full bg-white border-b border-gray-200 shadow-sm z-50 block md:hidden">
-      <div className="flex h-16 px-4 items-center">{/* Increased height from h-14 to h-16 */}
+      <div className="flex h-20 px-4 items-center">{/* Increased height from h-16 to h-20 for more logo space */}
         {renderContent()}
       </div>
     </div>

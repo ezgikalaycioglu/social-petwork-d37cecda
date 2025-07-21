@@ -168,26 +168,26 @@ const Social = () => {
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 py-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="-mx-4 w-[calc(100%+2rem)] min-h-[96px] grid grid-cols-1 grid-rows-3 gap-x-4 gap-y-6 bg-white rounded-2xl p-4 shadow-sm md:mx-0 md:w-full md:grid-cols-3 md:grid-rows-1 md:gap-x-2 md:gap-y-0">
+            <TabsList className="-mx-4 w-[calc(100%+2rem)] min-h-[120px] grid grid-cols-1 grid-rows-3 gap-x-4 gap-y-8 bg-white rounded-2xl p-6 shadow-sm md:mx-0 md:w-full md:grid-cols-3 md:grid-rows-1 md:gap-x-2 md:gap-y-0 md:min-h-[96px] md:p-4">{/* Increased mobile height and spacing */}
               <TabsTrigger
                 value="pet-social"
-                className="h-full flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="h-12 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-base"
               >
-                <Heart className="w-4 h-4 mr-2" />
+                <Heart className="w-5 h-5 mr-2" />
                 Pet Social
               </TabsTrigger>
               <TabsTrigger 
                 value="events"
-                className="h-full flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="h-12 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-base"
               >
-                <Calendar className="w-4 h-4 mr-2" />
+                <Calendar className="w-5 h-5 mr-2" />
                 Events
               </TabsTrigger>
               <TabsTrigger 
                 value="pet-map"
-                className="h-full flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="h-12 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-base"
               >
-                <MapPin className="w-4 h-4 mr-2" />
+                <MapPin className="w-5 h-5 mr-2" />
                 Pet Map
               </TabsTrigger>
             </TabsList>
