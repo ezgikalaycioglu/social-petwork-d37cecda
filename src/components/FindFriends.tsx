@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Heart, X, MapPin, Star, Loader2, Search, ArrowLeft, Users } from 'lucide-react';
+import { Heart, X, MapPin, Star, Loader2, Search, Users } from 'lucide-react';
 import { useLocation } from '@/hooks/useLocation';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -28,7 +28,6 @@ interface FindFriendsProps {
 }
 
 const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) => {
-  const [mode, setMode] = useState<'recommendations' | 'search'>('recommendations');
   const [matches, setMatches] = useState<MatchedPet[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,14 +35,15 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [processingAction, setProcessingAction] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const { coordinates, loading: locationLoading, error: locationError } = useLocation();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (coordinates && !locationLoading && mode === 'recommendations') {
+    if (coordinates && !locationLoading) {
       fetchMatches();
     }
-  }, [coordinates, locationLoading, userPetId, mode]);
+  }, [coordinates, locationLoading, userPetId]);
 
   const fetchMatches = async () => {
     if (!coordinates) return;
@@ -86,6 +86,7 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
     }
 
     setSearching(true);
+    setShowSearchResults(true);
     try {
       const { data, error } = await supabase.functions.invoke('search-pet-friends', {
         body: {
@@ -117,18 +118,10 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
     searchPets();
   };
 
-  const switchToSearch = () => {
-    setMode('search');
-    setSearchResults([]);
+  const clearSearch = () => {
     setSearchQuery('');
-  };
-
-  const switchToRecommendations = () => {
-    setMode('recommendations');
     setSearchResults([]);
-    if (coordinates && !loading) {
-      fetchMatches();
-    }
+    setShowSearchResults(false);
   };
 
   const handleLike = async (targetPetId?: string) => {
@@ -160,11 +153,11 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
 
       onMatchFound?.();
       
-      if (mode === 'recommendations') {
-        nextMatch();
-      } else {
+      if (targetPetId) {
         // Remove from search results
         setSearchResults(prev => prev.filter(p => p.id !== petId));
+      } else {
+        nextMatch();
       }
     } catch (error) {
       console.error('Error sending friend request:', error);
@@ -239,87 +232,52 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
     );
   }
 
-  if (matches.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🐕</div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">No matches found</h3>
-          <p className="text-gray-500 mb-4">Try expanding your search radius or check back later!</p>
-          <Button onClick={fetchMatches}>
-            Search Again
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (currentMatchIndex >= matches.length) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className="text-6xl mb-4">✨</div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">That's all for now!</h3>
-          <p className="text-gray-500 mb-4">You've seen all available matches in your area.</p>
-          <Button onClick={fetchMatches}>
-            Search Again
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   const currentMatch = matches[currentMatchIndex];
 
-  // Render search mode
-  if (mode === 'search') {
-    return (
-      <div className="max-w-md mx-auto">
-        {/* Header with back button */}
-        <div className="mb-6">
-          <Button 
-            variant="outline" 
-            onClick={switchToRecommendations}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Recommendations
-          </Button>
-          
-          {/* Search form */}
-          <form onSubmit={handleSearch} className="space-y-3">
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder="Search by pet name or owner name..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-12"
-              />
-              <Button
-                type="submit"
-                size="sm"
-                className="absolute right-1 top-1 h-8 w-8 p-0"
-                disabled={searching || !searchQuery.trim()}
-              >
-                {searching ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Search className="w-4 h-4" />
-                )}
-              </Button>
-            </div>
-          </form>
-        </div>
+  return (
+    <div className="max-w-md mx-auto">
+      {/* Search Section - Always visible */}
+      <div className="mb-6">
+        <form onSubmit={handleSearch} className="space-y-3">
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Search by pet name or owner name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pr-12"
+            />
+            <Button
+              type="submit"
+              size="sm"
+              className="absolute right-1 top-1 h-8 w-8 p-0"
+              disabled={searching || !searchQuery.trim()}
+            >
+              {searching ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Search className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
 
-        {/* Search results */}
-        {searchResults.length > 0 ? (
-          <div className="space-y-4">
+      {/* Search Results */}
+      {showSearchResults && (
+        <div className="space-y-4 mb-6">
+          <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
               <Users className="w-5 h-5" />
               Search Results ({searchResults.length})
             </h3>
-            {searchResults.map((pet) => (
+            <Button variant="outline" size="sm" onClick={clearSearch}>
+              Clear
+            </Button>
+          </div>
+          
+          {searchResults.length > 0 ? (
+            searchResults.map((pet) => (
               <Card key={pet.id} className="overflow-hidden">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-4">
@@ -379,151 +337,161 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
                   )}
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        ) : searchQuery && !searching ? (
-          <div className="text-center py-8">
-            <div className="text-4xl mb-4">🔍</div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">No results found</h3>
-            <p className="text-gray-500">
-              Try searching with a different pet name or owner name.
-            </p>
-          </div>
-        ) : (
-          <div className="text-center py-8">
-            <div className="text-4xl mb-4">🐕</div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">Search for Friends</h3>
-            <p className="text-gray-500">
-              Enter a pet name or owner name to find specific friends.
-            </p>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Render recommendations mode
-  return (
-    <div className="max-w-md mx-auto">
-      {/* Mode toggle */}
-      <div className="mb-4 text-center">
-        <Button 
-          variant="outline" 
-          onClick={switchToSearch}
-          className="mb-4"
-        >
-          <Search className="w-4 h-4 mr-2" />
-          Search by Name
-        </Button>
-        <p className="text-sm text-gray-600">
-          {currentMatchIndex + 1} of {matches.length} recommendations
-        </p>
-      </div>
-
-      <Card className="overflow-hidden shadow-lg">
-        <CardHeader className="relative p-0">
-          {/* Pet Image */}
-          <div className="h-80 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-            {currentMatch.profile_photo_url ? (
-              <img
-                src={currentMatch.profile_photo_url}
-                alt={currentMatch.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="text-6xl">🐕</div>
-            )}
-          </div>
-
-          {/* Compatibility Score Badge */}
-          <div className="absolute top-4 right-4">
-            <Badge className={`${getCompatibilityColor(currentMatch.compatibilityScore)} font-semibold`}>
-              <Star className="w-3 h-3 mr-1" />
-              {currentMatch.compatibilityScore}% {getCompatibilityText(currentMatch.compatibilityScore)}
-            </Badge>
-          </div>
-
-          {/* Distance Badge */}
-          <div className="absolute top-4 left-4">
-            <Badge variant="secondary" className="bg-white/90 text-gray-700">
-              <MapPin className="w-3 h-3 mr-1" />
-              {currentMatch.distance}km away
-            </Badge>
-          </div>
-        </CardHeader>
-
-        <CardContent className="p-6">
-          {/* Pet Info */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-2xl font-bold text-gray-800">{currentMatch.name}</h2>
-              {currentMatch.age && (
-                <Badge variant="outline">
-                  {currentMatch.age} {currentMatch.age === 1 ? 'year' : 'years'}
-                </Badge>
-              )}
+            ))
+          ) : searchQuery && !searching ? (
+            <div className="text-center py-6">
+              <div className="text-4xl mb-4">🔍</div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">No results found</h3>
+              <p className="text-gray-500">
+                Try searching with a different pet name or owner name.
+              </p>
             </div>
-            <p className="text-gray-600 mb-3">{currentMatch.breed}</p>
-            
-            {currentMatch.bio && (
-              <p className="text-gray-700 text-sm mb-3">{currentMatch.bio}</p>
-            )}
-          </div>
+          ) : null}
+        </div>
+      )}
 
-          {/* Personality Traits */}
-          {currentMatch.personality_traits && currentMatch.personality_traits.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">Personality</h4>
-              <div className="flex flex-wrap gap-2">
-                {currentMatch.personality_traits.map((trait, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
-                    {trait}
-                  </Badge>
-                ))}
+      {/* Recommendations Section */}
+      {!showSearchResults && (
+        <>
+          {matches.length === 0 ? (
+            <div className="flex items-center justify-center h-96">
+              <div className="text-center">
+                <div className="text-6xl mb-4">🐕</div>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">No matches found</h3>
+                <p className="text-gray-500 mb-4">Try expanding your search radius or check back later!</p>
+                <Button onClick={fetchMatches}>
+                  Search Again
+                </Button>
               </div>
             </div>
-          )}
-
-          {/* Vaccination Status */}
-          {currentMatch.vaccination_status && (
-            <div className="mb-4">
-              <Badge
-                variant={currentMatch.vaccination_status === 'Up-to-date' ? 'default' : 'secondary'}
-                className="text-xs"
-              >
-                {currentMatch.vaccination_status === 'Up-to-date' ? '✓ Vaccinated' : currentMatch.vaccination_status}
-              </Badge>
+          ) : currentMatchIndex >= matches.length ? (
+            <div className="flex items-center justify-center h-96">
+              <div className="text-center">
+                <div className="text-6xl mb-4">✨</div>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">That's all for now!</h3>
+                <p className="text-gray-500 mb-4">You've seen all available matches in your area.</p>
+                <Button onClick={fetchMatches}>
+                  Search Again
+                </Button>
+              </div>
             </div>
-          )}
+          ) : (
+            <>
+              <div className="mb-4 text-center">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Recommended for You</h3>
+                <p className="text-sm text-gray-600">
+                  {currentMatchIndex + 1} of {matches.length} recommendations
+                </p>
+              </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-4 mt-6">
-            <Button
-              variant="outline"
-              size="lg"
-              className="flex-1 border-red-200 hover:bg-red-50 hover:border-red-300"
-              onClick={handleSkip}
-              disabled={processingAction}
-            >
-              <X className="w-5 h-5 mr-2 text-red-500" />
-              Skip
-            </Button>
-            <Button
-              size="lg"
-              className="flex-1 bg-pink-500 hover:bg-pink-600"
-              onClick={() => handleLike()}
-              disabled={processingAction}
-            >
-              {processingAction ? (
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              ) : (
-                <Heart className="w-5 h-5 mr-2" />
-              )}
-              Like
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+              <Card className="overflow-hidden shadow-lg">
+                <CardHeader className="relative p-0">
+                  {/* Pet Image */}
+                  <div className="h-80 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                    {currentMatch.profile_photo_url ? (
+                      <img
+                        src={currentMatch.profile_photo_url}
+                        alt={currentMatch.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-6xl">🐕</div>
+                    )}
+                  </div>
+
+                  {/* Compatibility Score Badge */}
+                  <div className="absolute top-4 right-4">
+                    <Badge className={`${getCompatibilityColor(currentMatch.compatibilityScore)} font-semibold`}>
+                      <Star className="w-3 h-3 mr-1" />
+                      {currentMatch.compatibilityScore}% {getCompatibilityText(currentMatch.compatibilityScore)}
+                    </Badge>
+                  </div>
+
+                  {/* Distance Badge */}
+                  <div className="absolute top-4 left-4">
+                    <Badge variant="secondary" className="bg-white/90 text-gray-700">
+                      <MapPin className="w-3 h-3 mr-1" />
+                      {currentMatch.distance}km away
+                    </Badge>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="p-6">
+                  {/* Pet Info */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h2 className="text-2xl font-bold text-gray-800">{currentMatch.name}</h2>
+                      {currentMatch.age && (
+                        <Badge variant="outline">
+                          {currentMatch.age} {currentMatch.age === 1 ? 'year' : 'years'}
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-gray-600 mb-3">{currentMatch.breed}</p>
+                    
+                    {currentMatch.bio && (
+                      <p className="text-gray-700 text-sm mb-3">{currentMatch.bio}</p>
+                    )}
+                  </div>
+
+                  {/* Personality Traits */}
+                  {currentMatch.personality_traits && currentMatch.personality_traits.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Personality</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {currentMatch.personality_traits.map((trait, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {trait}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Vaccination Status */}
+                  {currentMatch.vaccination_status && (
+                    <div className="mb-4">
+                      <Badge
+                        variant={currentMatch.vaccination_status === 'Up-to-date' ? 'default' : 'secondary'}
+                        className="text-xs"
+                      >
+                        {currentMatch.vaccination_status === 'Up-to-date' ? '✓ Vaccinated' : currentMatch.vaccination_status}
+                      </Badge>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-4 mt-6">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="flex-1 border-red-200 hover:bg-red-50 hover:border-red-300"
+                      onClick={handleSkip}
+                      disabled={processingAction}
+                    >
+                      <X className="w-5 h-5 mr-2 text-red-500" />
+                      Skip
+                    </Button>
+                    <Button
+                      size="lg"
+                      className="flex-1 bg-pink-500 hover:bg-pink-600"
+                      onClick={() => handleLike()}
+                      disabled={processingAction}
+                    >
+                      {processingAction ? (
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      ) : (
+                        <Heart className="w-5 h-5 mr-2" />
+                      )}
+                      Like
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 };
