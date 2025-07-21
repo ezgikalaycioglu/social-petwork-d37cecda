@@ -62,14 +62,11 @@ const AuthButton = () => {
 
   if (user) {
     return (
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-gray-600 hidden sm:block">
-          Welcome, {user.email}
-        </span>
+      <div className="flex flex-col gap-2 w-full">
         <Button 
           onClick={() => navigate('/dashboard')}
           size="default"
-          className="text-sm sm:text-lg px-4 py-2 sm:px-6 sm:py-3 text-white hover:opacity-90 mr-2"
+          className="w-full text-sm px-4 py-2 text-white hover:opacity-90"
           style={{ backgroundColor: '#A8DAB5' }}
         >
           Dashboard
@@ -78,7 +75,7 @@ const AuthButton = () => {
           onClick={handleSignOut}
           variant="outline"
           size="default"
-          className="text-sm sm:text-lg px-4 py-2 sm:px-6 sm:py-3"
+          className="w-full text-sm px-4 py-2"
           style={{ 
             borderColor: '#FFB3A7', 
             color: '#FFB3A7',
