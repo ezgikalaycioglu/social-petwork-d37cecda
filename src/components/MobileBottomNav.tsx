@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, Search, Users, User, Heart } from 'lucide-react';
+import { Home, Search, Users, User, Heart, Building2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const MobileBottomNav = () => {
@@ -10,9 +10,10 @@ const MobileBottomNav = () => {
   const { t } = useTranslation();
 
   const navItems = [
-    { name: 'Discover', href: '/discover', icon: Search },
+    { name: 'Social', href: '/discover', icon: Search },
     { name: 'Pet Sitters', href: '/find-sitter', icon: Heart },
     { name: 'Home', href: '/dashboard', icon: Home },
+    { name: 'Businesses', href: '/deals', icon: Building2 },
     { name: 'Packs', href: '/packs/discover', icon: Users },
     { name: 'Profile', href: '/profile', icon: User },
   ];
@@ -27,6 +28,10 @@ const MobileBottomNav = () => {
     }
     if (href === '/packs/discover') {
       return location.pathname.startsWith('/packs');
+    }
+    if (href === '/deals') {
+      return location.pathname === href || location.pathname === '/deals' || 
+             location.pathname === '/business-dashboard';
     }
     if (href === '/profile') {
       return location.pathname === href || location.pathname === '/my-pets' || 
