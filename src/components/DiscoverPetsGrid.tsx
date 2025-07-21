@@ -9,12 +9,16 @@ interface DiscoverPetsGridProps {
   pets: PetProfile[];
   onPetSelect?: (pet: PetProfile) => void;
   isLoading?: boolean;
+  onSendFriendRequest?: (petId: string) => void;
+  userPetIds?: string[];
 }
 
 const DiscoverPetsGrid: React.FC<DiscoverPetsGridProps> = ({ 
   pets, 
   onPetSelect,
-  isLoading = false 
+  isLoading = false,
+  onSendFriendRequest,
+  userPetIds = []
 }) => {
   if (isLoading) {
     return (
@@ -45,6 +49,9 @@ const DiscoverPetsGrid: React.FC<DiscoverPetsGridProps> = ({
           onClick={() => onPetSelect?.(pet)}
           showLocation={true}
           showBoopButton={true}
+          showFriendRequestButton={true}
+          onSendFriendRequest={onSendFriendRequest}
+          userPetIds={userPetIds}
         />
       ))}
     </div>

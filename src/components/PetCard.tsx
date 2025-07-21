@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { MapPin, UserPlus } from 'lucide-react';
 import BoopButton from './BoopButton';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -14,13 +15,19 @@ interface PetCardProps {
   onClick?: () => void;
   showLocation?: boolean;
   showBoopButton?: boolean;
+  showFriendRequestButton?: boolean;
+  onSendFriendRequest?: (petId: string) => void;
+  userPetIds?: string[];
 }
 
 const PetCard: React.FC<PetCardProps> = ({ 
   pet, 
   onClick, 
   showLocation = true,
-  showBoopButton = true 
+  showBoopButton = true,
+  showFriendRequestButton = false,
+  onSendFriendRequest,
+  userPetIds = []
 }) => {
   const [currentBoopCount, setCurrentBoopCount] = useState(pet.boop_count || 0);
 
@@ -100,26 +107,43 @@ const PetCard: React.FC<PetCardProps> = ({
               </div>
             )}
 
-            {/* Boop Button */}
-            {showBoopButton && (
-              <div className="flex items-center justify-between mt-3">
-                <BoopButton
-                  petId={pet.id}
-                  currentBoopCount={currentBoopCount}
-                  onBoopUpdate={handleBoopUpdate}
-                  size="sm"
-                />
+            {/* Action Buttons */}
+            <div className="flex items-center justify-between mt-3">
+              <div className="flex items-center gap-2">
+                {showBoopButton && (
+                  <BoopButton
+                    petId={pet.id}
+                    currentBoopCount={currentBoopCount}
+                    onBoopUpdate={handleBoopUpdate}
+                    size="sm"
+                  />
+                )}
                 
-                {pet.vaccination_status && (
-                  <Badge 
-                    variant={pet.vaccination_status === 'Up-to-date' ? 'default' : 'secondary'}
-                    className="text-xs"
+                {showFriendRequestButton && onSendFriendRequest && userPetIds.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSendFriendRequest(pet.id);
+                    }}
+                    className="text-xs px-2 py-1 h-auto"
                   >
-                    {pet.vaccination_status === 'Up-to-date' ? '✓ Vaccinated' : pet.vaccination_status}
-                  </Badge>
+                    <UserPlus className="w-3 h-3 mr-1" />
+                    Add Friend
+                  </Button>
                 )}
               </div>
-            )}
+              
+              {pet.vaccination_status && (
+                <Badge 
+                  variant={pet.vaccination_status === 'Up-to-date' ? 'default' : 'secondary'}
+                  className="text-xs"
+                >
+                  {pet.vaccination_status === 'Up-to-date' ? '✓ Vaccinated' : pet.vaccination_status}
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>

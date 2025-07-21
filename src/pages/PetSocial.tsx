@@ -107,13 +107,6 @@ const PetSocial = () => {
             </div>
           ) : (
             <div className="space-y-8">
-              {/* Friend Requests Section */}
-              <FriendRequests 
-                key={`requests-${refreshKey}`}
-                userPetIds={userPetIds} 
-                onRequestHandled={handleRefresh}
-              />
-
               {/* Discover Pets Section */}
               <DiscoverPets 
                 userPetIds={userPetIds} 
@@ -123,6 +116,16 @@ const PetSocial = () => {
               {/* Friends Lists for Each Pet */}
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-gray-800">Your Pets' Friends</h2>
+                
+                {/* Friend Requests Section - smaller and moved below title */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <FriendRequests 
+                    key={`requests-${refreshKey}`}
+                    userPetIds={userPetIds} 
+                    onRequestHandled={handleRefresh}
+                  />
+                </div>
+
                 {pets.map((pet) => (
                   <PetFriendsList
                     key={`${pet.id}-${refreshKey}`}
