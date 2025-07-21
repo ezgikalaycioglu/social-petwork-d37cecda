@@ -168,7 +168,7 @@ const Social = () => {
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 py-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="-mx-4 w-[calc(100%+2rem)] min-h-[120px] grid grid-cols-1 grid-rows-3 gap-x-4 gap-y-12 bg-white rounded-2xl p-6 shadow-sm md:mx-0 md:w-full md:grid-cols-3 md:grid-rows-1 md:gap-x-2 md:gap-y-0 md:min-h-[96px] md:p-4">{/* Increased mobile height and spacing */}
+            <TabsList className="-mx-4 w-[calc(100%+2rem)] min-h-[320px] grid grid-cols-1 grid-rows-3 gap-x-4 gap-y-12 bg-white rounded-2xl p-6 shadow-sm md:mx-0 md:w-full md:grid-cols-3 md:grid-rows-1 md:gap-x-2 md:gap-y-0 md:min-h-[96px] md:p-4">{/* Increased mobile height and spacing */}
               <TabsTrigger
                 value="pet-social"
                 className="h-12 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-base"
