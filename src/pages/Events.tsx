@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, Clock, MapPin, Plus, Users, Heart, PawPrint } from 'lucide-react';
+import { Calendar, Clock, MapPin, Plus, Users, Heart, PawPrint, Star, DollarSign } from 'lucide-react';
 import Layout from '@/components/Layout';
 import PlaydateRequestModal from '@/components/PlaydateRequestModal';
 import GroupWalkModal from '@/components/GroupWalkModal';
+import UpcomingPlaydates from '@/components/UpcomingPlaydates';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Event = Tables<'events'>;
@@ -24,6 +25,17 @@ const Events = () => {
   const [userId, setUserId] = useState<string>('');
   const [showPlaydateModal, setShowPlaydateModal] = useState(false);
   const [showGroupWalkModal, setShowGroupWalkModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     checkAuthAndFetchData();
@@ -170,6 +182,165 @@ const Events = () => {
     );
   }
 
+  // Mobile Card Component
+  const EventCard = ({ event, type }: { event: Event; type: 'incoming' | 'outgoing' | 'upcoming' }) => {
+    if (!isMobile) {
+      // Desktop card layout (existing)
+      return (
+        <Card className="bg-white shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {event.event_type === 'playdate' ? '🐕 Playdate Request' : '🚶 Group Walk'}
+              {type === 'outgoing' && (
+                <span className="text-sm font-normal text-yellow-600 bg-yellow-100 px-2 py-1 rounded">
+                  Pending
+                </span>
+              )}
+              {type === 'upcoming' && (
+                <span className="text-sm font-normal text-green-600 bg-green-100 px-2 py-1 rounded">
+                  Confirmed
+                </span>
+              )}
+            </CardTitle>
+            {type === 'incoming' && (
+              <CardDescription>
+                {event.event_type === 'playdate' ? 'Someone wants to arrange a playdate' : 'You\'re invited to a group walk'}
+              </CardDescription>
+            )}
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Calendar className="w-4 h-4" />
+                <span>{formatDate(event.scheduled_time)}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Clock className="w-4 h-4" />
+                <span>{formatTime(event.scheduled_time)}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <MapPin className="w-4 h-4" />
+                <span>{event.location_name}</span>
+              </div>
+              {event.message && (
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-700">"{event.message}"</p>
+                </div>
+              )}
+              {event.title && (
+                <div>
+                  <h4 className="font-semibold text-gray-800">{event.title}</h4>
+                </div>
+              )}
+            </div>
+            {type === 'incoming' && (
+              <div className="flex gap-2 mt-4">
+                <Button
+                  onClick={() => handleAcceptRequest(event.id)}
+                  className="bg-green-600 hover:bg-green-700 text-white flex-1"
+                >
+                  Accept
+                </Button>
+                <Button
+                  onClick={() => handleDeclineRequest(event.id)}
+                  variant="outline"
+                  className="border-red-500 text-red-600 hover:bg-red-50 flex-1"
+                >
+                  Decline
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Mobile card layout (similar to pet sitters)
+    return (
+      <Card className="hover:shadow-lg transition-all duration-300 border-0 bg-white">
+        <CardContent className="p-4">
+          <div className="flex items-start space-x-3">
+            {/* Event Icon */}
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <span className="text-lg">
+                {event.event_type === 'playdate' ? '🐕' : '🚶'}
+              </span>
+            </div>
+            
+            <div className="flex-1 space-y-2">
+              <div>
+                <h3 className="font-semibold text-sm text-foreground">
+                  {event.title || (event.event_type === 'playdate' ? 'Playdate Request' : 'Group Walk')}
+                </h3>
+                <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                  <Calendar className="w-3 h-3" />
+                  <span>{formatDate(event.scheduled_time)}</span>
+                  <Clock className="w-3 h-3" />
+                  <span>{formatTime(event.scheduled_time)}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center text-xs text-muted-foreground">
+                <MapPin className="w-3 h-3 mr-1" />
+                <span className="truncate">{event.location_name}</span>
+              </div>
+
+              {event.message && (
+                <p className="text-xs text-muted-foreground line-clamp-2 bg-gray-50 p-2 rounded">
+                  "{event.message}"
+                </p>
+              )}
+
+              <div className="flex flex-col space-y-2 sm:space-y-0">
+                {/* Status and Action Row - separate on mobile, inline on desktop */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    {type === 'outgoing' && (
+                      <span className="text-xs font-medium text-yellow-600 bg-yellow-100 px-2 py-1 rounded">
+                        Pending
+                      </span>
+                    )}
+                    {type === 'upcoming' && (
+                      <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded">
+                        Confirmed
+                      </span>
+                    )}
+                    {type === 'incoming' && (
+                      <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                        New Request
+                      </span>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Action Buttons Row - full width on mobile */}
+                {type === 'incoming' && (
+                  <div className="flex gap-2 w-full">
+                    <Button
+                      onClick={() => handleAcceptRequest(event.id)}
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 text-white flex-1"
+                    >
+                      Accept
+                    </Button>
+                    <Button
+                      onClick={() => handleDeclineRequest(event.id)}
+                      variant="outline"
+                      size="sm"
+                      className="border-red-500 text-red-600 hover:bg-red-50 flex-1"
+                    >
+                      Decline
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -181,6 +352,13 @@ const Events = () => {
             </h1>
             <p className="text-gray-600 mt-1">Manage your playdates and group walks</p>
           </div>
+
+          {/* Upcoming Playdates Section - Mobile Only */}
+          {isMobile && (
+            <div className="mb-6">
+              <UpcomingPlaydates />
+            </div>
+          )}
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -220,7 +398,7 @@ const Events = () => {
             </Card>
           ) : (
             <Tabs defaultValue="incoming" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1 h-auto space-y-1' : 'grid-cols-3'}`}>
                 <TabsTrigger value="incoming" className="relative">
                   Incoming Requests
                   {incomingRequests.length > 0 && (
@@ -257,57 +435,7 @@ const Events = () => {
                   </Card>
                 ) : (
                   incomingRequests.map((event) => (
-                    <Card key={event.id} className="bg-white shadow-lg">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          {event.event_type === 'playdate' ? '🐕 Playdate Request' : '🚶 Group Walk Invitation'}
-                        </CardTitle>
-                        <CardDescription>
-                          {event.event_type === 'playdate' ? 'Someone wants to arrange a playdate' : 'You\'re invited to a group walk'}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Calendar className="w-4 h-4" />
-                            <span>{formatDate(event.scheduled_time)}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Clock className="w-4 h-4" />
-                            <span>{formatTime(event.scheduled_time)}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <MapPin className="w-4 h-4" />
-                            <span>{event.location_name}</span>
-                          </div>
-                          {event.message && (
-                            <div className="bg-gray-50 p-3 rounded-lg">
-                              <p className="text-sm text-gray-700">"{event.message}"</p>
-                            </div>
-                          )}
-                          {event.title && (
-                            <div>
-                              <h4 className="font-semibold text-gray-800">{event.title}</h4>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex gap-2 mt-4">
-                          <Button
-                            onClick={() => handleAcceptRequest(event.id)}
-                            className="bg-green-600 hover:bg-green-700 text-white flex-1"
-                          >
-                            Accept
-                          </Button>
-                          <Button
-                            onClick={() => handleDeclineRequest(event.id)}
-                            variant="outline"
-                            className="border-red-500 text-red-600 hover:bg-red-50 flex-1"
-                          >
-                            Decline
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <EventCard key={event.id} event={event} type="incoming" />
                   ))
                 )}
               </TabsContent>
@@ -322,37 +450,7 @@ const Events = () => {
                   </Card>
                 ) : (
                   outgoingRequests.map((event) => (
-                    <Card key={event.id} className="bg-white shadow-lg">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          {event.event_type === 'playdate' ? '🐕 Playdate Request' : '🚶 Group Walk'}
-                          <span className="text-sm font-normal text-yellow-600 bg-yellow-100 px-2 py-1 rounded">
-                            Pending
-                          </span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Calendar className="w-4 h-4" />
-                            <span>{formatDate(event.scheduled_time)}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Clock className="w-4 h-4" />
-                            <span>{formatTime(event.scheduled_time)}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <MapPin className="w-4 h-4" />
-                            <span>{event.location_name}</span>
-                          </div>
-                          {event.title && (
-                            <div>
-                              <h4 className="font-semibold text-gray-800">{event.title}</h4>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <EventCard key={event.id} event={event} type="outgoing" />
                   ))
                 )}
               </TabsContent>
@@ -367,37 +465,7 @@ const Events = () => {
                   </Card>
                 ) : (
                   upcomingEvents.map((event) => (
-                    <Card key={event.id} className="bg-white shadow-lg">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          {event.event_type === 'playdate' ? '🐕 Confirmed Playdate' : '🚶 Group Walk'}
-                          <span className="text-sm font-normal text-green-600 bg-green-100 px-2 py-1 rounded">
-                            Confirmed
-                          </span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Calendar className="w-4 h-4" />
-                            <span>{formatDate(event.scheduled_time)}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Clock className="w-4 h-4" />
-                            <span>{formatTime(event.scheduled_time)}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <MapPin className="w-4 h-4" />
-                            <span>{event.location_name}</span>
-                          </div>
-                          {event.title && (
-                            <div>
-                              <h4 className="font-semibold text-gray-800">{event.title}</h4>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <EventCard key={event.id} event={event} type="upcoming" />
                   ))
                 )}
               </TabsContent>
