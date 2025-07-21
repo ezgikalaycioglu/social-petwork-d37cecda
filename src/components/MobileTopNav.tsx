@@ -15,12 +15,15 @@ const MobileTopNav = () => {
   }
 
   const renderContent = () => {
-    // Home tab - Logo left, Notifications right
+    // Home tab - Logo centered, Notifications right
     if (location.pathname === '/dashboard' || location.pathname === '/') {
       return (
-        <div className="flex items-center justify-between w-full">
+        <div className="flex items-center justify-center w-full relative">
           <SocialPetworkLogo />
-          <Link to="/notifications" className="p-2 hover:bg-gray-100 rounded-full">
+          <Link 
+            to="/notifications" 
+            className="absolute right-0 p-2 hover:bg-gray-100 rounded-full"
+          >
             <Bell className="w-6 h-6 text-gray-600" />
           </Link>
         </div>
