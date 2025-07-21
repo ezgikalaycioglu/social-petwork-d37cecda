@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/Layout';
 import { LocationAutocomplete } from '@/components/LocationAutocomplete';
+import SitterAvailabilityCalendar from '@/components/SitterAvailabilityCalendar';
 import { 
   Search, 
   UserCheck, 
@@ -24,7 +25,11 @@ import {
   PawPrint,
   DollarSign,
   Clock,
-  CheckCircle
+  CheckCircle,
+  CalendarCheck,
+  AlertCircle,
+  ArrowRight,
+  Loader2
 } from 'lucide-react';
 
 interface SitterData {
@@ -56,7 +61,9 @@ const PetSitters = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('find');
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabFromUrl || 'find');
   const [loading, setLoading] = useState(false);
   
   // Find Sitters state
@@ -70,6 +77,10 @@ const PetSitters = () => {
   
   // Become Sitter state
   const [userIsSitter, setUserIsSitter] = useState(false);
+  
+  // Sitter Availability state
+  const [sitterProfile, setSitterProfile] = useState<any>(null);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
   useEffect(() => {
     if (activeTab === 'find') {
@@ -78,6 +89,8 @@ const PetSitters = () => {
       fetchMyBookings();
     } else if (activeTab === 'become') {
       checkSitterStatus();
+    } else if (activeTab === 'availability') {
+      checkSitterProfile();
     }
   }, [activeTab, user]);
 
@@ -158,6 +171,34 @@ const PetSitters = () => {
       setUserIsSitter(!!data);
     } catch (error) {
       setUserIsSitter(false);
+    }
+  };
+
+  const checkSitterProfile = async () => {
+    if (!user) return;
+    
+    setAvailabilityLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('sitter_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      setSitterProfile(data);
+    } catch (error) {
+      console.error('Error checking sitter profile:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load your sitter profile.',
+        variant: 'destructive',
+      });
+    } finally {
+      setAvailabilityLoading(false);
     }
   };
 
@@ -279,7 +320,7 @@ const PetSitters = () => {
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 py-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="grid w-full grid-cols-3 bg-white rounded-2xl p-2 shadow-sm">
+            <TabsList className="grid w-full grid-cols-4 bg-white rounded-2xl p-2 shadow-sm">
               <TabsTrigger 
                 value="find" 
                 className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -293,6 +334,13 @@ const PetSitters = () => {
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 My Bookings
+              </TabsTrigger>
+              <TabsTrigger 
+                value="availability"
+                className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <CalendarCheck className="w-4 h-4 mr-2" />
+                Sitter Availability
               </TabsTrigger>
               <TabsTrigger 
                 value="become"
@@ -438,6 +486,142 @@ const PetSitters = () => {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Sitter Availability Tab */}
+            <TabsContent value="availability" className="space-y-6">
+              {availabilityLoading ? (
+                <div className="text-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+                  <p className="text-muted-foreground">Loading your sitter profile...</p>
+                </div>
+              ) : !sitterProfile ? (
+                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
+                  <CardHeader className="text-center pb-8">
+                    <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                      <CalendarCheck className="w-8 h-8 text-purple-600" />
+                    </div>
+                    <CardTitle className="text-2xl font-medium text-gray-800">
+                      Become a Pet Sitter
+                    </CardTitle>
+                    <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
+                      To manage your availability calendar, you'll need to create a pet sitter profile first.
+                    </p>
+                  </CardHeader>
+                  <CardContent className="text-center pb-8">
+                    <div className="bg-blue-50 rounded-xl p-6 mb-6 border border-blue-200">
+                      <AlertCircle className="w-6 h-6 text-blue-600 mx-auto mb-3" />
+                      <h3 className="text-lg font-medium text-blue-800 mb-2">
+                        Ready to Start Pet Sitting?
+                      </h3>
+                      <p className="text-blue-700 text-sm">
+                        Create your sitter profile to access the availability calendar and start accepting bookings.
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => setActiveTab('become')}
+                      className="h-12 px-8 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 bg-primary hover:bg-primary/90"
+                    >
+                      Create Sitter Profile
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-6">
+                  {/* Header Section */}
+                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <CalendarCheck className="w-5 h-5 text-primary" />
+                        Your Availability Calendar
+                      </CardTitle>
+                      <p className="text-muted-foreground">
+                        Set your available dates for pet sitting services
+                      </p>
+                    </CardHeader>
+                  </Card>
+
+                  {/* Quick Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="bg-white/80 backdrop-blur-sm border-0">
+                      <CardContent className="p-4">
+                        <div className="flex items-center">
+                          <Clock className="w-8 h-8 text-green-500 mr-3" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">Profile Status</p>
+                            <p className="text-lg font-medium text-foreground">
+                              {sitterProfile?.is_active ? 'Active' : 'Inactive'}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-white/80 backdrop-blur-sm border-0">
+                      <CardContent className="p-4">
+                        <div className="flex items-center">
+                          <DollarSign className="w-8 h-8 text-purple-500 mr-3" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">Rate per Day</p>
+                            <p className="text-lg font-medium text-foreground">
+                              ${sitterProfile?.rate_per_day || 'Not set'}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-white/80 backdrop-blur-sm border-0">
+                      <CardContent className="p-4">
+                        <div className="flex items-center">
+                          <MapPin className="w-8 h-8 text-blue-500 mr-3" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">Location</p>
+                            <p className="text-lg font-medium text-foreground">
+                              {sitterProfile?.location || 'Not set'}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Calendar Component */}
+                  <Card className="bg-white/80 backdrop-blur-sm border-0">
+                    <CardContent className="p-6">
+                      <SitterAvailabilityCalendar sitterId={sitterProfile.id} />
+                    </CardContent>
+                  </Card>
+
+                  {/* Tips Section */}
+                  <Card className="bg-white/80 backdrop-blur-sm border-0">
+                    <CardContent className="p-6">
+                      <h3 className="text-lg font-medium text-foreground mb-4">
+                        💡 Tips for Managing Your Availability
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-foreground">
+                            Keep it updated
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Regularly update your calendar to ensure pet owners see accurate availability
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-foreground">
+                            Plan ahead
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Set your availability for several weeks in advance to get more booking requests
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </TabsContent>
 
             {/* Become a Sitter Tab */}

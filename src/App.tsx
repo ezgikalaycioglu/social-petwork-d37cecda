@@ -180,7 +180,7 @@ const App = () => {
                 } />
                 <Route path="/sitter-availability" element={
                   <ProtectedRoute>
-                    <SitterAvailability />
+                    <Navigate to="/pet-sitters?tab=availability" replace />
                   </ProtectedRoute>
                 } />
                 <Route path="/pet-sitters" element={<PetSitters />} />
