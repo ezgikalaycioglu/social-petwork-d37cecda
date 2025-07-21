@@ -34,6 +34,7 @@ import PetSitters from "./pages/PetSitters";
 import SitterProfile from "./pages/SitterProfile";
 import SitterAvailability from "./pages/SitterAvailability";
 import Discover from "./pages/Discover";
+import Social from "./pages/Social";
 import Profile from "./pages/Profile";
 import CreatePost from "./pages/CreatePost";
 import Notifications from "./pages/Notifications";
@@ -156,6 +157,11 @@ const App = () => {
                 <Route path="/discover" element={
                   <ProtectedRoute>
                     <Discover />
+                  </ProtectedRoute>
+                } />
+                <Route path="/social" element={
+                  <ProtectedRoute>
+                    <Social />
                   </ProtectedRoute>
                 } />
                 <Route path="/profile" element={

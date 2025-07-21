@@ -27,43 +27,12 @@ const MobileTopNav = () => {
       );
     }
 
-    // Discover tab - Pet Social, Events, Pet Map sections
+    // Social tab - just show logo, no sub-navigation
     if (location.pathname === '/discover' || location.pathname === '/pet-social' || 
         location.pathname === '/events' || location.pathname === '/pet-map') {
       return (
         <div className="flex items-center justify-center w-full">
-          <nav className="flex space-x-1 overflow-x-auto">
-            <Link
-              to="/pet-social"
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
-                location.pathname === '/pet-social'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              }`}
-            >
-              Pet Social
-            </Link>
-            <Link
-              to="/events"
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
-                location.pathname === '/events'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              }`}
-            >
-              Events
-            </Link>
-            <Link
-              to="/pet-map"
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
-                location.pathname === '/pet-map'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              }`}
-            >
-              Pet Map
-            </Link>
-          </nav>
+          <SocialPetworkLogo />
         </div>
       );
     }

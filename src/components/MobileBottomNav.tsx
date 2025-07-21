@@ -10,7 +10,7 @@ const MobileBottomNav = () => {
   const { t } = useTranslation();
 
   const navItems = [
-    { name: 'Social', href: '/discover', icon: Search },
+    { name: 'Social', href: '/social', icon: Search },
     { name: 'Pet Sitters', href: '/find-sitter', icon: Heart },
     { name: 'Home', href: '/dashboard', icon: Home },
     { name: 'Businesses', href: '/deals', icon: Building2 },
@@ -22,9 +22,10 @@ const MobileBottomNav = () => {
     if (href === '/dashboard') {
       return location.pathname === href || location.pathname === '/';
     }
-    if (href === '/discover') {
-      return location.pathname === href || location.pathname === '/pet-social' || 
-             location.pathname === '/events' || location.pathname === '/pet-map';
+    if (href === '/social') {
+      return location.pathname === href || location.pathname === '/discover' || 
+             location.pathname === '/pet-social' || location.pathname === '/events' || 
+             location.pathname === '/pet-map';
     }
     if (href === '/packs/discover') {
       return location.pathname.startsWith('/packs');
