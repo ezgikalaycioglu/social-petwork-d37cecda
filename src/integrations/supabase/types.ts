@@ -894,6 +894,30 @@ export type Database = {
         }
         Relationships: []
       }
+      sitter_availability: {
+        Row: {
+          available_date: string
+          created_at: string
+          id: string
+          sitter_id: string
+          updated_at: string
+        }
+        Insert: {
+          available_date: string
+          created_at?: string
+          id?: string
+          sitter_id: string
+          updated_at?: string
+        }
+        Update: {
+          available_date?: string
+          created_at?: string
+          id?: string
+          sitter_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sitter_bookings: {
         Row: {
           created_at: string

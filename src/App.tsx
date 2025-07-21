@@ -29,6 +29,7 @@ import FindFriends from "./pages/FindFriends";
 import BecomeSitter from "./pages/BecomeSitter";
 import PetSitters from "./pages/PetSitters";
 import SitterProfile from "./pages/SitterProfile";
+import SitterAvailability from "./pages/SitterAvailability";
 
 
 const queryClient = new QueryClient({
@@ -133,6 +134,11 @@ const App = () => {
                 <Route path="/become-sitter" element={
                   <ProtectedRoute>
                     <BecomeSitter />
+                  </ProtectedRoute>
+                } />
+                <Route path="/sitter-availability" element={
+                  <ProtectedRoute>
+                    <SitterAvailability />
                   </ProtectedRoute>
                 } />
                 <Route path="/pet-sitters" element={<PetSitters />} />

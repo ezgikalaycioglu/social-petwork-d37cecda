@@ -1,4 +1,6 @@
 
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,6 +8,13 @@
 /* Add smooth scrolling */
 html {
   scroll-behavior: smooth;
+}
+
+/* Custom DM Sans font utilities */
+.font-dm-sans {
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -1px;
+  line-height: 1.4;
 }
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
