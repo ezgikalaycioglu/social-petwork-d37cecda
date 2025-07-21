@@ -320,7 +320,7 @@ const PetSitters = () => {
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 py-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="grid w-full grid-cols-4 bg-white rounded-2xl p-2 shadow-sm">
+            <TabsList className="grid w-full grid-cols-2 grid-rows-2 gap-2 bg-white rounded-2xl p-3 shadow-sm md:grid-cols-4 md:grid-rows-1">
               <TabsTrigger 
                 value="find" 
                 className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
