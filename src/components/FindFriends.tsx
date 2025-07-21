@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Heart, X, MapPin, Star, Loader2 } from 'lucide-react';
+import { Heart, X, MapPin, Star, Loader2, Search, ArrowLeft, Users } from 'lucide-react';
 import { useLocation } from '@/hooks/useLocation';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -16,24 +17,33 @@ interface MatchedPet extends PetProfile {
   distance: number;
 }
 
+interface SearchResult extends PetProfile {
+  owner_name: string | null;
+  distance: number | null;
+}
+
 interface FindFriendsProps {
   userPetId: string;
   onMatchFound?: () => void;
 }
 
 const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) => {
+  const [mode, setMode] = useState<'recommendations' | 'search'>('recommendations');
   const [matches, setMatches] = useState<MatchedPet[]>([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const [processingAction, setProcessingAction] = useState(false);
   const { coordinates, loading: locationLoading, error: locationError } = useLocation();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (coordinates && !locationLoading) {
+    if (coordinates && !locationLoading && mode === 'recommendations') {
       fetchMatches();
     }
-  }, [coordinates, locationLoading, userPetId]);
+  }, [coordinates, locationLoading, userPetId, mode]);
 
   const fetchMatches = async () => {
     if (!coordinates) return;
@@ -65,9 +75,65 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
     }
   };
 
-  const handleLike = async () => {
-    const currentMatch = matches[currentMatchIndex];
-    if (!currentMatch || processingAction) return;
+  const searchPets = async () => {
+    if (!searchQuery.trim()) {
+      toast({
+        title: "Enter Search Query",
+        description: "Please enter a pet name or owner name to search.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSearching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('search-pet-friends', {
+        body: {
+          petId: userPetId,
+          searchQuery: searchQuery.trim(),
+          latitude: coordinates?.lat,
+          longitude: coordinates?.lng,
+          maxDistance: 50
+        }
+      });
+
+      if (error) throw error;
+
+      setSearchResults(data.results || []);
+    } catch (error) {
+      console.error('Error searching pets:', error);
+      toast({
+        title: "Search Error",
+        description: "Failed to search for pets. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    searchPets();
+  };
+
+  const switchToSearch = () => {
+    setMode('search');
+    setSearchResults([]);
+    setSearchQuery('');
+  };
+
+  const switchToRecommendations = () => {
+    setMode('recommendations');
+    setSearchResults([]);
+    if (coordinates && !loading) {
+      fetchMatches();
+    }
+  };
+
+  const handleLike = async (targetPetId?: string) => {
+    const petId = targetPetId || matches[currentMatchIndex]?.id;
+    if (!petId || processingAction) return;
 
     setProcessingAction(true);
     try {
@@ -76,20 +142,30 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
         .from('pet_friendships')
         .insert({
           requester_pet_id: userPetId,
-          recipient_pet_id: currentMatch.id,
+          recipient_pet_id: petId,
           status: 'pending'
         });
 
       if (error) throw error;
 
+      const petName = targetPetId 
+        ? searchResults.find(p => p.id === targetPetId)?.name 
+        : matches[currentMatchIndex]?.name;
+
       toast({
         title: "Friend Request Sent! 💕",
-        description: `You sent a friend request to ${currentMatch.name}`,
+        description: `You sent a friend request to ${petName}`,
         duration: 2000,
       });
 
       onMatchFound?.();
-      nextMatch();
+      
+      if (mode === 'recommendations') {
+        nextMatch();
+      } else {
+        // Remove from search results
+        setSearchResults(prev => prev.filter(p => p.id !== petId));
+      }
     } catch (error) {
       console.error('Error sending friend request:', error);
       toast({
@@ -195,11 +271,152 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
 
   const currentMatch = matches[currentMatchIndex];
 
+  // Render search mode
+  if (mode === 'search') {
+    return (
+      <div className="max-w-md mx-auto">
+        {/* Header with back button */}
+        <div className="mb-6">
+          <Button 
+            variant="outline" 
+            onClick={switchToRecommendations}
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Recommendations
+          </Button>
+          
+          {/* Search form */}
+          <form onSubmit={handleSearch} className="space-y-3">
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder="Search by pet name or owner name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pr-12"
+              />
+              <Button
+                type="submit"
+                size="sm"
+                className="absolute right-1 top-1 h-8 w-8 p-0"
+                disabled={searching || !searchQuery.trim()}
+              >
+                {searching ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Search className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
+
+        {/* Search results */}
+        {searchResults.length > 0 ? (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Search Results ({searchResults.length})
+            </h3>
+            {searchResults.map((pet) => (
+              <Card key={pet.id} className="overflow-hidden">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-4">
+                    <Avatar className="w-16 h-16">
+                      <AvatarImage src={pet.profile_photo_url || ''} alt={pet.name} />
+                      <AvatarFallback className="bg-green-100 text-green-600 text-lg">
+                        {pet.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="text-lg font-semibold text-gray-800 truncate">
+                          {pet.name}
+                        </h3>
+                        {pet.age && (
+                          <Badge variant="outline" className="text-xs">
+                            {pet.age} {pet.age === 1 ? 'yr' : 'yrs'}
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <p className="text-sm text-gray-600 mb-1">{pet.breed}</p>
+                      
+                      {pet.owner_name && (
+                        <p className="text-xs text-gray-500">
+                          Owner: {pet.owner_name}
+                        </p>
+                      )}
+                      
+                      {pet.distance !== null && (
+                        <div className="flex items-center text-xs text-gray-500 mt-1">
+                          <MapPin className="w-3 h-3 mr-1" />
+                          {pet.distance}km away
+                        </div>
+                      )}
+                    </div>
+                    
+                    <Button
+                      size="sm"
+                      className="bg-pink-500 hover:bg-pink-600"
+                      onClick={() => handleLike(pet.id)}
+                      disabled={processingAction}
+                    >
+                      {processingAction ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Heart className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                  
+                  {pet.bio && (
+                    <p className="text-sm text-gray-700 mt-3 line-clamp-2">
+                      {pet.bio}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : searchQuery && !searching ? (
+          <div className="text-center py-8">
+            <div className="text-4xl mb-4">🔍</div>
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">No results found</h3>
+            <p className="text-gray-500">
+              Try searching with a different pet name or owner name.
+            </p>
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <div className="text-4xl mb-4">🐕</div>
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">Search for Friends</h3>
+            <p className="text-gray-500">
+              Enter a pet name or owner name to find specific friends.
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Render recommendations mode
   return (
     <div className="max-w-md mx-auto">
+      {/* Mode toggle */}
       <div className="mb-4 text-center">
+        <Button 
+          variant="outline" 
+          onClick={switchToSearch}
+          className="mb-4"
+        >
+          <Search className="w-4 h-4 mr-2" />
+          Search by Name
+        </Button>
         <p className="text-sm text-gray-600">
-          {currentMatchIndex + 1} of {matches.length} matches
+          {currentMatchIndex + 1} of {matches.length} recommendations
         </p>
       </div>
 
@@ -294,7 +511,7 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
             <Button
               size="lg"
               className="flex-1 bg-pink-500 hover:bg-pink-600"
-              onClick={handleLike}
+              onClick={() => handleLike()}
               disabled={processingAction}
             >
               {processingAction ? (
