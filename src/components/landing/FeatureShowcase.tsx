@@ -17,7 +17,7 @@ const FeatureShowcase = () => {
         <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
           <div className="order-2 lg:order-1">
             <img 
-              src="/lovable-uploads/d9e8b07e-7d6b-4ddb-ae7c-bcf5166c1ce0.png" 
+              src="/lovable-uploads/2d10cedf-1d4a-4e52-bba5-57f929afcff0.png" 
               alt="Interactive pet map showing nearby pets and their locations"
               className="w-full max-w-lg mx-auto rounded-2xl shadow-xl"
             />
@@ -54,7 +54,7 @@ const FeatureShowcase = () => {
               Connect & Plan Together
             </h3>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Once you've found compatible pets nearby, easily coordinate meetups through our built-in messaging system. Plan group walks, puppy playdates, or visit pet-friendly venues together.
+              Once you've found compatible pets nearby, easily coordinate meetups through our built-in messaging system. Plan pack walks, puppy playdates, or visit pet-friendly venues together.
             </p>
             <ul className="space-y-3 text-gray-600">
               <li className="flex items-start">
@@ -63,7 +63,7 @@ const FeatureShowcase = () => {
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 rounded-full bg-orange-500 mt-2 mr-3 flex-shrink-0"></div>
-                <span>Group event coordination tools</span>
+                <span>Pack event coordination tools</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 rounded-full bg-orange-500 mt-2 mr-3 flex-shrink-0"></div>
@@ -74,7 +74,7 @@ const FeatureShowcase = () => {
           
           <div>
             <img 
-              src="/lovable-uploads/4c206775-4a71-4b32-a928-56724509f935.png" 
+              src="/lovable-uploads/7fee39e3-23ef-4fac-8893-d6482330416a.png" 
               alt="Pet messaging and coordination interface"
               className="w-full max-w-lg mx-auto rounded-2xl shadow-xl"
             />

@@ -1,17 +1,17 @@
 const AppShowcase = () => {
   const appScreenshots = [
     {
-      src: "/lovable-uploads/d9e8b07e-7d6b-4ddb-ae7c-bcf5166c1ce0.png",
+      src: "/lovable-uploads/2d10cedf-1d4a-4e52-bba5-57f929afcff0.png",
       alt: "Pet Map Feature",
       title: "Interactive Map"
     },
     {
-      src: "/lovable-uploads/5f6310c4-2136-48d2-84a3-11a3c11677d2.png", 
+      src: "/lovable-uploads/fe720991-9c3b-4ed1-aedb-8f99f69fe11c.png", 
       alt: "Social Feed",
       title: "Social Feed"
     },
     {
-      src: "/lovable-uploads/843c803e-8ea4-4a7c-865a-77f0687a1413.png",
+      src: "/lovable-uploads/bae374ba-a277-4e16-92dd-d6738ad85b12.png",
       alt: "Event Planning",
       title: "Events"
     }
