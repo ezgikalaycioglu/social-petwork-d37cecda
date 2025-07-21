@@ -18,6 +18,7 @@ type PetProfile = Tables<'pet_profiles'>;
 interface InteractiveMapProps {
   userPets: PetProfile[];
   onLocationPermissionChange?: (granted: boolean) => void;
+  showLocationToasts?: boolean;
 }
 
 // Custom marker icons
@@ -75,12 +76,14 @@ const LocationTracker: React.FC<{ onLocationUpdate: (lat: number, lng: number) =
 
 const InteractiveMap: React.FC<InteractiveMapProps> = ({ 
   userPets, 
-  onLocationPermissionChange 
+  onLocationPermissionChange,
+  showLocationToasts = false
 }) => {
   const { toast } = useToast();
   const { loading, coordinates, error } = useLocation();
   const [isReady, setIsReady] = useState(false);
   const [nearbyPets, setNearbyPets] = useState<PetProfile[]>([]);
+  const [hasShownLocationToast, setHasShownLocationToast] = useState(false);
   const channelRef = useRef<any>(null);
   const locationUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -98,13 +101,17 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     // Notify parent about location permission status
     onLocationPermissionChange?.(locationPermission);
     
-    if (locationPermission) {
+    if (locationPermission && showLocationToasts && !hasShownLocationToast) {
       setupRealtimeListener();
       
       toast({
         title: "Location Access Granted",
         description: "Your location will only be shared when you're 'Ready to Play'.",
       });
+      
+      setHasShownLocationToast(true);
+    } else if (locationPermission && !showLocationToasts) {
+      setupRealtimeListener();
     }
     
     return () => {
@@ -112,10 +119,10 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         supabase.removeChannel(channelRef.current);
       }
     };
-  }, [locationPermission, onLocationPermissionChange]);
+  }, [locationPermission, onLocationPermissionChange, showLocationToasts, hasShownLocationToast]);
 
   useEffect(() => {
-    if (error) {
+    if (error && showLocationToasts) {
       onLocationPermissionChange?.(false);
       
       toast({
@@ -123,8 +130,10 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         description: "Using default location. Enable location access for better experience.",
         variant: "destructive",
       });
+    } else if (error) {
+      onLocationPermissionChange?.(false);
     }
-  }, [error, onLocationPermissionChange]);
+  }, [error, onLocationPermissionChange, showLocationToasts]);
 
   const setupRealtimeListener = () => {
     fetchNearbyPets();

@@ -439,6 +439,7 @@ const UserSettings = () => {
                 <Card>
                   <CardContent className="pt-6">
                     <Button
+                      type="button"
                       onClick={handleSignOut}
                       variant="destructive"
                       className="w-full flex items-center justify-center gap-2"

@@ -173,6 +173,7 @@ const PetMap = () => {
               <InteractiveMap 
                 userPets={pets}
                 onLocationPermissionChange={handleLocationPermissionChange}
+                showLocationToasts={true}
               />
             </div>
 
