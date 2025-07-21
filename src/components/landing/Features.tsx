@@ -49,7 +49,7 @@ const Features = () => {
             Everything Your Pet Needs
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            From finding playmates to discovering new adventures, Social Petwork has all the tools to enrich your pet's social life
+            From finding playmates to discovering new adventures, PawCult has all the tools to enrich your pet's social life
           </p>
         </div>
 

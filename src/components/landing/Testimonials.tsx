@@ -6,7 +6,7 @@ const Testimonials = () => {
     {
       name: "Sarah & Max",
       location: "San Francisco, CA",
-      text: "Social Petwork helped Max find his best friend Luna! Now they have weekly playdates and we've become great friends with Luna's family too.",
+      text: "PawCult helped Max find his best friend Luna! Now they have weekly playdates and we've become great friends with Luna's family too.",
       petEmoji: "🐕",
       rating: 5
     },
@@ -20,7 +20,7 @@ const Testimonials = () => {
     {
       name: "Emma & Buddy",
       location: "Seattle, WA",
-      text: "As a new pet parent, Social Petwork connected me with experienced dog owners who gave invaluable advice. The community is so supportive!",
+      text: "As a new pet parent, PawCult connected me with experienced dog owners who gave invaluable advice. The community is so supportive!",
       petEmoji: "🐕",
       rating: 5
     }
@@ -34,7 +34,7 @@ const Testimonials = () => {
             <span style={{ color: '#FFB3A7' }}>Paw-sitive</span> Stories from Our Community
           </h2>
           <p className="text-xl text-gray-600">
-            Hear how Social Petwork has transformed the lives of pets and their families
+            Hear how PawCult has transformed the lives of pets and their families
           </p>
         </div>
         

@@ -23,7 +23,7 @@ const AppPreview = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-gray-900 mb-6">
-            See Social Petwork in Action
+            See PawCult in Action
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Take a peek at how our app makes pet socializing simple and fun

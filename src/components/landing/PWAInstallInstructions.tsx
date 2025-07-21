@@ -9,7 +9,7 @@ const PWAInstallInstructions = () => {
             Get the App Experience
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Install Social Petwork on your phone's home screen for the best experience - no app store needed!
+            Install PawCult on your phone's home screen for the best experience - no app store needed!
           </p>
         </div>
 

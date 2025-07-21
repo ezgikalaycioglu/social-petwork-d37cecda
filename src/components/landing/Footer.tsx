@@ -21,7 +21,7 @@ const Footer = () => {
           <div className="md:col-span-2">
             <div className="flex items-center mb-4">
               <span className="text-2xl mr-2">🐾</span>
-              <h3 className="text-2xl font-bold">Social Petwork</h3>
+              <h3 className="text-2xl font-bold">PawCult</h3>
             </div>
             <p className="text-gray-400 mb-4 max-w-md">
               Connecting pets and their families through meaningful social experiences, 
@@ -116,7 +116,7 @@ const Footer = () => {
         
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm mb-4 md:mb-0">
-            © 2025 Social Petwork. All rights reserved.
+            © 2025 PawCult. All rights reserved.
           </p>
           <div className="flex items-center text-gray-400 text-sm">
             Made with <Heart className="h-4 w-4 text-red-500 mx-1" /> for pets and their families

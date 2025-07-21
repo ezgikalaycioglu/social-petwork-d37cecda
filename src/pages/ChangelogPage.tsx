@@ -5,7 +5,7 @@ import Layout from '@/components/Layout';
 
 const changelogContent = `# Changelog
 
-Welcome to the changelog for The Social Petwork! Here you can follow our journey as we build the ultimate social app for pets and their parents, one feature at a time.
+Welcome to the changelog for PawCult! Here you can follow our journey as we build the ultimate social app for pets and their parents, one feature at a time.
 
 ### **June 27, 2025**
 

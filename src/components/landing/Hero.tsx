@@ -42,10 +42,10 @@ const Hero = () => {
           <div className="flex items-center">
             <img 
               src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
-              alt="Social Petwork Logo"
+              alt="PawCult Logo"
               className="w-10 h-10 mr-3"
             />
-            <span className="text-2xl font-bold text-gray-800">Social Petwork</span>
+            <span className="text-2xl font-bold text-gray-800">PawCult</span>
           </div>
           
           {/* Desktop Navigation */}
@@ -102,7 +102,7 @@ const Hero = () => {
         <div className="flex justify-center mb-8">
           <img 
             src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
-            alt="Social Petwork Logo"
+            alt="PawCult Logo"
             className="w-32 h-32 md:w-40 md:h-40"
           />
         </div>

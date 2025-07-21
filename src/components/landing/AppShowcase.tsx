@@ -25,7 +25,7 @@ const AppShowcase = () => {
             See the app in action
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Get a glimpse of how Social Petwork makes connecting with other pet parents effortless
+            Get a glimpse of how PawCult makes connecting with other pet parents effortless
           </p>
         </div>
 
