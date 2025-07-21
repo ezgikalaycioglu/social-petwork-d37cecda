@@ -41,7 +41,7 @@ const Hero = () => {
           {/* Logo */}
           <div className="flex items-center">
             <img 
-              src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
+              src="/lovable-uploads/bed53e0f-52d4-45b8-ae07-fcb1a7eeabb8.png" 
               alt="PawCult Logo"
               className="w-10 h-10 mr-3"
             />
@@ -101,7 +101,7 @@ const Hero = () => {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <img 
-            src="/lovable-uploads/5666bf06-1feb-489f-9249-016d535e52bb.png" 
+            src="/lovable-uploads/bed53e0f-52d4-45b8-ae07-fcb1a7eeabb8.png" 
             alt="PawCult Logo"
             className="w-32 h-32 md:w-40 md:h-40"
           />
