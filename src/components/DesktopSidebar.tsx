@@ -21,7 +21,7 @@ const DesktopSidebar = () => {
     { name: t('navigation.petMap'), href: '/pet-map', icon: MapPin },
     { name: t('navigation.events'), href: '/events', icon: Calendar },
     { name: t('navigation.deals'), href: '/deals', icon: Gift },
-    { name: t('navigation.packs'), href: '/packs', icon: Users },
+    { name: t('navigation.packs'), href: '/packs/discover', icon: Users },
     { name: 'Pet Sitters', href: '/pet-sitters', icon: Search },
     { name: 'Sitter Availability', href: '/sitter-availability', icon: CalendarCheck },
     { name: 'Business', href: '/business-dashboard', icon: Building },
@@ -36,6 +36,9 @@ const DesktopSidebar = () => {
     }
     if (href === '/sitter-availability') {
       return location.pathname === href;
+    }
+    if (href === '/packs/discover') {
+      return location.pathname.startsWith('/packs');
     }
     return location.pathname === href;
   };

@@ -13,7 +13,7 @@ const MobileBottomNav = () => {
     { name: t('navigation.petMap'), href: '/pet-map', icon: MapPin },
     { name: t('navigation.events'), href: '/events', icon: Calendar },
     { name: t('navigation.deals'), href: '/deals', icon: Tag },
-    { name: t('navigation.packs'), href: '/packs', icon: Users },
+    { name: t('navigation.packs'), href: '/packs/discover', icon: Users },
     { name: 'Sitters', href: '/pet-sitters', icon: UserCheck },
   ];
 
@@ -21,6 +21,9 @@ const MobileBottomNav = () => {
     if (href === '/pet-sitters') {
       return location.pathname === href || location.pathname.startsWith('/sitter/') || 
              location.pathname === '/become-sitter' || location.pathname === '/my-bookings';
+    }
+    if (href === '/packs/discover') {
+      return location.pathname.startsWith('/packs');
     }
     return location.pathname === href;
   };

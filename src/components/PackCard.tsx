@@ -150,7 +150,7 @@ const PackCard = ({ pack, onUpdate }: PackCardProps) => {
                   handleJoinPack();
                 }}
                 disabled={isJoining}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                className="flex-1 bg-primary hover:bg-primary-hover text-primary-foreground"
               >
                 {isJoining ? 'Joining...' : 'Join Pack'}
               </Button>

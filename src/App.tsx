@@ -25,6 +25,9 @@ import BusinessDashboard from "./pages/BusinessDashboard";
 import ChangelogPage from "./pages/ChangelogPage";
 import Packs from "./pages/Packs";
 import PackDetails from "./pages/PackDetails";
+import PackDiscovery from "./pages/PackDiscovery";
+import PackPreview from "./pages/PackPreview";
+import CreatePackForm from "./components/CreatePackForm";
 import FindFriends from "./pages/FindFriends";
 import BecomeSitter from "./pages/BecomeSitter";
 import PetSitters from "./pages/PetSitters";
@@ -113,12 +116,27 @@ const App = () => {
                 } />
                 <Route path="/packs" element={
                   <ProtectedRoute>
-                    <Packs />
+                    <Navigate to="/packs/discover" replace />
+                  </ProtectedRoute>
+                } />
+                <Route path="/packs/discover" element={
+                  <ProtectedRoute>
+                    <PackDiscovery />
+                  </ProtectedRoute>
+                } />
+                <Route path="/packs/create" element={
+                  <ProtectedRoute>
+                    <CreatePackForm />
                   </ProtectedRoute>
                 } />
                 <Route path="/packs/:packId" element={
                   <ProtectedRoute>
-                    <PackDetails />
+                    <PackPreview />
+                  </ProtectedRoute>
+                } />
+                <Route path="/packs-old" element={
+                  <ProtectedRoute>
+                    <Packs />
                   </ProtectedRoute>
                 } />
                 <Route path="/pet-adventures/:petId" element={

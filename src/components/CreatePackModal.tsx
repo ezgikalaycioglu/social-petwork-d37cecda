@@ -105,7 +105,7 @@ const CreatePackModal = ({ open, onOpenChange, onPackCreated }: CreatePackModalP
             <Button
               type="submit"
               disabled={isCreating || !name.trim()}
-              className="bg-green-600 hover:bg-green-700 text-white"
+              className="bg-primary hover:bg-primary-hover text-primary-foreground"
             >
               {isCreating ? 'Creating...' : 'Create Pack'}
             </Button>
