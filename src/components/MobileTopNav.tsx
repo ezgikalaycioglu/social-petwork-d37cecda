@@ -27,9 +27,9 @@ const MobileTopNav = () => {
       );
     }
 
-    // Discover tab - Pet Social, Events, Pet Map sections
+    // Discover tab - Pet Social, Events, Pet Map, Deals sections
     if (location.pathname === '/discover' || location.pathname === '/pet-social' || 
-        location.pathname === '/events' || location.pathname === '/pet-map') {
+        location.pathname === '/events' || location.pathname === '/pet-map' || location.pathname === '/deals') {
       return (
         <div className="flex items-center justify-center w-full">
           <nav className="flex space-x-1">
@@ -62,6 +62,16 @@ const MobileTopNav = () => {
               }`}
             >
               Pet Map
+            </Link>
+            <Link
+              to="/deals"
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                location.pathname === '/deals'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+            >
+              Deals
             </Link>
           </nav>
         </div>
