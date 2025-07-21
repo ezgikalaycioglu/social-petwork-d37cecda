@@ -40,12 +40,15 @@ const MobileTopNav = () => {
       );
     }
 
-    // Packs tab - Title left, Create pack right
+    // Packs tab - Logo centered, Create pack right
     if (location.pathname.startsWith('/packs')) {
       return (
-        <div className="flex items-center justify-between w-full">
-          <h1 className="text-lg font-semibold">Packs</h1>
-          <Link to="/packs/create" className="p-2 hover:bg-gray-100 rounded-full">
+        <div className="flex items-center justify-center w-full relative">
+          <SocialPetworkLogo />
+          <Link 
+            to="/packs/create" 
+            className="absolute right-0 p-2 hover:bg-gray-100 rounded-full"
+          >
             <Plus className="w-6 h-6 text-gray-600" />
           </Link>
         </div>
@@ -82,16 +85,16 @@ const MobileTopNav = () => {
       );
     }
 
-    // Profile tab - My Pets left, Settings right
+    // Profile tab - Logo centered, Settings right
     if (location.pathname === '/profile' || location.pathname === '/my-pets' || 
         location.pathname === '/settings') {
       return (
-        <div className="flex items-center justify-between w-full">
-          <Link to="/my-pets" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg">
-            <PawPrint className="w-5 h-5 text-gray-600" />
-            <span className="text-sm font-medium">My Pets</span>
-          </Link>
-          <Link to="/settings" className="p-2 hover:bg-gray-100 rounded-full">
+        <div className="flex items-center justify-center w-full relative">
+          <SocialPetworkLogo />
+          <Link 
+            to="/settings" 
+            className="absolute right-0 p-2 hover:bg-gray-100 rounded-full"
+          >
             <Settings className="w-6 h-6 text-gray-600" />
           </Link>
         </div>
@@ -108,7 +111,7 @@ const MobileTopNav = () => {
 
   return (
     <div className="fixed top-0 left-0 w-full bg-white border-b border-gray-200 shadow-sm z-50 block md:hidden">
-      <div className="flex h-14 px-4 items-center">
+      <div className="flex h-16 px-4 items-center">{/* Increased height from h-14 to h-16 */}
         {renderContent()}
       </div>
     </div>
