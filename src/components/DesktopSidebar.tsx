@@ -53,7 +53,7 @@ const DesktopSidebar = () => {
         {/* Logo Section */}
         <div className="flex items-center space-x-3 p-6 border-b border-gray-200">
           <SocialPetworkLogo className="h-8 w-auto" />
-          <span className="text-lg font-bold text-green-600">Social Petwork</span>
+          <span className="text-lg font-bold text-primary">PawCult</span>
         </div>
 
         {/* Navigation */}

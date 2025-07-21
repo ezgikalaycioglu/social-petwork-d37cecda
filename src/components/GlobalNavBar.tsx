@@ -60,7 +60,7 @@ const GlobalNavBar = () => {
           <div className="flex items-center">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <SocialPetworkLogo className="h-10 w-auto" />
-              <span className="text-xl font-bold text-green-600">Social Petwork</span>
+              <span className="text-xl font-bold text-primary">PawCult</span>
             </Link>
           </div>
 
