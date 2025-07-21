@@ -27,16 +27,17 @@ const MobileTopNav = () => {
       );
     }
 
-    // Discover tab - Pet Social, Events, Pet Map sections
-    if (location.pathname === '/discover' || location.pathname === '/pet-social' || 
-        location.pathname === '/events' || location.pathname === '/pet-map') {
+    // Social tab - Pet Social, Events, Pet Map sections
+    if (location.pathname === '/discover' || location.pathname === '/social' || 
+        location.pathname === '/pet-social' || location.pathname === '/events' || 
+        location.pathname === '/pet-map') {
       return (
         <div className="flex items-center justify-center w-full">
           <nav className="flex space-x-1 overflow-x-auto">
             <Link
-              to="/pet-social"
+              to="/discover?tab=social"
               className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
-                location.pathname === '/pet-social'
+                location.pathname === '/discover' || location.pathname === '/pet-social'
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
@@ -44,7 +45,7 @@ const MobileTopNav = () => {
               Pet Social
             </Link>
             <Link
-              to="/events"
+              to="/discover?tab=events"
               className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
                 location.pathname === '/events'
                   ? 'bg-primary text-primary-foreground'
@@ -54,7 +55,7 @@ const MobileTopNav = () => {
               Events
             </Link>
             <Link
-              to="/pet-map"
+              to="/discover?tab=map"
               className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
                 location.pathname === '/pet-map'
                   ? 'bg-primary text-primary-foreground'
