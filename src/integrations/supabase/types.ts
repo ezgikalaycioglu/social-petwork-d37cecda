@@ -529,6 +529,90 @@ export type Database = {
           },
         ]
       }
+      pack_message_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pack_message_reads: {
+        Row: {
+          id: string
+          message_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          message_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          message_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pack_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_deleted: boolean
+          media_url: string | null
+          message_type: string
+          pack_id: string
+          replied_to_message_id: string | null
+          sender_id: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          media_url?: string | null
+          message_type?: string
+          pack_id: string
+          replied_to_message_id?: string | null
+          sender_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          media_url?: string | null
+          message_type?: string
+          pack_id?: string
+          replied_to_message_id?: string | null
+          sender_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pack_photo_contests: {
         Row: {
           created_at: string
@@ -648,6 +732,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pack_typing_indicators: {
+        Row: {
+          id: string
+          is_typing: boolean
+          pack_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_typing?: boolean
+          pack_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_typing?: boolean
+          pack_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       packs: {
         Row: {
