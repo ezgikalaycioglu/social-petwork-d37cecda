@@ -32,10 +32,10 @@ html {
     --popover-foreground: 240 10% 3.9%;
 
     /* Primary: Soft Purple #7A5FFF */
-    --primary: 255 68% 68%;
+    --primary: 251 73% 68%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 255 68% 60%;
-    --primary-light: 255 68% 95%;
+    --primary-hover: 251 73% 60%;
+    --primary-light: 251 73% 95%;
 
     /* Secondary: Light gray for backgrounds */
     --secondary: 240 4.8% 95.9%;
@@ -62,7 +62,7 @@ html {
 
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 255 68% 68%;
+    --ring: 251 73% 68%;
 
     --radius: 1rem;
 
