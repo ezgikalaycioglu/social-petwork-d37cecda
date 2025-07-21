@@ -15,6 +15,7 @@ interface PetCardProps {
   onClick?: () => void;
   showLocation?: boolean;
   showBoopButton?: boolean;
+  showVaccinationStatus?: boolean;
   showFriendRequestButton?: boolean;
   onSendFriendRequest?: (petId: string) => void;
   userPetIds?: string[];
@@ -25,6 +26,7 @@ const PetCard: React.FC<PetCardProps> = ({
   onClick, 
   showLocation = true,
   showBoopButton = true,
+  showVaccinationStatus = true,
   showFriendRequestButton = false,
   onSendFriendRequest,
   userPetIds = []
@@ -135,7 +137,7 @@ const PetCard: React.FC<PetCardProps> = ({
                 )}
               </div>
               
-              {pet.vaccination_status && (
+              {showVaccinationStatus && pet.vaccination_status && (
                 <Badge 
                   variant={pet.vaccination_status === 'Up-to-date' ? 'default' : 'secondary'}
                   className="text-xs"

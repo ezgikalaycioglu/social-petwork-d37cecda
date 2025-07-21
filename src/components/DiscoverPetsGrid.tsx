@@ -48,7 +48,8 @@ const DiscoverPetsGrid: React.FC<DiscoverPetsGridProps> = ({
           pet={pet}
           onClick={() => onPetSelect?.(pet)}
           showLocation={true}
-          showBoopButton={true}
+          showBoopButton={false}
+          showVaccinationStatus={false}
           showFriendRequestButton={true}
           onSendFriendRequest={onSendFriendRequest}
           userPetIds={userPetIds}
