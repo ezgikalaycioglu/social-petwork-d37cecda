@@ -273,7 +273,8 @@ const PetSitters = () => {
                 )}
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col space-y-3 sm:space-y-0">
+                {/* Price and Rating Row */}
                 <div className="flex items-center space-x-4 text-sm">
                   <div className="flex items-center text-muted-foreground">
                     <DollarSign className="w-4 h-4 mr-1" />
@@ -285,6 +286,20 @@ const PetSitters = () => {
                   </div>
                 </div>
                 
+                {/* View Profile Button Row - separate on mobile, inline on desktop */}
+                <div className="flex sm:hidden">
+                  <Button 
+                    size="sm"
+                    onClick={() => navigate(`/sitter/${sitter.id}`)}
+                    className="bg-primary hover:bg-primary/90 w-full"
+                  >
+                    View Profile
+                  </Button>
+                </div>
+              </div>
+              
+              {/* View Profile Button - hidden on mobile, shown on desktop */}
+              <div className="hidden sm:block">
                 <Button 
                   size="sm"
                   onClick={() => navigate(`/sitter/${sitter.id}`)}
