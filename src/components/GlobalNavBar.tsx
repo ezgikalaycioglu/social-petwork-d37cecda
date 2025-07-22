@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,6 +15,7 @@ const GlobalNavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Get initial user
@@ -47,10 +49,10 @@ const GlobalNavBar = () => {
   };
 
   const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'My Pets', href: '/my-pets', icon: PawPrint },
-    { name: 'Pet Social', href: '/pet-social', icon: Users },
-    { name: 'Pet Map', href: '/pet-map', icon: MapPin },
+    { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
+    { name: t('navigation.myPets'), href: '/my-pets', icon: PawPrint },
+    { name: t('navigation.petSocial'), href: '/pet-social', icon: Users },
+    { name: t('navigation.petMap'), href: '/pet-map', icon: MapPin },
   ];
 
   return (
@@ -69,49 +71,49 @@ const GlobalNavBar = () => {
               to="/dashboard" 
               className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             >
-              Dashboard
+              {t('navigation.dashboard')}
             </Link>
             <Link 
               to="/my-pets" 
               className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             >
-              My Pets
+              {t('navigation.myPets')}
             </Link>
             <Link 
               to="/pet-social" 
               className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             >
-              Social
+              {t('navigation.petSocial')}
             </Link>
             <Link 
               to="/deals" 
               className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             >
-              Deals
+              {t('navigation.deals')}
             </Link>
             <Link 
               to="/events" 
               className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             >
-              Events
+              {t('navigation.events')}
             </Link>
             <Link 
               to="/pet-map" 
               className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             >
-              Map
+              {t('navigation.petMap')}
             </Link>
             <Link 
               to="/business-dashboard" 
               className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             >
-              Business
+              {t('navigation.business')}
             </Link>
             <Link 
               to="/pet-sitters" 
               className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             >
-              Sitters
+              {t('navigation.petSitters')}
             </Link>
             
             <AuthButton />
@@ -166,12 +168,12 @@ const GlobalNavBar = () => {
                     <DropdownMenuItem asChild>
                       <Link to="/settings" className="flex items-center space-x-2">
                         <Settings className="w-4 h-4" />
-                        <span>Settings</span>
+                        <span>{t('navigation.settings')}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
                       <LogOut className="w-4 h-4 mr-2" />
-                      Sign out
+                      {t('auth.signOut')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -179,10 +181,10 @@ const GlobalNavBar = () => {
             ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="ghost" asChild>
-                  <Link to="/auth">Sign In</Link>
+                  <Link to="/auth">{t('auth.signIn')}</Link>
                 </Button>
                 <Button asChild className="bg-green-600 hover:bg-green-700">
-                  <Link to="/auth">Get Started</Link>
+                  <Link to="/auth">{t('landing.hero.getStarted')}</Link>
                 </Button>
               </div>
             )}

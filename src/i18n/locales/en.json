@@ -8,7 +8,10 @@
     "deals": "Deals",
     "packs": "Packs",
     "petSocial": "Pet Social",
-    "settings": "Settings"
+    "settings": "Settings",
+    "business": "Business",
+    "petSitters": "Pet Sitters",
+    "profile": "Profile"
   },
   "settings": {
     "title": "User Settings",

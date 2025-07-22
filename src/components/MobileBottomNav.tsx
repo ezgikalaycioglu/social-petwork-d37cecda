@@ -10,12 +10,12 @@ const MobileBottomNav = () => {
   const { t } = useTranslation();
 
   const navItems = [
-    { name: 'Home', href: '/dashboard', icon: Home },
-    { name: 'Social', href: '/social', icon: Search },
-    { name: 'Pet Sitters', href: '/find-sitter', icon: Heart },
-    { name: 'Businesses', href: '/business', icon: Building2 },
-    { name: 'Packs', href: '/packs/discover', icon: Users },
-    { name: 'Profile', href: '/profile', icon: User },
+    { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
+    { name: t('navigation.petSocial'), href: '/social', icon: Search },
+    { name: t('navigation.petSitters'), href: '/find-sitter', icon: Heart },
+    { name: t('navigation.business'), href: '/business', icon: Building2 },
+    { name: t('navigation.packs'), href: '/packs/discover', icon: Users },
+    { name: t('navigation.profile'), href: '/profile', icon: User },
   ];
 
   const isActive = (href: string) => {

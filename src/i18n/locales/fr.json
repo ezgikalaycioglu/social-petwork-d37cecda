@@ -8,7 +8,10 @@
     "deals": "Offres",
     "packs": "Groupes",
     "petSocial": "Animaux Social",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "business": "Entreprise",
+    "petSitters": "Gardiens",
+    "profile": "Profil"
   },
   "settings": {
     "title": "Paramètres Utilisateur",

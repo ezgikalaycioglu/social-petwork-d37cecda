@@ -8,7 +8,10 @@
     "deals": "Fırsatlar",
     "packs": "Gruplar",
     "petSocial": "Evcil Hayvan Sosyal",
-    "settings": "Ayarlar"
+    "settings": "Ayarlar",
+    "business": "İş",
+    "petSitters": "Evcil Hayvan Bakıcıları",
+    "profile": "Profil"
   },
   "settings": {
     "title": "Kullanıcı Ayarları",

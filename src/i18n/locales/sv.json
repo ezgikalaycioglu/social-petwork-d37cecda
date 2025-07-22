@@ -8,7 +8,10 @@
     "deals": "Erbjudanden",
     "packs": "Grupper",
     "petSocial": "Husdjur Social",
-    "settings": "Inställningar"
+    "settings": "Inställningar",
+    "business": "Företag",
+    "petSitters": "Husdjursvakter",
+    "profile": "Profil"
   },
   "settings": {
     "title": "Användarinställningar",
