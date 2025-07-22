@@ -78,6 +78,8 @@ const PWAInstallPopup = () => {
         user_id: user.id,
         hide_pwa_popup: true,
         updated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'user_id'
       });
 
     if (error) {
