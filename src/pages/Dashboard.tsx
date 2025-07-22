@@ -15,6 +15,7 @@ import { AICoach } from '@/components/AICoach';
 import { CreateTweetModal } from '@/components/CreateTweetModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { handleAuthError } from '@/utils/authErrorHandler';
+import PWAInstallPopup from '@/components/PWAInstallPopup';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -156,6 +157,7 @@ const Dashboard = () => {
 
   return (
     <Layout>
+      <PWAInstallPopup />
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-4 py-6">

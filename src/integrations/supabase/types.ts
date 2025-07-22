@@ -327,6 +327,7 @@ export type Database = {
         Row: {
           created_at: string | null
           event_reminders: boolean | null
+          hide_pwa_popup: boolean | null
           id: string
           new_follower_alerts: boolean | null
           playdate_confirmations: boolean | null
@@ -338,6 +339,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           event_reminders?: boolean | null
+          hide_pwa_popup?: boolean | null
           id?: string
           new_follower_alerts?: boolean | null
           playdate_confirmations?: boolean | null
@@ -349,6 +351,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           event_reminders?: boolean | null
+          hide_pwa_popup?: boolean | null
           id?: string
           new_follower_alerts?: boolean | null
           playdate_confirmations?: boolean | null

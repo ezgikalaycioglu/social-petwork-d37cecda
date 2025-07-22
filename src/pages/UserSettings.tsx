@@ -10,11 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, User, Bell, Loader2, LogOut, Globe } from 'lucide-react';
+import { Settings, User, Bell, Loader2, LogOut, Globe, Smartphone, ChevronDown } from 'lucide-react';
 import Layout from '@/components/Layout';
 import type { Tables } from '@/integrations/supabase/types';
 import PushNotificationSettings from '@/components/PushNotificationSettings';
 import { useAuth } from '@/contexts/AuthContext';
+import PWAInstallContent from '@/components/PWAInstallContent';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 type UserProfile = Tables<'user_profiles'>;
 type NotificationPreferences = Tables<'notification_preferences'>;
@@ -310,6 +312,32 @@ const UserSettings = () => {
                       </Select>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* PWA Install Guide Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Smartphone className="w-5 h-5" />
+                    Get the App Experience
+                  </CardTitle>
+                  <CardDescription>
+                    Learn how to install PawCult on your device for the best experience
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Collapsible>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="outline" className="w-full justify-between">
+                        App Installation Guide
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pt-4">
+                      <PWAInstallContent />
+                    </CollapsibleContent>
+                  </Collapsible>
                 </CardContent>
               </Card>
 
