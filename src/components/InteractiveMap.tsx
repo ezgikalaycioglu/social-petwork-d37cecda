@@ -101,16 +101,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     // Notify parent about location permission status
     onLocationPermissionChange?.(locationPermission);
     
-    if (locationPermission && showLocationToasts && !hasShownLocationToast) {
-      setupRealtimeListener();
-      
-      toast({
-        title: "Location Access Granted",
-        description: "Your location will only be shared when you're 'Ready to Play'.",
-      });
-      
-      setHasShownLocationToast(true);
-    } else if (locationPermission && !showLocationToasts) {
+    if (locationPermission) {
       setupRealtimeListener();
     }
     
@@ -122,18 +113,10 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   }, [locationPermission, onLocationPermissionChange, showLocationToasts, hasShownLocationToast]);
 
   useEffect(() => {
-    if (error && showLocationToasts) {
-      onLocationPermissionChange?.(false);
-      
-      toast({
-        title: "Location Access Denied",
-        description: "Using default location. Enable location access for better experience.",
-        variant: "destructive",
-      });
-    } else if (error) {
+    if (error) {
       onLocationPermissionChange?.(false);
     }
-  }, [error, onLocationPermissionChange, showLocationToasts]);
+  }, [error, onLocationPermissionChange]);
 
   const setupRealtimeListener = () => {
     fetchNearbyPets();

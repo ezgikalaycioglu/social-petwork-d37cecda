@@ -19,9 +19,9 @@ const MobileTopNav = () => {
 
   const getLocationTooltipContent = () => {
     if (locationLoading) return "Getting your location...";
-    if (locationError) return `Location unavailable: ${locationError}`;
-    if (coordinates) return `Location enabled (${coordinates.lat.toFixed(4)}, ${coordinates.lng.toFixed(4)})`;
-    return "Location not available";
+    if (locationError) return "Enable location access for the full pet map experience.";
+    if (coordinates) return "You can now find pets near you and share your location!";
+    return "Enable location access for the full pet map experience.";
   };
 
   const renderContent = () => {

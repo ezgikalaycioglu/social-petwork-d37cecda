@@ -82,18 +82,8 @@ const PetMap = () => {
   };
 
   const handleLocationPermissionChange = (granted: boolean) => {
-    if (granted) {
-      toast({
-        title: "Location Enabled",
-        description: "You can now find pets near you and share your location!",
-      });
-    } else {
-      toast({
-        title: "Location Disabled",
-        description: "Enable location access for the full pet map experience.",
-        variant: "destructive",
-      });
-    }
+    // Location permission changes are handled by the icon tooltip on mobile
+    // No toasts needed here
   };
 
   if (loading) {
