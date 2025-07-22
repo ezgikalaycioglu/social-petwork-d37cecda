@@ -96,7 +96,7 @@ const PWAInstallPopup = () => {
 
   return (
     <Dialog open={isVisible} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg w-full max-h-[90vh] overflow-y-auto [&>button[data-dialog-close]]:hidden">
         <DialogHeader>
           <DialogTitle className="text-2xl md:text-3xl font-bold text-foreground mb-4">
             Get the App Experience
