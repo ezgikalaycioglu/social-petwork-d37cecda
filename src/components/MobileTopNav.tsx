@@ -3,22 +3,44 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell, PawPrint, Settings, Plus, MapPin, Calendar, Users as UsersIcon, Building2, Tag } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocation as useUserLocation } from '@/hooks/useLocation';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import SocialPetworkLogo from './SocialPetworkLogo';
 
 const MobileTopNav = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { loading: locationLoading, coordinates, error: locationError } = useUserLocation();
 
   if (!user) {
     return null;
   }
+
+  const getLocationTooltipContent = () => {
+    if (locationLoading) return "Getting your location...";
+    if (locationError) return `Location unavailable: ${locationError}`;
+    if (coordinates) return `Location enabled (${coordinates.lat.toFixed(4)}, ${coordinates.lng.toFixed(4)})`;
+    return "Location not available";
+  };
 
   const renderContent = () => {
     // Home tab - Logo centered, Notifications right
     if (location.pathname === '/dashboard' || location.pathname === '/') {
       return (
         <div className="flex items-center justify-center w-full relative">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="absolute left-0 p-2">
+                  <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{getLocationTooltipContent()}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <SocialPetworkLogo />
           <Link 
             to="/notifications" 
@@ -30,20 +52,44 @@ const MobileTopNav = () => {
       );
     }
 
-    // Social tab - just show logo, no sub-navigation
+    // Social tab - Location icon left, logo center
     if (location.pathname === '/discover' || location.pathname === '/pet-social' || 
         location.pathname === '/events' || location.pathname === '/pet-map') {
       return (
-        <div className="flex items-center justify-center w-full">
+        <div className="flex items-center justify-center w-full relative">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="absolute left-0 p-2">
+                  <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{getLocationTooltipContent()}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <SocialPetworkLogo />
         </div>
       );
     }
 
-    // Packs tab - Logo centered, Create pack right
+    // Packs tab - Location icon left, logo center, Create pack right
     if (location.pathname.startsWith('/packs')) {
       return (
         <div className="flex items-center justify-center w-full relative">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="absolute left-0 p-2">
+                  <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{getLocationTooltipContent()}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <SocialPetworkLogo />
           <Link 
             to="/packs/create" 
@@ -55,10 +101,22 @@ const MobileTopNav = () => {
       );
     }
 
-    // Businesses and Deals tab - Businesses and Deals sections
+    // Businesses and Deals tab - Location icon left, navigation center
     if (location.pathname === '/deals' || location.pathname === '/business-dashboard') {
       return (
-        <div className="flex items-center justify-center w-full">
+        <div className="flex items-center justify-center w-full relative">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="absolute left-0 p-2">
+                  <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{getLocationTooltipContent()}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <nav className="flex space-x-1 overflow-x-auto">
             <Link
               to="/business-dashboard"
@@ -85,11 +143,23 @@ const MobileTopNav = () => {
       );
     }
 
-    // Profile tab - Logo centered, Settings right
+    // Profile tab - Location icon left, logo center, Settings right
     if (location.pathname === '/profile' || location.pathname === '/my-pets' || 
         location.pathname === '/settings') {
       return (
         <div className="flex items-center justify-center w-full relative">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="absolute left-0 p-2">
+                  <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{getLocationTooltipContent()}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <SocialPetworkLogo />
           <Link 
             to="/settings" 
@@ -101,9 +171,21 @@ const MobileTopNav = () => {
       );
     }
 
-    // Default - just show logo
+    // Default - Location icon left, logo center
     return (
-      <div className="flex items-center justify-center w-full">
+      <div className="flex items-center justify-center w-full relative">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="absolute left-0 p-2">
+                <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{getLocationTooltipContent()}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <SocialPetworkLogo />
       </div>
     );
