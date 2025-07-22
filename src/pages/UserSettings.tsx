@@ -151,6 +151,8 @@ const UserSettings = () => {
           new_follower_alerts: data.newFollowerAlerts,
           weekly_newsletter: data.weeklyNewsletter,
           updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id'
         });
 
       if (preferencesError) throw preferencesError;
