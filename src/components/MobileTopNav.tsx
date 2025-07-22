@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Bell, PawPrint, Settings, Plus, MapPin, Calendar, Users as UsersIcon, Building2, Tag } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation as useUserLocation } from '@/hooks/useLocation';
+import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import SocialPetworkLogo from './SocialPetworkLogo';
 
@@ -11,6 +12,7 @@ const MobileTopNav = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { toast } = useToast();
   const { loading: locationLoading, coordinates, error: locationError } = useUserLocation();
 
   if (!user) {
@@ -24,6 +26,15 @@ const MobileTopNav = () => {
     return "Enable location access for the full pet map experience.";
   };
 
+  const handleLocationClick = () => {
+    const content = getLocationTooltipContent();
+    toast({
+      title: coordinates ? "Location Enabled" : "Location Disabled",
+      description: content,
+      variant: coordinates ? "default" : "destructive",
+    });
+  };
+
   const renderContent = () => {
     // Home tab - Logo centered, Notifications right
     if (location.pathname === '/dashboard' || location.pathname === '/') {
@@ -32,7 +43,7 @@ const MobileTopNav = () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="absolute left-0 p-2">
+                <div className="absolute left-0 p-2 cursor-pointer" onClick={handleLocationClick}>
                   <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
@@ -60,7 +71,7 @@ const MobileTopNav = () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="absolute left-0 p-2">
+                <div className="absolute left-0 p-2 cursor-pointer" onClick={handleLocationClick}>
                   <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
@@ -81,7 +92,7 @@ const MobileTopNav = () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="absolute left-0 p-2">
+                <div className="absolute left-0 p-2 cursor-pointer" onClick={handleLocationClick}>
                   <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
@@ -108,7 +119,7 @@ const MobileTopNav = () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="absolute left-0 p-2">
+                <div className="absolute left-0 p-2 cursor-pointer" onClick={handleLocationClick}>
                   <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
@@ -151,7 +162,7 @@ const MobileTopNav = () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="absolute left-0 p-2">
+                <div className="absolute left-0 p-2 cursor-pointer" onClick={handleLocationClick}>
                   <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
@@ -177,7 +188,7 @@ const MobileTopNav = () => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="absolute left-0 p-2">
+              <div className="absolute left-0 p-2 cursor-pointer" onClick={handleLocationClick}>
                 <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
               </div>
             </TooltipTrigger>
