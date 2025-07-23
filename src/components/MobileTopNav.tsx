@@ -24,17 +24,16 @@ const MobileTopNav = () => {
   const getLocationTooltipContent = () => {
     if (locationLoading) return "Getting your location...";
     if (locationError) return "Enable location access for the full pet map experience.";
-    if (isReady) return "Ready to Play is ON - Your pets are visible on the map!";
-    if (coordinates) return "Location enabled. Toggle 'Ready to Play' to share your location.";
-    return "Enable location access for the full pet map experience.";
+    if (isReady) return "Location Enabled. You're sharing your location with other pets.";
+    return "Location disabled. Toggle 'ready to play' to share your location with other pets.";
   };
 
   const handleLocationClick = () => {
     const content = getLocationTooltipContent();
     toast({
-      title: isReady ? "Ready to Play - ON" : coordinates ? "Location Enabled" : "Location Disabled",
+      title: isReady ? "Location Enabled" : "Location Disabled",
       description: content,
-      variant: isReady ? "default" : coordinates ? "default" : "destructive",
+      variant: isReady ? "default" : "destructive",
     });
   };
 

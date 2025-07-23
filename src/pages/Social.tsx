@@ -15,8 +15,10 @@ import {
   Plus,
   Users,
   Clock,
-  Loader2
+  Loader2,
+  ChevronDown
 } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 // Import components from the individual pages
 import DiscoverPets from '@/components/DiscoverPets';
@@ -376,20 +378,27 @@ const Social = () => {
                   {/* Privacy Notice */}
                   <Card className="bg-blue-50/80 border-blue-200 backdrop-blur-sm">
                     <CardContent className="p-4">
-                      <div className="flex items-start space-x-3">
-                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-white text-xs font-bold">i</span>
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-blue-900 mb-1">Privacy Notice</h3>
-                           <p className="text-sm text-blue-800">
-                             Your location will only be shared with others when you toggle "Ready to Play" ON. You can turn it off anytime to stop sharing your location.
-                             <br /><br />
-                             <strong>Important Note:</strong> When you switch "Ready to Play" OFF, our application will stop actively receiving and storing your location information in our database. 
-                             However, the location access permission you previously granted to our application (through your browser or device settings) will remain active until you manually revoke it.
-                           </p>
-                        </div>
-                      </div>
+                      <Collapsible>
+                        <CollapsibleTrigger asChild>
+                          <Button variant="outline" className="w-full justify-between bg-white/50 border-blue-300 text-blue-900 hover:bg-white/70">
+                            <div className="flex items-center gap-2">
+                              <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span className="text-white text-xs font-bold">i</span>
+                              </div>
+                              Privacy Notice
+                            </div>
+                            <ChevronDown className="h-4 w-4" />
+                          </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pt-4">
+                          <p className="text-sm text-blue-800">
+                            Your location will only be shared with others when you toggle "Ready to Play" ON. You can turn it off anytime to stop sharing your location.
+                            <br /><br />
+                            <strong>Important Note:</strong> When you switch "Ready to Play" OFF, our application will stop actively receiving and storing your location information in our database. 
+                            However, the location access permission you previously granted to our application (through your browser or device settings) will remain active until you manually revoke it.
+                          </p>
+                        </CollapsibleContent>
+                      </Collapsible>
                     </CardContent>
                   </Card>
 
