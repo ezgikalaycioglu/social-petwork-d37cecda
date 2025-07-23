@@ -42,7 +42,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import Layout from '@/components/Layout';
-import CreatePetProfile from './CreatePetProfile';
+import CreatePetProfileForm from '@/components/CreatePetProfileForm';
 
 interface PetProfile {
   id: string;
@@ -223,7 +223,10 @@ const MyPets = () => {
                     Add a new furry friend to your family
                   </DialogDescription>
                 </DialogHeader>
-                <CreatePetProfile />
+                <CreatePetProfileForm
+                  onSuccess={handleCreateSuccess}
+                  showHeader={false}
+                />
               </DialogContent>
             </Dialog>
           </div>
