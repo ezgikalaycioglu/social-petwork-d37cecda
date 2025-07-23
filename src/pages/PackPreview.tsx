@@ -262,15 +262,27 @@ const PackPreview = () => {
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-primary-light to-background p-4">
         <div className="max-w-4xl mx-auto space-y-6">
-          {/* Back Button */}
-          <Button 
-            onClick={() => navigate('/packs')}
-            variant="ghost"
-            className="rounded-xl hover:bg-white/80"
-          >
-            <ArrowLeft className="h-5 w-5 mr-2" />
-            Back to Packs
-          </Button>
+          {/* Header with Back Button and Settings */}
+          <div className="flex items-center justify-between">
+            <Button 
+              onClick={() => navigate('/packs')}
+              variant="ghost"
+              className="rounded-xl hover:bg-white/80"
+            >
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              Back to Packs
+            </Button>
+            
+            {isUserMember && (
+              <Button 
+                onClick={() => navigate(`/packs/${packId}/settings`)}
+                variant="ghost"
+                className="rounded-xl hover:bg-white/80"
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
+            )}
+          </div>
 
           {/* Pack Header */}
           <Card className="border-0 shadow-2xl rounded-3xl overflow-hidden">

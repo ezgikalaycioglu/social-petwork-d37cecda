@@ -40,6 +40,7 @@ import Social from "./pages/Social";
 import Profile from "./pages/Profile";
 import CreatePost from "./pages/CreatePost";
 import Notifications from "./pages/Notifications";
+import PackSettingsPage from "./components/PackSettingsPage";
 
 
 const queryClient = new QueryClient({
@@ -145,6 +146,11 @@ const App = () => {
                 <Route path="/packs/:packId" element={
                   <ProtectedRoute>
                     <PackPreview />
+                  </ProtectedRoute>
+                } />
+                <Route path="/packs/:packId/settings" element={
+                  <ProtectedRoute>
+                    <PackSettingsPage />
                   </ProtectedRoute>
                 } />
                 <Route path="/packs-old" element={
