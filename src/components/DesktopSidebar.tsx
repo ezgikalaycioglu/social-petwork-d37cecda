@@ -1,7 +1,15 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, PawPrint, Users, MapPin, Calendar, Gift, Building, Settings, User, Heart, UserCheck, Search, Star, CalendarCheck } from 'lucide-react';
+import { Home, PawPrint, Users, MapPin, Calendar, Gift, Building, Settings, User, Heart, UserCheck, Search, Star, CalendarCheck, MessageSquare } from 'lucide-react';
+import ContactUs from './ContactUs';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -12,6 +20,7 @@ const DesktopSidebar = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const [isContactOpen, setIsContactOpen] = React.useState(false);
 
   const navItems = [
     { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
@@ -83,6 +92,22 @@ const DesktopSidebar = () => {
             <Settings className="w-5 h-5" />
             <span>{t('navigation.settings')}</span>
           </Link>
+
+          {/* Contact Us Link */}
+          <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
+            <DialogTrigger asChild>
+              <button className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-700 hover:text-green-600 hover:bg-green-50 w-full text-left">
+                <MessageSquare className="w-5 h-5" />
+                <span>Contact Us</span>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Contact Us</DialogTitle>
+              </DialogHeader>
+              <ContactUs onClose={() => setIsContactOpen(false)} />
+            </DialogContent>
+          </Dialog>
 
           {/* Auth Buttons */}
           <div className="pt-4">

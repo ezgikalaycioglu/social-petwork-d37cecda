@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell, PawPrint, Settings, Plus, MapPin, Calendar, Users as UsersIcon, Building2, Tag } from 'lucide-react';
+import MobileMoreMenu from './MobileMoreMenu';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation as useUserLocation } from '@/hooks/useLocation';
 import { useReadyToPlay } from '@/contexts/ReadyToPlayContext';
@@ -55,12 +56,9 @@ const MobileTopNav = () => {
             </Tooltip>
           </TooltipProvider>
           <SocialPetworkLogo />
-          <Link 
-            to="/notifications" 
-            className="absolute right-0 p-2 hover:bg-gray-100 rounded-full"
-          >
-            <Bell className="w-6 h-6 text-gray-600" />
-          </Link>
+          <div className="absolute right-0">
+            <MobileMoreMenu />
+          </div>
         </div>
       );
     }
@@ -81,9 +79,12 @@ const MobileTopNav = () => {
                 <p>{getLocationTooltipContent()}</p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
-          <SocialPetworkLogo />
-        </div>
+           </TooltipProvider>
+           <SocialPetworkLogo />
+           <div className="absolute right-0">
+             <MobileMoreMenu />
+           </div>
+         </div>
       );
     }
 
@@ -104,12 +105,9 @@ const MobileTopNav = () => {
             </Tooltip>
           </TooltipProvider>
           <SocialPetworkLogo />
-          <Link 
-            to="/packs/create" 
-            className="absolute right-0 p-2 hover:bg-gray-100 rounded-full"
-          >
-            <Plus className="w-6 h-6 text-gray-600" />
-          </Link>
+          <div className="absolute right-0">
+            <MobileMoreMenu />
+          </div>
         </div>
       );
     }
@@ -151,8 +149,11 @@ const MobileTopNav = () => {
             >
               Deals
             </Link>
-          </nav>
-        </div>
+           </nav>
+           <div className="absolute right-0">
+             <MobileMoreMenu />
+           </div>
+         </div>
       );
     }
 
@@ -174,12 +175,9 @@ const MobileTopNav = () => {
             </Tooltip>
           </TooltipProvider>
           <SocialPetworkLogo />
-          <Link 
-            to="/settings" 
-            className="absolute right-0 p-2 hover:bg-gray-100 rounded-full"
-          >
-            <Settings className="w-6 h-6 text-gray-600" />
-          </Link>
+          <div className="absolute right-0">
+            <MobileMoreMenu />
+          </div>
         </div>
       );
     }
@@ -198,9 +196,12 @@ const MobileTopNav = () => {
                 <p>{getLocationTooltipContent()}</p>
               </TooltipContent>
           </Tooltip>
-        </TooltipProvider>
-        <SocialPetworkLogo />
-      </div>
+         </TooltipProvider>
+         <SocialPetworkLogo />
+         <div className="absolute right-0">
+           <MobileMoreMenu />
+         </div>
+       </div>
     );
   };
 
