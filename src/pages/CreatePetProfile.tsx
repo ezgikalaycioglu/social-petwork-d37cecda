@@ -117,7 +117,7 @@ const CreatePetProfile = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pb-24 md:pb-8">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="flex items-center mb-8">
