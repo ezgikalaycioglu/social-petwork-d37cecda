@@ -82,6 +82,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const { toast } = useToast();
   const { loading, coordinates, error, requestLocation, clearLocation, hasPermission } = useLocationOnDemand();
   const [isReady, setIsReady] = useState(false);
+  const [isReadyIntent, setIsReadyIntent] = useState(false);
   const [nearbyPets, setNearbyPets] = useState<PetProfile[]>([]);
   const [hasShownLocationToast, setHasShownLocationToast] = useState(false);
   const channelRef = useRef<any>(null);
@@ -117,6 +118,64 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       onLocationPermissionChange?.(false);
     }
   }, [error, onLocationPermissionChange]);
+
+  // Complete the Ready to Play activation once we have coordinates
+  const completeReadyToPlayActivation = async () => {
+    if (!coordinates || !isReadyIntent || isReady) return;
+
+    try {
+      const [latitude, longitude] = [coordinates.lat, coordinates.lng];
+      
+      console.log('Completing Ready to Play activation:', { latitude, longitude, petCount: userPets.length });
+      
+      // Update all user's pets with location and availability
+      const updates = userPets.map(pet => 
+        supabase
+          .from('pet_profiles')
+          .update({
+            is_available: true,
+            latitude,
+            longitude,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', pet.id)
+      );
+
+      const results = await Promise.all(updates);
+      
+      // Check for errors in any of the updates
+      const errors = results.filter(result => result.error);
+      if (errors.length > 0) {
+        console.error('Update errors:', errors);
+        throw new Error('Failed to update some pets');
+      }
+      
+      setIsReady(true);
+      
+      toast({
+        title: "Ready to Play!",
+        description: "Your pets are now visible to others on the map (location updates every 60 seconds)",
+      });
+    } catch (error) {
+      console.error('Error completing Ready to Play activation:', error);
+      setIsReady(false);
+      setIsReadyIntent(false);
+      
+      toast({
+        title: "Error",
+        description: "Failed to activate Ready to Play mode",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle successful location acquisition when user has indicated intent to be ready
+  useEffect(() => {
+    if (isReadyIntent && coordinates && hasPermission && !isReady) {
+      // Complete the "Ready to Play" action now that we have coordinates
+      completeReadyToPlayActivation();
+    }
+  }, [isReadyIntent, coordinates, hasPermission, isReady]);
 
   const setupRealtimeListener = () => {
     fetchNearbyPets();
@@ -243,76 +302,70 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       return;
     }
 
-    // If toggling ON, request location first
-    if (available && !hasPermission) {
+    // Set user intent immediately for UI feedback
+    setIsReadyIntent(available);
+
+    // If toggling OFF, clear everything immediately
+    if (!available) {
       try {
-        await requestLocation();
-      } catch (error) {
+        // Clear location tracking first
+        clearLocation();
+        
+        // Update database to clear availability and location
+        const updates = userPets.map(pet => 
+          supabase
+            .from('pet_profiles')
+            .update({
+              is_available: false,
+              latitude: null,
+              longitude: null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', pet.id)
+        );
+
+        const results = await Promise.all(updates);
+        
+        // Check for errors in any of the updates
+        const errors = results.filter(result => result.error);
+        if (errors.length > 0) {
+          console.error('Update errors:', errors);
+          throw new Error('Failed to update some pets');
+        }
+        
+        setIsReady(false);
+        setIsReadyIntent(false);
+        
         toast({
-          title: "Location Required",
-          description: "Please allow location access to share your pet's location",
+          title: "No longer available",
+          description: "Your pets have been removed from the map and location tracking stopped",
+        });
+      } catch (error) {
+        console.error('Error updating availability:', error);
+        setIsReadyIntent(false);
+        toast({
+          title: "Error",
+          description: "Failed to update availability status",
           variant: "destructive",
         });
-        return;
       }
-    }
-
-    // If toggling OFF, clear location
-    if (!available) {
-      clearLocation();
-    }
-
-    const updatedCurrentLocation = available && coordinates ? [coordinates.lat, coordinates.lng] : null;
-
-    if (available && !updatedCurrentLocation) {
-      toast({
-        title: "Error",
-        description: "Location not available",
-        variant: "destructive",
-      });
       return;
     }
 
+    // If toggling ON, request location first (async completion handled by useEffect)
     try {
-      const [latitude, longitude] = updatedCurrentLocation || [null, null];
-      
-      console.log('Updating availability status:', { available, latitude, longitude, petCount: userPets.length });
-      
-      // Update all user's pets
-      const updates = userPets.map(pet => 
-        supabase
-          .from('pet_profiles')
-          .update({
-            is_available: available,
-            latitude: available ? latitude : null,
-            longitude: available ? longitude : null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', pet.id)
-      );
-
-      const results = await Promise.all(updates);
-      
-      // Check for errors in any of the updates
-      const errors = results.filter(result => result.error);
-      if (errors.length > 0) {
-        console.error('Update errors:', errors);
-        throw new Error('Failed to update some pets');
-      }
-      
-      setIsReady(available);
-      
-      toast({
-        title: available ? "Ready to Play!" : "No longer available",
-        description: available 
-          ? "Your pets are now visible to others on the map (location updates every 60 seconds)" 
-          : "Your pets have been removed from the map",
-      });
+      console.log('Requesting location for Ready to Play...');
+      await requestLocation();
+      // The completeReadyToPlayActivation function will be called by useEffect
+      // once coordinates are available
     } catch (error) {
-      console.error('Error updating availability:', error);
+      console.error('Error requesting location:', error);
+      setIsReady(false);
+      setIsReadyIntent(false);
+      
       toast({
-        title: "Error",
-        description: "Failed to update availability status",
+        title: "Location Required",
+        description: "Please allow location access to share your pet's location",
         variant: "destructive",
       });
     }
