@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useLocationOnDemand } from '@/hooks/useLocationOnDemand'; // This hook's internal logic is crucial
+import { useReadyToPlay } from '@/contexts/ReadyToPlayContext';
 import { MapPin, Navigation, PawPrint } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import type { Tables } from '@/integrations/supabase/types';
@@ -92,6 +93,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   // Ensure useLocationOnDemand's requestLocation re-prompts or re-acquires.
   // Ensure useLocationOnDemand's clearLocation truly stops tracking and clears state.
   const { loading, coordinates, error, requestLocation, clearLocation, hasPermission } = useLocationOnDemand();
+  const { setIsReady: setGlobalIsReady } = useReadyToPlay();
   
   const [isReady, setIsReady] = useState(false); // Actual "Ready to Play" status (location confirmed)
   const [isReadyIntent, setIsReadyIntent] = useState(false); // User's desired "Ready to Play" status (from switch)
@@ -299,6 +301,11 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       });
     }
   }, [isReadyIntent, coordinates, hasPermission, isReady, updatePetsAvailabilityInDB, toast]);
+
+  // Sync local isReady state with global context
+  useEffect(() => {
+    setGlobalIsReady(isReady);
+  }, [isReady, setGlobalIsReady]);
 
   const handleReadyToPlayToggle = async (checked: boolean) => {
     if (userPets.length === 0) {

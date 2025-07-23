@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Bell, PawPrint, Settings, Plus, MapPin, Calendar, Users as UsersIcon, Building2, Tag } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation as useUserLocation } from '@/hooks/useLocation';
+import { useReadyToPlay } from '@/contexts/ReadyToPlayContext';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import SocialPetworkLogo from './SocialPetworkLogo';
@@ -14,6 +15,7 @@ const MobileTopNav = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { loading: locationLoading, coordinates, error: locationError } = useUserLocation();
+  const { isReady } = useReadyToPlay();
 
   if (!user) {
     return null;
@@ -22,16 +24,17 @@ const MobileTopNav = () => {
   const getLocationTooltipContent = () => {
     if (locationLoading) return "Getting your location...";
     if (locationError) return "Enable location access for the full pet map experience.";
-    if (coordinates) return "You can now find pets near you and share your location!";
+    if (isReady) return "Ready to Play is ON - Your pets are visible on the map!";
+    if (coordinates) return "Location enabled. Toggle 'Ready to Play' to share your location.";
     return "Enable location access for the full pet map experience.";
   };
 
   const handleLocationClick = () => {
     const content = getLocationTooltipContent();
     toast({
-      title: coordinates ? "Location Enabled" : "Location Disabled",
+      title: isReady ? "Ready to Play - ON" : coordinates ? "Location Enabled" : "Location Disabled",
       description: content,
-      variant: coordinates ? "default" : "destructive",
+      variant: isReady ? "default" : coordinates ? "default" : "destructive",
     });
   };
 
@@ -44,7 +47,7 @@ const MobileTopNav = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="absolute left-0 p-2 cursor-pointer" onClick={handleLocationClick}>
-                  <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
+                   <MapPin className={`w-6 h-6 ${isReady ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="block md:hidden">
@@ -65,14 +68,14 @@ const MobileTopNav = () => {
 
     // Social tab - Location icon left, logo center
     if (location.pathname === '/discover' || location.pathname === '/pet-social' || 
-        location.pathname === '/events' || location.pathname === '/pet-map') {
+        location.pathname === '/events' || location.pathname === '/pet-map' || location.pathname === '/social') {
       return (
         <div className="flex items-center justify-center w-full relative">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="absolute left-0 p-2 cursor-pointer" onClick={handleLocationClick}>
-                  <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
+                   <MapPin className={`w-6 h-6 ${isReady ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="block md:hidden">
@@ -93,7 +96,7 @@ const MobileTopNav = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="absolute left-0 p-2 cursor-pointer" onClick={handleLocationClick}>
-                  <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
+                   <MapPin className={`w-6 h-6 ${isReady ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="block md:hidden">
@@ -120,7 +123,7 @@ const MobileTopNav = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="absolute left-0 p-2 cursor-pointer" onClick={handleLocationClick}>
-                  <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
+                   <MapPin className={`w-6 h-6 ${isReady ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="block md:hidden">
@@ -163,7 +166,7 @@ const MobileTopNav = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="absolute left-0 p-2 cursor-pointer" onClick={handleLocationClick}>
-                  <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
+                   <MapPin className={`w-6 h-6 ${isReady ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="block md:hidden">
@@ -189,7 +192,7 @@ const MobileTopNav = () => {
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="absolute left-0 p-2 cursor-pointer" onClick={handleLocationClick}>
-                <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
+                <MapPin className={`w-6 h-6 ${isReady ? 'text-green-600' : 'text-gray-400'}`} />
               </div>
             </TooltipTrigger>
               <TooltipContent side="bottom" className="block md:hidden">
