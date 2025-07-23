@@ -16,6 +16,7 @@ import { CreateTweetModal } from '@/components/CreateTweetModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { handleAuthError } from '@/utils/authErrorHandler';
 import PWAInstallPopup from '@/components/PWAInstallPopup';
+import QuickTour from '@/components/QuickTour';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -29,6 +30,8 @@ const Dashboard = () => {
   const [userEmail, setUserEmail] = useState<string>('');
   const [isCreateTweetModalOpen, setIsCreateTweetModalOpen] = useState(false);
   const [tweetFeedKey, setTweetFeedKey] = useState(0);
+  const [showQuickTour, setShowQuickTour] = useState(false);
+  const [tourCompleted, setTourCompleted] = useState(false);
 
   useEffect(() => {
     // Track page view safely
@@ -63,6 +66,7 @@ const Dashboard = () => {
       const { user } = data;
       setUserEmail(user.email || '');
       await fetchPets(user.id);
+      await checkTourStatus(user.id);
 
     } catch (outerError) {
       console.error('Caught an unexpected error during auth/fetch process:', outerError);
@@ -138,6 +142,37 @@ const Dashboard = () => {
     navigate(path);
   };
 
+  const checkTourStatus = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('tour_completed')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error checking tour status:', error);
+        return;
+      }
+
+      const completed = data?.tour_completed || false;
+      setTourCompleted(completed);
+      setShowQuickTour(!completed);
+    } catch (error) {
+      console.error('Error checking tour status:', error);
+    }
+  };
+
+  const handleTourComplete = () => {
+    setShowQuickTour(false);
+    setTourCompleted(true);
+  };
+
+  const handleTourSkip = () => {
+    setShowQuickTour(false);
+    setTourCompleted(true);
+  };
+
   const handleTweetCreated = () => {
     setTweetFeedKey(prev => prev + 1); // Force refresh of tweet feed
   };
@@ -158,6 +193,12 @@ const Dashboard = () => {
   return (
     <Layout>
       <PWAInstallPopup />
+      {showQuickTour && (
+        <QuickTour
+          onComplete={handleTourComplete}
+          onSkip={handleTourSkip}
+        />
+      )}
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-4 py-6">

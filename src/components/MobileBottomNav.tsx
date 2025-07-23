@@ -10,12 +10,12 @@ const MobileBottomNav = () => {
   const { t } = useTranslation();
 
   const navItems = [
-    { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
-    { name: t('navigation.petSocial'), href: '/social', icon: Search },
-    { name: t('navigation.petSitters'), href: '/find-sitter', icon: Heart },
-    { name: t('navigation.business'), href: '/business', icon: Building2 },
-    { name: t('navigation.packs'), href: '/packs/discover', icon: Users },
-    { name: t('navigation.profile'), href: '/profile', icon: User },
+    { name: t('navigation.dashboard'), href: '/dashboard', icon: Home, tourId: 'dashboard' },
+    { name: t('navigation.petSocial'), href: '/social', icon: Search, tourId: 'social' },
+    { name: t('navigation.petSitters'), href: '/find-sitter', icon: Heart, tourId: 'sitters' },
+    { name: t('navigation.business'), href: '/business', icon: Building2, tourId: 'business' },
+    { name: t('navigation.packs'), href: '/packs/discover', icon: Users, tourId: 'packs' },
+    { name: t('navigation.profile'), href: '/profile', icon: User, tourId: 'profile' },
   ];
 
   const isActive = (href: string) => {
@@ -54,6 +54,7 @@ const MobileBottomNav = () => {
             <Link
               key={item.name}
               to={item.href}
+              data-tour={item.tourId}
               className={`flex-1 flex flex-col items-center justify-center py-3 px-2 transition-colors ${
                 isActive(item.href)
                   ? 'text-primary bg-primary/10'
