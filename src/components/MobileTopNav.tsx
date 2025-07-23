@@ -47,7 +47,7 @@ const MobileTopNav = () => {
                   <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom" className="block md:hidden">
                 <p>{getLocationTooltipContent()}</p>
               </TooltipContent>
             </Tooltip>
@@ -75,7 +75,7 @@ const MobileTopNav = () => {
                   <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom" className="block md:hidden">
                 <p>{getLocationTooltipContent()}</p>
               </TooltipContent>
             </Tooltip>
@@ -96,7 +96,7 @@ const MobileTopNav = () => {
                   <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom" className="block md:hidden">
                 <p>{getLocationTooltipContent()}</p>
               </TooltipContent>
             </Tooltip>
@@ -123,7 +123,7 @@ const MobileTopNav = () => {
                   <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom" className="block md:hidden">
                 <p>{getLocationTooltipContent()}</p>
               </TooltipContent>
             </Tooltip>
@@ -166,7 +166,7 @@ const MobileTopNav = () => {
                   <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
                 </div>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom" className="block md:hidden">
                 <p>{getLocationTooltipContent()}</p>
               </TooltipContent>
             </Tooltip>
@@ -192,9 +192,9 @@ const MobileTopNav = () => {
                 <MapPin className={`w-6 h-6 ${coordinates ? 'text-green-600' : 'text-gray-400'}`} />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
-              <p>{getLocationTooltipContent()}</p>
-            </TooltipContent>
+              <TooltipContent side="bottom" className="block md:hidden">
+                <p>{getLocationTooltipContent()}</p>
+              </TooltipContent>
           </Tooltip>
         </TooltipProvider>
         <SocialPetworkLogo />

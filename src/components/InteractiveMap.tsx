@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { useLocation } from '@/hooks/useLocation';
+import { useLocationOnDemand } from '@/hooks/useLocationOnDemand';
 import { MapPin, Navigation, PawPrint } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import type { Tables } from '@/integrations/supabase/types';
@@ -80,7 +80,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   showLocationToasts = false
 }) => {
   const { toast } = useToast();
-  const { loading, coordinates, error } = useLocation();
+  const { loading, coordinates, error, requestLocation, clearLocation, hasPermission } = useLocationOnDemand();
   const [isReady, setIsReady] = useState(false);
   const [nearbyPets, setNearbyPets] = useState<PetProfile[]>([]);
   const [hasShownLocationToast, setHasShownLocationToast] = useState(false);
@@ -95,7 +95,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     ? [coordinates.lat, coordinates.lng] 
     : null;
   
-  const locationPermission = !!coordinates;
+  const locationPermission = hasPermission && !!coordinates;
 
   useEffect(() => {
     // Notify parent about location permission status
@@ -234,17 +234,47 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   }, [isReady, currentLocation, userPets]);
 
   const updateAvailabilityStatus = async (available: boolean) => {
-    if (!currentLocation || userPets.length === 0) {
+    if (userPets.length === 0) {
       toast({
         title: "Error",
-        description: "Location not available or no pets found",
+        description: "No pets found",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // If toggling ON, request location first
+    if (available && !hasPermission) {
+      try {
+        await requestLocation();
+      } catch (error) {
+        toast({
+          title: "Location Required",
+          description: "Please allow location access to share your pet's location",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    // If toggling OFF, clear location
+    if (!available) {
+      clearLocation();
+    }
+
+    const updatedCurrentLocation = available && coordinates ? [coordinates.lat, coordinates.lng] : null;
+
+    if (available && !updatedCurrentLocation) {
+      toast({
+        title: "Error",
+        description: "Location not available",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      const [latitude, longitude] = currentLocation;
+      const [latitude, longitude] = updatedCurrentLocation || [null, null];
       
       console.log('Updating availability status:', { available, latitude, longitude, petCount: userPets.length });
       
@@ -313,12 +343,12 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             <Switch
               checked={isReady}
               onCheckedChange={updateAvailabilityStatus}
-              disabled={!locationPermission || userPets.length === 0}
+              disabled={userPets.length === 0}
             />
             <div>
               <p className="font-medium text-sm">Ready to Play</p>
               <p className="text-xs text-gray-500">
-                {locationPermission ? 'Share location with others' : 'Location access required'}
+                {locationPermission ? 'Share location with others' : 'Tap to enable location'}
               </p>
             </div>
           </div>
