@@ -151,8 +151,10 @@ const PetMap = () => {
                 <div>
                   <h3 className="font-medium text-blue-900 mb-1">Privacy Notice</h3>
                   <p className="text-sm text-blue-800">
-                    Your location will only be shared with others when you toggle "Ready to Play" ON. 
-                    You can turn it off anytime to stop sharing your location.
+
+                    Your location will only be shared with others when you toggle "Ready to Play" ON. You can turn it off anytime to stop sharing your location.
+                    Important Note: When you switch "Ready to Play" OFF, our application will stop actively receiving and storing your location information in our database. 
+                    However, the location access permission you previously granted to our application (through your browser or device settings) will remain active until you manually revoke it.
                   </p>
                 </div>
               </div>

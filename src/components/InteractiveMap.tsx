@@ -1,14 +1,13 @@
-
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { Icon, divIcon } from 'leaflet';
+import { Icon, divIcon } from 'leaflet'; // divIcon is correctly imported
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { useLocationOnDemand } from '@/hooks/useLocationOnDemand';
+import { useLocationOnDemand } from '@/hooks/useLocationOnDemand'; // This hook's internal logic is crucial
 import { MapPin, Navigation, PawPrint } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import type { Tables } from '@/integrations/supabase/types';
@@ -27,7 +26,7 @@ const createPetMarker = (petPhotoUrl?: string) => {
     return divIcon({
       html: `<div class="w-10 h-10 rounded-full border-2 border-green-500 overflow-hidden bg-white shadow-lg">
                <img src="${petPhotoUrl}" class="w-full h-full object-cover" />
-             </div>`,
+             </div>`, // Corrected to template literal
       className: 'custom-pet-marker',
       iconSize: [40, 40],
       iconAnchor: [20, 20],
@@ -39,7 +38,7 @@ const createPetMarker = (petPhotoUrl?: string) => {
              <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
              </svg>
-           </div>`,
+           </div>`, // Corrected to template literal
     className: 'custom-pet-marker',
     iconSize: [40, 40],
     iconAnchor: [20, 20],
@@ -50,8 +49,14 @@ const LocationTracker: React.FC<{ onLocationUpdate: (lat: number, lng: number) =
   const map = useMap();
   
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      console.warn("Geolocation is not supported by this browser.");
+      return;
+    }
 
+    // It's crucial that useLocationOnDemand manages its own watchId,
+    // and this LocationTracker's watchId is distinct or explicitly cleared by it.
+    // For this component's purpose, it's fine as long as it's conditionally rendered.
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
@@ -59,7 +64,7 @@ const LocationTracker: React.FC<{ onLocationUpdate: (lat: number, lng: number) =
         map.setView([latitude, longitude], map.getZoom());
       },
       (error) => {
-        console.error('Error watching position:', error);
+        console.error('Error watching position in LocationTracker:', error);
       },
       {
         enableHighAccuracy: true,
@@ -68,7 +73,11 @@ const LocationTracker: React.FC<{ onLocationUpdate: (lat: number, lng: number) =
       }
     );
 
-    return () => navigator.geolocation.clearWatch(watchId);
+    return () => {
+      // Cleanup for this specific watcher when component unmounts
+      navigator.geolocation.clearWatch(watchId);
+      console.log("LocationTracker: Geolocation watch cleared.");
+    };
   }, [map, onLocationUpdate]);
 
   return null;
@@ -80,11 +89,14 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   showLocationToasts = false
 }) => {
   const { toast } = useToast();
+  // Ensure useLocationOnDemand's requestLocation re-prompts or re-acquires.
+  // Ensure useLocationOnDemand's clearLocation truly stops tracking and clears state.
   const { loading, coordinates, error, requestLocation, clearLocation, hasPermission } = useLocationOnDemand();
-  const [isReady, setIsReady] = useState(false);
-  const [isReadyIntent, setIsReadyIntent] = useState(false);
+  
+  const [isReady, setIsReady] = useState(false); // Actual "Ready to Play" status (location confirmed)
+  const [isReadyIntent, setIsReadyIntent] = useState(false); // User's desired "Ready to Play" status (from switch)
+
   const [nearbyPets, setNearbyPets] = useState<PetProfile[]>([]);
-  const [hasShownLocationToast, setHasShownLocationToast] = useState(false);
   const channelRef = useRef<any>(null);
   const locationUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -96,46 +108,26 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     ? [coordinates.lat, coordinates.lng] 
     : null;
   
-  const locationPermission = hasPermission && !!coordinates;
+  // Location permission is granted if hasPermission from hook is true AND we have coordinates
+  const locationPermission = hasPermission && !!currentLocation;
 
-  useEffect(() => {
-    // Notify parent about location permission status
-    onLocationPermissionChange?.(locationPermission);
-    
-    if (locationPermission) {
-      setupRealtimeListener();
+  // Use useCallback for database updates to ensure stable function reference
+  const updatePetsAvailabilityInDB = useCallback(async (available: boolean, latitude: number | null, longitude: number | null) => {
+    if (userPets.length === 0) {
+      console.warn("No user pets to update availability for.");
+      return;
     }
-    
-    return () => {
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-      }
-    };
-  }, [locationPermission, onLocationPermissionChange, showLocationToasts, hasShownLocationToast]);
-
-  useEffect(() => {
-    if (error) {
-      onLocationPermissionChange?.(false);
-    }
-  }, [error, onLocationPermissionChange]);
-
-  // Complete the Ready to Play activation once we have coordinates
-  const completeReadyToPlayActivation = async () => {
-    if (!coordinates || !isReadyIntent || isReady) return;
 
     try {
-      const [latitude, longitude] = [coordinates.lat, coordinates.lng];
+      console.log('Updating availability status in DB:', { available, latitude, longitude, petCount: userPets.length });
       
-      console.log('Completing Ready to Play activation:', { latitude, longitude, petCount: userPets.length });
-      
-      // Update all user's pets with location and availability
       const updates = userPets.map(pet => 
         supabase
           .from('pet_profiles')
           .update({
-            is_available: true,
-            latitude,
-            longitude,
+            is_available: available,
+            latitude: available ? latitude : null,
+            longitude: available ? longitude : null,
             updated_at: new Date().toISOString(),
           })
           .eq('id', pet.id)
@@ -143,44 +135,70 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
       const results = await Promise.all(updates);
       
-      // Check for errors in any of the updates
       const errors = results.filter(result => result.error);
       if (errors.length > 0) {
         console.error('Update errors:', errors);
         throw new Error('Failed to update some pets');
       }
-      
-      setIsReady(true);
-      
-      toast({
-        title: "Ready to Play!",
-        description: "Your pets are now visible to others on the map (location updates every 60 seconds)",
-      });
+      console.log('Successfully updated pet availability in DB.');
     } catch (error) {
-      console.error('Error completing Ready to Play activation:', error);
-      setIsReady(false);
-      setIsReadyIntent(false);
-      
+      console.error('Error updating pet availability in DB:', error);
       toast({
         title: "Error",
-        description: "Failed to activate Ready to Play mode",
+        description: "Failed to update availability status",
         variant: "destructive",
       });
     }
-  };
+  }, [userPets, toast]); // Dependencies: userPets, toast
 
-  // Handle successful location acquisition when user has indicated intent to be ready
+  // Effect to notify parent and manage real-time listener based on locationPermission
   useEffect(() => {
-    if (isReadyIntent && coordinates && hasPermission && !isReady) {
-      // Complete the "Ready to Play" action now that we have coordinates
-      completeReadyToPlayActivation();
+    onLocationPermissionChange?.(locationPermission);
+    
+    if (locationPermission) {
+      setupRealtimeListener();
+    } else {
+      // Clear real-time channel if permission is lost or not available
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     }
-  }, [isReadyIntent, coordinates, hasPermission, isReady]);
+    
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
+    };
+  }, [locationPermission, onLocationPermissionChange]);
+
+  // Handle location errors from useLocationOnDemand
+  useEffect(() => {
+    if (error) {
+      onLocationPermissionChange?.(false);
+      // If an error occurs while we were trying to be ready, reset states
+      if (isReadyIntent || isReady) {
+        setIsReadyIntent(false);
+        setIsReady(false);
+        toast({
+          title: "Location Error",
+          description: "Could not get location. Please check your device settings or grant permission.",
+          variant: "destructive",
+        });
+        // Important: Update DB to set available to false if an error occurs
+        updatePetsAvailabilityInDB(false, null, null);
+      }
+    }
+  }, [error, onLocationPermissionChange, isReadyIntent, isReady, toast, updatePetsAvailabilityInDB]);
 
   const setupRealtimeListener = () => {
-    fetchNearbyPets();
+    fetchNearbyPets(); // Initial fetch
     
-    // Listen for real-time updates to pet locations
+    // Ensure only one listener is active
+    if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+    }
+
     channelRef.current = supabase
       .channel('pet-locations')
       .on(
@@ -227,55 +245,31 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   };
 
   // Function to update location in database (throttled)
-  const updateLocationInDatabase = async () => {
+  const updateLocationInDatabase = useCallback(async () => {
     if (!currentLocation || !isReady || userPets.length === 0) {
+      console.log('Skipping periodic location update: not ready, no current location, or no user pets.');
       return;
     }
+    // Only update if isReady is true and we have current location
+    await updatePetsAvailabilityInDB(true, currentLocation[0], currentLocation[1]);
+  }, [currentLocation, isReady, userPets, updatePetsAvailabilityInDB]);
 
-    try {
-      const [latitude, longitude] = currentLocation;
-      
-      console.log('Updating pet locations in database:', { latitude, longitude, petCount: userPets.length });
-      
-      // Update all user's pets with new location
-      const updates = userPets.map(pet => 
-        supabase
-          .from('pet_profiles')
-          .update({
-            latitude,
-            longitude,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', pet.id)
-      );
-
-      const results = await Promise.all(updates);
-      
-      // Check for errors in any of the updates
-      const errors = results.filter(result => result.error);
-      if (errors.length > 0) {
-        console.error('Location update errors:', errors);
-      } else {
-        console.log('Successfully updated pet locations');
-      }
-    } catch (error) {
-      console.error('Error updating pet locations:', error);
-    }
-  };
-
-  // Start/stop location update interval based on "Ready to Play" status
+  // Start/stop location update interval based on "Ready to Play" status and actual location availability
   useEffect(() => {
     if (isReady && currentLocation && userPets.length > 0) {
-      // Start 60-second interval for location updates
       console.log('Starting location update interval (60 seconds)');
+      // Clear any existing interval before setting a new one
+      if (locationUpdateIntervalRef.current) {
+        clearInterval(locationUpdateIntervalRef.current);
+      }
       locationUpdateIntervalRef.current = setInterval(() => {
         updateLocationInDatabase();
       }, 60000); // 60 seconds
 
-      // Update immediately when starting
+      // Update immediately when becoming ready
       updateLocationInDatabase();
     } else {
-      // Clear interval when not ready to play
+      // Clear interval when not ready to play or location is lost
       if (locationUpdateIntervalRef.current) {
         console.log('Stopping location update interval');
         clearInterval(locationUpdateIntervalRef.current);
@@ -290,90 +284,93 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         locationUpdateIntervalRef.current = null;
       }
     };
-  }, [isReady, currentLocation, userPets]);
+  }, [isReady, currentLocation, userPets, updateLocationInDatabase]);
 
-  const updateAvailabilityStatus = async (available: boolean) => {
+  // Complete the Ready to Play activation once we have coordinates and user intent
+  // This useEffect will trigger after requestLocation() successfully gets coordinates
+  useEffect(() => {
+    if (isReadyIntent && coordinates && hasPermission && !isReady) {
+      // Now that we have coordinates and permission, set actual ready state and update DB
+      setIsReady(true);
+      updatePetsAvailabilityInDB(true, coordinates.lat, coordinates.lng);
+      toast({
+        title: "Ready to Play!",
+        description: "Your pets are now visible to others on the map (location updates every 60 seconds)",
+      });
+    }
+  }, [isReadyIntent, coordinates, hasPermission, isReady, updatePetsAvailabilityInDB, toast]);
+
+  const handleReadyToPlayToggle = async (checked: boolean) => {
     if (userPets.length === 0) {
       toast({
         title: "Error",
-        description: "No pets found",
+        description: "No pets found to set ready status.",
         variant: "destructive",
       });
+      // Do not change isReadyIntent if there are no pets
       return;
     }
+    
+    // Immediately update user's intent in the UI
+    setIsReadyIntent(checked);
 
-    // Set user intent immediately for UI feedback
-    setIsReadyIntent(available);
-
-    // If toggling OFF, clear everything immediately
-    if (!available) {
-      try {
-        // Clear location tracking first
-        clearLocation();
-        
-        // Update database to clear availability and location
-        const updates = userPets.map(pet => 
-          supabase
-            .from('pet_profiles')
-            .update({
-              is_available: false,
-              latitude: null,
-              longitude: null,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', pet.id)
-        );
-
-        const results = await Promise.all(updates);
-        
-        // Check for errors in any of the updates
-        const errors = results.filter(result => result.error);
-        if (errors.length > 0) {
-          console.error('Update errors:', errors);
-          throw new Error('Failed to update some pets');
+    if (checked) { // User wants to be ready
+      if (!hasPermission || !coordinates) { // If we don't have active permission or coordinates
+        try {
+          console.log('Requesting location for Ready to Play...');
+          await requestLocation();
+          // The useEffect above will handle setting isReady and updating DB once coordinates are available.
+        } catch (err) {
+          console.error("Failed to request location:", err);
+          setIsReady(false); // Ensure actual ready state is off
+          setIsReadyIntent(false); // Reset intent if permission denied/error
+          toast({
+            title: "Location Required",
+            description: "Please allow location access to share your pet's location.",
+            variant: "destructive",
+          });
+          // Also clear database status if request fails
+          updatePetsAvailabilityInDB(false, null, null);
         }
-        
-        setIsReady(false);
-        setIsReadyIntent(false);
-        
+      } else {
+        // If hasPermission and coordinates already exist, trigger the useEffect manually
+        // or ensure it will fire. For robust re-prompts, requestLocation should handle it.
+        // For existing permission, we just confirm state.
+        if (!isReady) { // If intent is on, and we have location, but not yet ready
+            // Manually trigger the ready state update if useEffect hasn't caught up
+            setIsReady(true);
+            updatePetsAvailabilityInDB(true, coordinates.lat, coordinates.lng);
+            toast({
+              title: "Ready to Play!",
+              description: "Your pets are now visible to others on the map (location updates every 60 seconds)",
+            });
+        }
+      }
+    } else { // User wants to turn off 'Ready to Play'
+      try {
+        clearLocation(); // Tell the hook to stop location tracking
+        setIsReady(false); // Immediately reflect 'off' in UI
+        await updatePetsAvailabilityInDB(false, null, null); // Clear location in DB
         toast({
           title: "No longer available",
-          description: "Your pets have been removed from the map and location tracking stopped",
+          description: "Your pets have been removed from the map and location tracking stopped.",
         });
       } catch (error) {
-        console.error('Error updating availability:', error);
-        setIsReadyIntent(false);
+        console.error('Error turning off availability:', error);
+        // Reset intent if there's an error turning it off
+        setIsReadyIntent(true); // Revert UI switch if there was an error clearing status
         toast({
           title: "Error",
-          description: "Failed to update availability status",
+          description: "Failed to turn off availability status.",
           variant: "destructive",
         });
       }
-      return;
-    }
-
-    // If toggling ON, request location first (async completion handled by useEffect)
-    try {
-      console.log('Requesting location for Ready to Play...');
-      await requestLocation();
-      // The completeReadyToPlayActivation function will be called by useEffect
-      // once coordinates are available
-    } catch (error) {
-      console.error('Error requesting location:', error);
-      setIsReady(false);
-      setIsReadyIntent(false);
-      
-      toast({
-        title: "Location Required",
-        description: "Please allow location access to share your pet's location",
-        variant: "destructive",
-      });
     }
   };
 
   const handleLocationUpdate = (lat: number, lng: number) => {
-    // Location updates for map display only - database updates are handled by interval
-    // No database operations here to prevent excessive updates
+    // This function is for the `LocationTracker` to update the map view,
+    // not for initiating database updates, which are handled by the interval.
   };
 
   if (loading) {
@@ -394,14 +391,18 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         <CardContent className="p-4">
           <div className="flex items-center space-x-3">
             <Switch
-              checked={isReady}
-              onCheckedChange={updateAvailabilityStatus}
+              checked={isReadyIntent} // Control switch with user's intent
+              onCheckedChange={handleReadyToPlayToggle}
               disabled={userPets.length === 0}
             />
             <div>
               <p className="font-medium text-sm">Ready to Play</p>
               <p className="text-xs text-gray-500">
-                {locationPermission ? 'Share location with others' : 'Tap to enable location'}
+                {isReadyIntent && !currentLocation && hasPermission // User wants to be ready, has permission, but waiting for coordinates
+                    ? 'Waiting for location...'
+                    : locationPermission // User is ready and location is active
+                        ? 'Share location with others'
+                        : 'Tap to enable location'} {/* Not ready and no location */}
               </p>
             </div>
           </div>
@@ -430,7 +431,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
-        {locationPermission && currentLocation && (
+        {/* LocationTracker now only active when actual `isReady` is true and we have a current location */}
+        {isReady && currentLocation && (
           <LocationTracker onLocationUpdate={handleLocationUpdate} />
         )}
 
@@ -439,7 +441,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           <Marker 
             position={currentLocation}
             icon={divIcon({
-              html: `<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg"></div>`,
+              html: `<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg"></div>`, // Corrected to template literal
               className: 'current-location-marker',
               iconSize: [16, 16],
               iconAnchor: [8, 8],
@@ -494,8 +496,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           ))}
       </MapContainer>
 
-      {/* Location Permission Warning */}
-      {!locationPermission && (
+      {/* Location Permission Warning - shown if user intent is ON but no actual permission/location */}
+      {isReadyIntent && !locationPermission && (
         <div className="absolute bottom-4 left-4 right-4 z-[1000]">
           <Card className="bg-orange-50 border-orange-200">
             <CardContent className="p-4">
@@ -507,11 +509,11 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     Enable location sharing to find pets near you and let others discover your pets.
                   </p>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
     </div>
   );
 };
