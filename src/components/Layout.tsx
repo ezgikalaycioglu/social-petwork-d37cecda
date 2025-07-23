@@ -26,8 +26,8 @@ const Layout = ({ children }: LayoutProps) => {
       {/* Main Content */}
       <main className={`${
         showNavigation 
-          ? 'md:ml-64 pt-14 pb-20 md:pt-0 md:pb-0' // Add top padding for mobile top nav, left margin for desktop sidebar, bottom padding for mobile nav
-          : ''
+          ? 'md:ml-64 pt-14 pb-20 md:pt-0 md:pb-0 min-h-screen' // Add top padding for mobile top nav, left margin for desktop sidebar, bottom padding for mobile nav
+          : 'min-h-screen'
       }`}>
         {children}
       </main>
