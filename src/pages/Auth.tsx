@@ -32,15 +32,31 @@ const Auth = () => {
       return;
     }
 
-    // Check if user is already logged in
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    // Handle email verification callback
+    const handleEmailVerification = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Auth session error:', error);
+        toast({
+          title: "Verification Error",
+          description: "There was an issue verifying your email. Please try signing in.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (session) {
+        toast({
+          title: "Email verified!",
+          description: "Your account has been successfully verified.",
+        });
         navigate('/dashboard');
       }
     };
-    checkAuth();
-  }, [navigate, searchParams]);
+
+    handleEmailVerification();
+  }, [navigate, searchParams, toast]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +68,7 @@ const Auth = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`
+            emailRedirectTo: `${window.location.origin}/auth`
           }
         });
 
