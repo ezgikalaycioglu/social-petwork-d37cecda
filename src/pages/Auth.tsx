@@ -32,34 +32,8 @@ const Auth = () => {
     const resetParam = searchParams.get('reset');
     if (resetParam === 'true') {
       setIsPasswordReset(true);
-      return;
     }
-
-    // Handle email verification callback
-    const handleEmailVerification = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('Auth session error:', error);
-        toast({
-          title: "Verification Error",
-          description: "There was an issue verifying your email. Please try signing in.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (session) {
-        toast({
-          title: "Email verified!",
-          description: "Your account has been successfully verified.",
-        });
-        navigate('/dashboard');
-      }
-    };
-
-    handleEmailVerification();
-  }, [navigate, searchParams, toast]);
+  }, [searchParams]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,17 +68,17 @@ const Auth = () => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth`
-          }
         });
 
         if (error) throw error;
 
         toast({
           title: "Account created!",
-          description: "Please check your email to verify your account.",
+          description: "You can now sign in with your credentials.",
         });
+        
+        // Redirect to dashboard after successful signup
+        navigate('/dashboard');
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
