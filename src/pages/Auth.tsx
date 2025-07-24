@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { validateEmail } from '@/utils/validation';
+import { useSecurity } from '@/hooks/useSecurity';
 import { Eye, EyeOff, Heart, PawPrint, ArrowLeft, Mail, Lock, User } from 'lucide-react';
 import authIllustration from '@/assets/auth-pets-illustration.jpg';
 
@@ -23,6 +25,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
+  const { checkRateLimit, logSecurityEvent, generateCSRFToken } = useSecurity();
 
   useEffect(() => {
     // Check if this is a password reset callback
@@ -62,6 +65,30 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Check rate limiting for authentication attempts
+    const rateLimitCheck = await checkRateLimit(email, {
+      action: isSignUp ? 'signup' : 'signin',
+      maxAttempts: 5,
+      windowMinutes: 15
+    });
+
+    if (!rateLimitCheck.allowed) {
+      await logSecurityEvent({
+        event_type: 'rate_limit_exceeded',
+        email,
+        details: { action: isSignUp ? 'signup' : 'signin' },
+        severity: 'medium'
+      });
+      
+      toast({
+        title: "Too many attempts",
+        description: "Please wait before trying again.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({
@@ -95,6 +122,17 @@ const Auth = () => {
         navigate('/dashboard');
       }
     } catch (error: any) {
+      // Log failed authentication attempts
+      await logSecurityEvent({
+        event_type: 'failed_login',
+        email,
+        details: { 
+          error: error.message,
+          action: isSignUp ? 'signup' : 'signin'
+        },
+        severity: 'medium'
+      });
+
       toast({
         title: "Error",
         description: error.message,

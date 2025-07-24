@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import { useSecurity } from '@/hooks/useSecurity';
 import { Gift } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 import { 
@@ -29,6 +30,7 @@ interface CreateDealModalProps {
 
 const CreateDealModal: React.FC<CreateDealModalProps> = ({ businessProfile, onClose, onCreated }) => {
   const { toast } = useToast();
+  const { checkRateLimit, logSecurityEvent } = useSecurity();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
@@ -128,6 +130,32 @@ const CreateDealModal: React.FC<CreateDealModalProps> = ({ businessProfile, onCl
       toast({
         title: "Validation Error",
         description: "Please fix the errors below and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check rate limiting for deal creation
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const rateLimitCheck = await checkRateLimit(user.id, {
+      action: 'deal_creation',
+      maxAttempts: 5,
+      windowMinutes: 30
+    });
+
+    if (!rateLimitCheck.allowed) {
+      await logSecurityEvent({
+        event_type: 'rate_limit_exceeded',
+        user_id: user.id,
+        details: { action: 'deal_creation' },
+        severity: 'medium'
+      });
+      
+      toast({
+        title: "Too many attempts",
+        description: "Please wait before trying again.",
         variant: "destructive",
       });
       return;

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useSecurity } from '@/hooks/useSecurity';
 import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 import { Building2 } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
@@ -28,6 +29,7 @@ interface BusinessProfileFormProps {
 
 const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onClose, onSave }) => {
   const { toast } = useToast();
+  const { checkRateLimit, logSecurityEvent, generateCSRFToken } = useSecurity();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
@@ -61,6 +63,32 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
       toast({
         title: "Validation Error",
         description: "Please fix the errors below and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check rate limiting for business profile creation/updates
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const rateLimitCheck = await checkRateLimit(user.id, {
+      action: 'business_profile_update',
+      maxAttempts: 3,
+      windowMinutes: 10
+    });
+
+    if (!rateLimitCheck.allowed) {
+      await logSecurityEvent({
+        event_type: 'rate_limit_exceeded',
+        user_id: user.id,
+        details: { action: 'business_profile_update' },
+        severity: 'medium'
+      });
+      
+      toast({
+        title: "Too many attempts",
+        description: "Please wait before trying again.",
         variant: "destructive",
       });
       return;
