@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, User, Bell, Loader2, LogOut, Globe, Smartphone, ChevronDown } from 'lucide-react';
+import { Settings, User, Bell, Loader2, LogOut, Globe, Smartphone, ChevronDown, Shield, ExternalLink } from 'lucide-react';
 import Layout from '@/components/Layout';
 import type { Tables } from '@/integrations/supabase/types';
 import PushNotificationSettings from '@/components/PushNotificationSettings';
@@ -462,6 +462,30 @@ const UserSettings = () => {
                       </FormItem>
                     )}
                   />
+                </CardContent>
+              </Card>
+
+              {/* Privacy & Legal Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    Privacy & Legal
+                  </CardTitle>
+                  <CardDescription>
+                    Review our privacy policy and data handling practices
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate('/privacy')}
+                    className="w-full justify-between"
+                  >
+                    Privacy Policy
+                    <ExternalLink className="w-4 h-4" />
+                  </Button>
                 </CardContent>
               </Card>
 

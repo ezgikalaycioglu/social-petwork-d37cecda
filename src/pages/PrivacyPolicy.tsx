@@ -11,7 +11,7 @@ const PrivacyPolicy = () => {
               Privacy Policy for Pawcult
             </CardTitle>
             <p className="text-muted-foreground mt-4">
-              Pawcult ("we", "our", or "the app") is a social application developed with Lovable.dev and powered by Supabase. 
+              Pawcult("We") is a social application developed with Lovable.dev and powered by Supabase. 
               This Privacy Policy outlines what data we collect, how we use it, and your rights regarding your personal information.
             </p>
           </CardHeader>
