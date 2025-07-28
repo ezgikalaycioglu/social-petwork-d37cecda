@@ -41,6 +41,7 @@ import Profile from "./pages/Profile";
 import CreatePost from "./pages/CreatePost";
 import Notifications from "./pages/Notifications";
 import PackSettingsPage from "./components/PackSettingsPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 
 const queryClient = new QueryClient({
@@ -65,6 +66,7 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/changelog" element={<ChangelogPage />} />
                 
                 {/* Protected Routes */}

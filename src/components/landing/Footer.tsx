@@ -14,6 +14,10 @@ const Footer = () => {
     navigate('/changelog');
   };
 
+  const handlePrivacyClick = () => {
+    navigate('/privacy');
+  };
+
   return (
     <footer className="bg-gray-900 text-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -48,7 +52,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <button 
-                  onClick={handleLinkClick}
+                  onClick={handlePrivacyClick}
                   className="text-gray-400 hover:text-white transition-colors text-left"
                 >
                   Privacy Policy
