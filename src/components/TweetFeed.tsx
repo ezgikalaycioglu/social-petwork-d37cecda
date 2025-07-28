@@ -80,8 +80,15 @@ export const TweetFeed: React.FC = () => {
           created_at,
           pet_id,
           owner_id,
-          pet_profiles!inner(name, profile_photo_url, breed)
+          pet_profiles!inner(
+            name, 
+            profile_photo_url, 
+            breed, 
+            user_id,
+            user_profiles!inner(is_private)
+          )
         `)
+        .eq('pet_profiles.user_profiles.is_private', false)
         .order('created_at', { ascending: false })
         .range(currentOffset, currentOffset + TWEETS_PER_PAGE - 1);
 

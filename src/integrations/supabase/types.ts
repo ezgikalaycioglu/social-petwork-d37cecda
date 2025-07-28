@@ -1431,6 +1431,7 @@ export type Database = {
           display_name: string | null
           email: string | null
           id: string
+          is_private: boolean | null
           neighborhood: string | null
           tour_completed: boolean | null
           updated_at: string | null
@@ -1441,6 +1442,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id: string
+          is_private?: boolean | null
           neighborhood?: string | null
           tour_completed?: boolean | null
           updated_at?: string | null
@@ -1451,6 +1453,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          is_private?: boolean | null
           neighborhood?: string | null
           tour_completed?: boolean | null
           updated_at?: string | null
@@ -1563,6 +1566,10 @@ export type Database = {
       }
       cleanup_security_events: {
         Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      delete_user_account: {
+        Args: { user_id_to_delete: string }
         Returns: undefined
       }
       generate_redemption_code: {

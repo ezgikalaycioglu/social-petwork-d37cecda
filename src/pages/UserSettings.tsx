@@ -10,13 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, User, Bell, Loader2, LogOut, Globe, Smartphone, ChevronDown, Shield, ExternalLink } from 'lucide-react';
+import { Settings, User, Bell, Loader2, LogOut, Globe, Smartphone, ChevronDown, Shield, ExternalLink, Trash2, Eye, EyeOff } from 'lucide-react';
 import Layout from '@/components/Layout';
 import type { Tables } from '@/integrations/supabase/types';
 import PushNotificationSettings from '@/components/PushNotificationSettings';
 import { useAuth } from '@/contexts/AuthContext';
 import PWAInstallContent from '@/components/PWAInstallContent';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 type UserProfile = Tables<'user_profiles'>;
 type NotificationPreferences = Tables<'notification_preferences'>;
@@ -30,6 +31,7 @@ interface SettingsFormData {
   eventReminders: boolean;
   newFollowerAlerts: boolean;
   weeklyNewsletter: boolean;
+  isPrivate: boolean;
 }
 
 const UserSettings = () => {
@@ -51,6 +53,7 @@ const UserSettings = () => {
       eventReminders: true,
       newFollowerAlerts: true,
       weeklyNewsletter: false,
+      isPrivate: false,
     },
   });
 
@@ -111,6 +114,7 @@ const UserSettings = () => {
         eventReminders: preferences?.event_reminders ?? true,
         newFollowerAlerts: preferences?.new_follower_alerts ?? true,
         weeklyNewsletter: preferences?.weekly_newsletter ?? false,
+        isPrivate: profile?.is_private ?? false,
       });
     } catch (error) {
       console.error('Error loading user settings:', error);
@@ -135,6 +139,7 @@ const UserSettings = () => {
           display_name: data.displayName || null,
           city: data.city || null,
           neighborhood: data.neighborhood || null,
+          is_private: data.isPrivate,
           updated_at: new Date().toISOString(),
         });
 
@@ -194,6 +199,33 @@ const UserSettings = () => {
       toast({
         title: "Error",
         description: "Failed to sign out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!userId) return;
+
+    try {
+      const { error } = await supabase.rpc('delete_user_account', {
+        user_id_to_delete: userId
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Account Deleted",
+        description: "Your account and all associated data have been permanently deleted.",
+      });
+
+      // Navigate to home page since user is now deleted
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete your account. Please try again.",
         variant: "destructive",
       });
     }
@@ -462,6 +494,92 @@ const UserSettings = () => {
                       </FormItem>
                     )}
                   />
+                </CardContent>
+              </Card>
+
+              {/* Privacy Settings Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Eye className="w-5 h-5" />
+                    Privacy Settings
+                  </CardTitle>
+                  <CardDescription>
+                    Control who can see your content and pets
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <FormField
+                    control={form.control}
+                    name="isPrivate"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base flex items-center gap-2">
+                            {field.value ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            Private Account
+                          </FormLabel>
+                          <div className="text-sm text-gray-600">
+                            When enabled, your pets won't appear in discovery and your tweets will be hidden from public feeds
+                          </div>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Account Management Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Trash2 className="w-5 h-5" />
+                    Account Management
+                  </CardTitle>
+                  <CardDescription>
+                    Permanently delete your account and all associated data
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" className="w-full">
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete My Account
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete your account and remove all of your data from our servers, including:
+                          <ul className="list-disc list-inside mt-2 space-y-1">
+                            <li>Your profile and pets</li>
+                            <li>All tweets and interactions</li>
+                            <li>Pack memberships and messages</li>
+                            <li>Sitter profiles and bookings</li>
+                            <li>Business profiles and deals</li>
+                            <li>All photos and adventures</li>
+                          </ul>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDeleteAccount}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          Yes, Delete My Account
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </CardContent>
               </Card>
 
