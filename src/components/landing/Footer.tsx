@@ -1,6 +1,6 @@
 
 import { Separator } from '@/components/ui/separator';
-import { Heart, Facebook, Twitter, Instagram } from 'lucide-react';
+import { Heart, Linkedin, Twitter, Instagram } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
@@ -32,17 +32,17 @@ const Footer = () => {
               adventures, and community support.
             </p>
             <div className="flex space-x-4">
-              <Facebook 
+              <Linkedin 
                 className="h-6 w-6 text-gray-400 hover:text-white cursor-pointer transition-colors" 
-                onClick={handleLinkClick}
+                onClick={() => window.open('https://www.linkedin.com/company/pawcult', '_blank')}
               />
               <Twitter 
                 className="h-6 w-6 text-gray-400 hover:text-white cursor-pointer transition-colors" 
-                onClick={handleLinkClick}
+                onClick={() => window.open('https://x.com/CultPaw83135', '_blank')}
               />
               <Instagram 
                 className="h-6 w-6 text-gray-400 hover:text-white cursor-pointer transition-colors" 
-                onClick={handleLinkClick}
+                onClick={() => window.open('https://www.instagram.com/pawcultapp/', '_blank')}
               />
             </div>
           </div>
