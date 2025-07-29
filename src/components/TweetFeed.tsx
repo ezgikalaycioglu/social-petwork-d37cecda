@@ -63,6 +63,8 @@ export const TweetFeed: React.FC = () => {
   // Fetch tweets
   const fetchTweets = useCallback(async (isInitial = true) => {
     try {
+      console.log('🔄 Fetching tweets...', { isInitial, currentOffset: isInitial ? 0 : offset });
+      
       if (isInitial) {
         setLoading(true);
       } else {
@@ -71,6 +73,7 @@ export const TweetFeed: React.FC = () => {
 
       const currentOffset = isInitial ? 0 : offset;
 
+      // Simplified query - let's first get tweets loading, then add privacy filter
       const { data, error } = await supabase
         .from('pet_tweets')
         .select(`
@@ -83,16 +86,16 @@ export const TweetFeed: React.FC = () => {
           pet_profiles!inner(
             name, 
             profile_photo_url, 
-            breed, 
-            user_id,
-            user_profiles!inner(is_private)
+            breed
           )
         `)
-        .eq('pet_profiles.user_profiles.is_private', false)
         .order('created_at', { ascending: false })
         .range(currentOffset, currentOffset + TWEETS_PER_PAGE - 1);
 
+      console.log('📊 Tweet query result:', { data, error, dataLength: data?.length });
+
       if (error) {
+        console.error('❌ Tweet fetch error:', error);
         const authErrorHandled = await handleAuthError(error, navigate);
         if (authErrorHandled.shouldSignOut) {
           return;
@@ -101,6 +104,7 @@ export const TweetFeed: React.FC = () => {
       }
 
       const newTweets = (data || []) as Tweet[];
+      console.log('✅ Processed tweets:', newTweets.length);
 
       if (isInitial) {
         setTweets(newTweets);
