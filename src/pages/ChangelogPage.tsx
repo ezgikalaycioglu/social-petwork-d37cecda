@@ -7,6 +7,57 @@ const changelogContent = `# Changelog
 
 Welcome to the changelog for PawCult! Here you can follow our journey as we build the ultimate social app for pets and their parents, one feature at a time.
 
+### **July 21 - July 27, 2025**
+
+🚀 Launch & Major Mobile Improvements!
+
+This week was a whirlwind of excitement as we officially launched in Sweden and rolled out a massive update to the mobile experience!
+
+* **📱 Sleek New Mobile Experience:** We've completely revamped the mobile view! It's now more beautiful, user-friendly, and accessible on the go.
+* **🇸🇪 Sweden, Meet PawCult!** The app has officially launched to friends and communities in Sweden. The marketing journey has begun!
+* **🗺️ A Welcoming Guide:** New users will now be greeted with a helpful app tour to guide them through all of PawCult's amazing features.
+* **🔒 Fort Knox Security:** We've tackled a ton of security issues to make the platform safer and more secure for you and your furry friends.
+* **📬 Contact Us with a Click:** We've made it easier than ever to get in touch by adding a new "Contact Me" section.
+* **🤖 Android App on the Horizon:** Get ready for more growth! The Google Play app is just a few days away from launching.
+
+### **July 14 - July 20, 2025**
+
+🔧 Building the Future: Pet Sitter Marketplace!
+
+This week was all about laying the groundwork for one of our most requested features: a pet sitter marketplace.
+
+* **🐛 Critical Bug Fix:** We successfully diagnosed and fixed a critical bug that was preventing the new pet sitter section from loading.
+* **🗺️ Blueprint Finalized:** We finalized the entire blueprint for the pet sitter marketplace feature, including detailed plans for sitter profiles, search functionality, and booking management pages.
+
+### **July 7 - July 13, 2025**
+
+🛠️ Rock-Solid & User-Friendly!
+
+We dedicated this week to making the app more reliable and enjoyable to use, tackling some major bugs and UI improvements.
+
+* **🐛 Critical Bugs Squashed:** We've permanently solved the frustrating app loading stalls that happened after login and after granting location permission.
+* **✨ Upgraded PWA Experience:** The PWA bottom navigation bar is now bigger, more responsive, and always visible. We also created proper home screen icons from the app logo.
+* **⬆️ Improved Navigation:** We've added a much-needed "Back" button to the Sign In/Sign Up pages and implemented a persistent navigation system for both desktop and mobile.
+* **🔋 Optimized Performance:** The "Ready to Play" feature now updates your location at a battery-friendly 60-second interval.
+
+### **June 30 - July 6, 2025**
+
+🔋 Strengthening the Foundation!
+
+This week was all about strengthening the foundation of the app and fixing critical bugs.
+
+* **📲 Push Notification Opt-Ins:** We've implemented the complete user-facing flow for push notification opt-ins, from the UI toggle to storing the subscription token.
+* **🐞 Major Bug Diagnosis:** We diagnosed a major app-loading bug caused by expired sessions and created a detailed plan to fix it permanently.
+
+### **June 23 - June 29, 2025**
+
+🚀 A Week of Massive Progress!
+
+This was an incredibly productive week, with a major overhaul of the landing page and a huge number of core application features implemented.
+
+* **🗣️ Landing Page Overhaul (Based on Community Feedback):** Restructured the landing page to build user trust and improve clarity. Improved color contrast and humanized all the text. Removed placeholder testimonials.
+* **🛠️ Core App Development:** We implemented a huge suite of features from our roadmap, including secure backend and authentication, a brand new changelog, improved user and pet profiles, the real-time map-based "Playdate Finder," a social feed, a notification system, and the initial framework for business profiles and discounts.
+
 ### **June 27, 2025**
 
 This update focuses on stability and adding a feature with real-world impact. We've also integrated analytics to start making data-driven decisions.
