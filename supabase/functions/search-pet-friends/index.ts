@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
       excludedPetIds.add(f.requester_pet_id === petId ? f.recipient_pet_id : f.requester_pet_id);
     });
 
-    // Search for pets by name and join with user profiles for owner names
+    // Search for pets by pet_username only
     const { data: searchResults, error: searchError } = await supabase
       .from('pet_profiles')
       .select(`
@@ -86,9 +86,7 @@ Deno.serve(async (req) => {
       `)
       .neq('id', petId)
       .eq('is_available', true)
-      .or(
-        `name.ilike.%${searchQuery}%,user_profiles.display_name.ilike.%${searchQuery}%`
-      )
+      .ilike('pet_username', `%${searchQuery}%`)
       .not('latitude', 'is', null)
       .not('longitude', 'is', null)
       .limit(20);

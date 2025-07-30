@@ -864,6 +864,7 @@ export type Database = {
           longitude: number | null
           name: string
           personality_traits: string[] | null
+          pet_username: string
           photos: string[] | null
           profile_photo_url: string | null
           unique_code: string | null
@@ -885,6 +886,7 @@ export type Database = {
           longitude?: number | null
           name: string
           personality_traits?: string[] | null
+          pet_username: string
           photos?: string[] | null
           profile_photo_url?: string | null
           unique_code?: string | null
@@ -906,6 +908,7 @@ export type Database = {
           longitude?: number | null
           name?: string
           personality_traits?: string[] | null
+          pet_username?: string
           photos?: string[] | null
           profile_photo_url?: string | null
           unique_code?: string | null
@@ -1578,6 +1581,10 @@ export type Database = {
       }
       generate_redemption_code: {
         Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_unique_pet_username: {
+        Args: { base_name: string }
         Returns: string
       }
     }

@@ -8,6 +8,7 @@ import { Heart, X, MapPin, Star, Loader2, Search, Users } from 'lucide-react';
 import { useLocation } from '@/hooks/useLocation';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useUserPetUsernames } from '@/hooks/useUserPetUsernames';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -37,6 +38,7 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
   const [processingAction, setProcessingAction] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const { coordinates, loading: locationLoading, error: locationError } = useLocation();
+  const { petUsernames } = useUserPetUsernames();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -79,7 +81,7 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
     if (!searchQuery.trim()) {
       toast({
         title: "Enter Search Query",
-        description: "Please enter a pet name or owner name to search.",
+        description: "Please enter a pet username to search.",
         variant: "destructive",
       });
       return;
@@ -242,7 +244,7 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
           <div className="relative">
             <Input
               type="text"
-              placeholder="Search by pet name or owner name..."
+              placeholder="Find by pet username..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pr-12"
@@ -260,6 +262,11 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
               )}
             </Button>
           </div>
+          {petUsernames.length > 0 && (
+            <p className="text-sm text-gray-500 mt-2">
+              Your pet usernames are: {petUsernames.join(', ')}
+            </p>
+          )}
         </form>
       </div>
 
@@ -299,6 +306,10 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
                           </Badge>
                         )}
                       </div>
+                      
+                      {pet.pet_username && (
+                        <p className="text-sm text-primary font-medium mb-1">@{pet.pet_username}</p>
+                      )}
                       
                       <p className="text-sm text-gray-600 mb-1">{pet.breed}</p>
                       
@@ -343,7 +354,7 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
               <div className="text-4xl mb-4">🔍</div>
               <h3 className="text-lg font-semibold text-gray-700 mb-2">No results found</h3>
               <p className="text-gray-500">
-                Try searching with a different pet name or owner name.
+                Try searching with a different pet username.
               </p>
             </div>
           ) : null}
@@ -427,6 +438,10 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
                         </Badge>
                       )}
                     </div>
+                    
+                    {currentMatch.pet_username && (
+                      <p className="text-lg text-primary font-semibold mb-2">@{currentMatch.pet_username}</p>
+                    )}
                     <p className="text-gray-600 mb-3">{currentMatch.breed}</p>
                     
                     {currentMatch.bio && (

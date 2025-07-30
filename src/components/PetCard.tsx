@@ -73,6 +73,10 @@ const PetCard: React.FC<PetCardProps> = ({
               )}
             </div>
             
+            {pet.pet_username && (
+              <p className="text-sm text-primary font-medium mb-1">@{pet.pet_username}</p>
+            )}
+            
             <p className="text-sm text-gray-600 mb-2">{pet.breed}</p>
             
             {pet.bio && (
