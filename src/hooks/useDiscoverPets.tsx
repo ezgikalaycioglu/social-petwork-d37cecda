@@ -30,7 +30,7 @@ export const useDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseDiscover
           .from('pet_profiles')
           .select(`
             *,
-            user_profiles!inner(is_private)
+            user_profiles!pet_profiles_user_id_fkey(is_private)
           `)
           .eq('user_profiles.is_private', false)
           .limit(12);
@@ -62,7 +62,7 @@ export const useDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseDiscover
         .from('pet_profiles')
         .select(`
           *,
-          user_profiles!inner(is_private)
+          user_profiles!pet_profiles_user_id_fkey(is_private)
         `)
         .eq('user_profiles.is_private', false);
 
