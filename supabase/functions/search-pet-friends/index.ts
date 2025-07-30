@@ -80,10 +80,7 @@ Deno.serve(async (req) => {
     // Search for pets by pet_username only
     const { data: searchResults, error: searchError } = await supabase
       .from('pet_profiles')
-      .select(`
-        *,
-        user_profiles!inner(display_name)
-      `)
+      .select('*')
       .neq('id', petId)
       .eq('is_available', true)
       .ilike('pet_username', `%${searchQuery}%`)
@@ -98,6 +95,16 @@ Deno.serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Get user profiles for owner names
+    const userIds = [...new Set(searchResults?.map(pet => pet.user_id) || [])];
+    const { data: userProfiles } = await supabase
+      .from('user_profiles')
+      .select('id, display_name')
+      .in('id', userIds);
+
+    // Create a map for quick lookup
+    const userProfileMap = new Map(userProfiles?.map(profile => [profile.id, profile.display_name]) || []);
 
     // Transform results and calculate distances
     const results: PetWithOwner[] = [];
@@ -130,7 +137,7 @@ Deno.serve(async (req) => {
         bio: pet.bio,
         vaccination_status: pet.vaccination_status,
         user_id: pet.user_id,
-        owner_name: pet.user_profiles?.display_name || null,
+        owner_name: userProfileMap.get(pet.user_id) || null,
         distance
       });
     }
