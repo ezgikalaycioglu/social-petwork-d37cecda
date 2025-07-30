@@ -204,6 +204,32 @@ const UserSettings = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!userId) return;
+
+    try {
+      const { error } = await supabase.rpc('delete_user_account', {
+        user_id_to_delete: userId
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Account Deleted",
+        description: "Your account and all associated data have been permanently deleted.",
+      });
+
+      // Navigate to home page since user is now deleted
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete your account. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -520,30 +546,40 @@ const UserSettings = () => {
                     Permanently delete your account and all associated data
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <Trash2 className="h-5 w-5 text-destructive mt-0.5" />
-                      <div className="text-sm">
-                        <p className="font-medium text-destructive">Danger Zone</p>
-                        <p className="text-muted-foreground mt-1">
-                          Account deletion requires secure verification and cannot be undone.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => {
-                      console.log('Delete account button clicked, navigating to /delete-account');
-                      navigate('/delete-account');
-                    }}
-                    className="w-full"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete My Account
-                  </Button>
+                <CardContent>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" className="w-full">
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete My Account
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete your account and remove all of your data from our servers, including:
+                          <ul className="list-disc list-inside mt-2 space-y-1">
+                            <li>Your profile and pets</li>
+                            <li>All tweets and interactions</li>
+                            <li>Pack memberships and messages</li>
+                            <li>Sitter profiles and bookings</li>
+                            <li>Business profiles and deals</li>
+                            <li>All photos and adventures</li>
+                          </ul>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDeleteAccount}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          Yes, Delete My Account
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </CardContent>
               </Card>
 
