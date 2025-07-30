@@ -26,13 +26,25 @@ export const useDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseDiscover
     try {
       // If user has no pets, we can show all pets from non-private accounts
       if (userPetIds.length === 0) {
+        // First get non-private users
+        const { data: nonPrivateUsers, error: usersError } = await supabase
+          .from('user_profiles')
+          .select('id')
+          .or('is_private.is.null,is_private.eq.false');
+
+        if (usersError) throw usersError;
+
+        const nonPrivateUserIds = nonPrivateUsers?.map(u => u.id) || [];
+        
+        if (nonPrivateUserIds.length === 0) {
+          setAvailablePets([]);
+          return;
+        }
+
         const { data, error } = await supabase
           .from('pet_profiles')
-          .select(`
-            *,
-            user_profiles!inner(is_private)
-          `)
-          .eq('user_profiles.is_private', false)
+          .select('*')
+          .in('user_id', nonPrivateUserIds)
           .limit(12);
 
         if (error) throw error;
@@ -57,14 +69,26 @@ export const useDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseDiscover
       // Combine user's own pets and their friends/pending requests to exclude
       const excludedPetIds = [...new Set([...userPetIds, ...friendIds])];
 
+      // Get non-private users first
+      const { data: nonPrivateUsers, error: usersError } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .or('is_private.is.null,is_private.eq.false');
+
+      if (usersError) throw usersError;
+
+      const nonPrivateUserIds = nonPrivateUsers?.map(u => u.id) || [];
+      
+      if (nonPrivateUserIds.length === 0) {
+        setAvailablePets([]);
+        return;
+      }
+
       // 2. Fetch pets excluding the ones already connected to user and from private accounts
       let query = supabase
         .from('pet_profiles')
-        .select(`
-          *,
-          user_profiles!inner(is_private)
-        `)
-        .eq('user_profiles.is_private', false);
+        .select('*')
+        .in('user_id', nonPrivateUserIds);
 
       // Only apply the exclusion filter if there are pets to exclude
       if (excludedPetIds.length > 0) {
