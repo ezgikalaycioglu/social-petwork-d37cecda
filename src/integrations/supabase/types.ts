@@ -1560,6 +1560,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_view_user_content: {
+        Args: { content_owner_id: string; viewer_id: string }
+        Returns: boolean
+      }
       cleanup_rate_limit_attempts: {
         Args: Record<PropertyKey, never>
         Returns: undefined
