@@ -26,25 +26,65 @@ Deno.serve(async (req) => {
 
     console.log('Attempting to verify user credentials for:', email);
 
-    // First, verify the user credentials
-    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
-      email,
-      password,
-    });
+    // Get the authorization header to check if user is already authenticated
+    const authHeader = req.headers.get('authorization');
+    let userId: string;
 
-    if (authError) {
-      console.error('Authentication failed:', authError);
-      return new Response(
-        JSON.stringify({ error: 'Invalid credentials' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+    if (authHeader) {
+      // User is already authenticated, verify their identity matches the email
+      const { data: { user }, error: userError } = await supabaseClient.auth.getUser(authHeader.replace('Bearer ', ''));
+      
+      if (userError || !user || user.email !== email) {
+        console.error('User verification failed:', userError);
+        return new Response(
+          JSON.stringify({ error: 'Invalid credentials or unauthorized access' }),
+          { 
+            status: 401, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+
+      // Still verify password by attempting sign in
+      const { error: passwordError } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (passwordError) {
+        console.error('Password verification failed:', passwordError);
+        return new Response(
+          JSON.stringify({ error: 'Invalid credentials' }),
+          { 
+            status: 401, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+
+      userId = user.id;
+      console.log('Authenticated user verified for deletion:', userId);
+    } else {
+      // User is not authenticated, verify credentials normally
+      const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        console.error('Authentication failed:', authError);
+        return new Response(
+          JSON.stringify({ error: 'Invalid credentials' }),
+          { 
+            status: 401, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+
+      userId = authData.user.id;
+      console.log('Authentication successful for user:', userId);
     }
-
-    const userId = authData.user.id;
-    console.log('Authentication successful for user:', userId);
 
     // Call the database function to delete all user data
     console.log('Calling delete_user_account function...');
