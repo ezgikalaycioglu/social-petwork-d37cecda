@@ -595,15 +595,16 @@ const UserSettings = () => {
                             <li>All photos and interactions</li>
                           </ul>
                           <p className="mt-2 font-medium">Your account will remain active and you can start fresh.</p>
+                          <p className="mt-2 text-sm">For security, you'll need to verify your credentials on the next page.</p>
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={handleDeleteAllData}
+                          onClick={() => navigate('/delete-data')}
                           className="bg-orange-600 hover:bg-orange-700"
                         >
-                          Yes, Delete All Data
+                          Continue to Secure Deletion
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -630,15 +631,16 @@ const UserSettings = () => {
                             <li>Business profiles and deals</li>
                             <li>All photos and adventures</li>
                           </ul>
+                          <p className="mt-2 text-sm">For security, you'll need to verify your credentials on the next page.</p>
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={handleDeleteAccount}
+                          onClick={() => navigate('/delete-account')}
                           className="bg-red-600 hover:bg-red-700"
                         >
-                          Yes, Delete My Account
+                          Continue to Account Deletion
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
