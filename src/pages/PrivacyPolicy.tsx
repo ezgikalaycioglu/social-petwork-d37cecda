@@ -1,181 +1,175 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import React from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import GlobalNavBar from '@/components/GlobalNavBar';
 
 const PrivacyPolicy = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-background">
+      <GlobalNavBar />
+      
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold text-primary">
-              Privacy Policy for Pawcult
-            </CardTitle>
-            <p className="text-muted-foreground mt-4">
-              Pawcult ("we", "our", or "the app") is a social application developed with Lovable.dev and powered by Supabase. 
-              This Privacy Policy outlines what data we collect, how we use it, and your rights regarding your personal information.
-            </p>
-          </CardHeader>
+        <div className="mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
           
-          <CardContent className="space-y-8">
-            <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">1. What Data We Collect</h2>
-              <p className="text-muted-foreground mb-4">
-                We collect and process the following data from users:
-              </p>
-              
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">Email address & password:</h3>
-                  <p className="text-muted-foreground">
-                    Required for secure login and account creation. We do not use third-party login methods (e.g., Google, Facebook).
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">Location data:</h3>
-                  <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
-                    <li>Requested at login and again on the Pet Map screen</li>
-                    <li>Only stored and shared when the user toggles "Ready to Play" ON</li>
-                    <li>When OFF, location tracking and storage stop</li>
-                    <li>Permission remains active until manually revoked via device settings</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">Photos & media:</h3>
-                  <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
-                    <li>Users can upload images for pet profiles or pet tweets</li>
-                    <li>Only files explicitly selected by the user are accessed</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">Pet profiles:</h3>
-                  <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
-                    <li>Users can create public or private pet profiles, including pet usernames</li>
-                    <li>Users can search for others via pet usernames to send friend requests</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">Activity visibility:</h3>
-                  <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
-                    <li>Users can set their profile to "Private"</li>
-                    <li>If private, your activities (tweets, pet profiles, events, and appearance in Discover) are only visible to accepted friends</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">App features used:</h3>
-                  <p className="text-muted-foreground">
-                    Events, pet sitters, businesses, deals, groups ("packs"), likes, comments
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">AI Paw Coach:</h3>
-                  <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
-                    <li>Sends pet-related questions to OpenAI</li>
-                    <li>No sensitive personal data (like email or password) is transmitted</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">Analytics (Mixpanel):</h3>
-                  <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
-                    <li>The app contains code for feature usage tracking (e.g., "Pet Profile Created")</li>
-                    <li>Tracking is currently disabled in production</li>
-                  </ul>
-                </div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Privacy Policy for Pawcult</h1>
+          <p className="text-muted-foreground">
+            Pawcult ("we", "our", or "the app") is a social application developed with Lovable.dev and powered by Supabase. This Privacy Policy outlines what data we collect, how we use it, and your rights regarding your personal information.
+          </p>
+        </div>
+
+        <div className="bg-card rounded-lg shadow-sm p-6 space-y-8">
+          
+          <section>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">1. What Data We Collect</h2>
+            <p className="text-muted-foreground mb-4">
+              We collect and process the following data from users:
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-2">Email address & password:</h3>
+                <p className="text-muted-foreground">
+                  Required for secure login and account creation. We do not support third-party login methods.
+                </p>
               </div>
-            </section>
 
-            <Separator />
-
-            <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">2. How We Use the Data</h2>
-              <p className="text-muted-foreground mb-4">Your data is used to:</p>
-              <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-4">
-                <li>Authenticate and manage your account</li>
-                <li>Enable map features and location-based visibility (when opted in)</li>
-                <li>Display pet profiles and pet tweets (according to privacy settings)</li>
-                <li>Allow sending and receiving of friend requests via pet usernames</li>
-                <li>Support events, sitter bookings, business listings, and discount deals</li>
-                <li>Power AI Paw Coach responses based on your input</li>
-                <li>Improve feature usage (analytics disabled by default)</li>
-              </ul>
-              <p className="text-muted-foreground mt-4 font-medium">
-                We do not serve ads, do not sell your data, and do not share it with third parties.
-              </p>
-            </section>
-
-            <Separator />
-
-            <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">3. Data Storage & Security</h2>
-              <p className="text-muted-foreground mb-4">
-                All user data is stored using Supabase's secure infrastructure:
-              </p>
-              <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-4">
-                <li>Communication is encrypted (TLS/HTTPS)</li>
-                <li>Data at rest is encrypted (AES‑256)</li>
-                <li>Passwords are securely hashed with bcrypt</li>
-                <li>Row-level security (RLS) ensures users only access their own data</li>
-              </ul>
-            </section>
-
-            <Separator />
-
-            <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">4. Your Rights and Controls</h2>
-              <p className="text-muted-foreground mb-4">You have the right to:</p>
-              <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-4">
-                <li>Toggle "Ready to Play" OFF to stop sharing your location</li>
-                <li>Revoke app location permission from device settings</li>
-                <li>Delete or edit uploaded photos and tweets anytime</li>
-                <li>Set your profile to "Private" to limit visibility to friends only</li>
-                <li>Delete your account and associated data directly from the app or by contacting us</li>
-              </ul>
-              <div className="bg-muted p-4 rounded-lg mt-4">
-                <p className="text-foreground font-medium">📧 To request account deletion or for privacy inquiries:</p>
-                <p className="text-foreground font-medium">info.pawcult@gmail.com</p>
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-2">Location data:</h3>
+                <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                  <li>Requested at login and again on the Pet Map screen</li>
+                  <li>Only stored and shared when you toggle "Ready to Play" ON</li>
+                  <li>When toggled OFF, location storage stops. Permission remains until manually revoked via device/browser settings.</li>
+                </ul>
               </div>
-            </section>
 
-            <Separator />
-
-            <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">5. Children's Privacy</h2>
-              <p className="text-muted-foreground">
-                Pawcult is not intended for users under the age of 13. We do not knowingly collect data from minors.
-              </p>
-            </section>
-
-            <Separator />
-
-            <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">6. Updates to This Policy</h2>
-              <p className="text-muted-foreground mb-2">
-                We may update this policy from time to time. All changes will be published on:
-              </p>
-              <div className="bg-muted p-3 rounded-lg">
-                <code className="text-primary">https://pawcultapp.com/privacy</code>
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-2">Photos & media:</h3>
+                <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                  <li>Users can upload images for pet profiles and pet tweets</li>
+                  <li>Only selected files are uploaded; we do not access your gallery automatically</li>
+                </ul>
               </div>
-            </section>
 
-            <Separator />
-
-            <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">7. Contact Us</h2>
-              <p className="text-muted-foreground mb-2">
-                For privacy-related questions or feedback:
-              </p>
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-foreground font-medium">📧 info.pawcult@gmail.com</p>
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-2">Pet profiles & usernames:</h3>
+                <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                  <li>Public or private profiles with optional pet usernames</li>
+                  <li>Users can search for others via pet usernames and send friend requests</li>
+                </ul>
               </div>
-            </section>
-          </CardContent>
-        </Card>
+
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-2">Content & Interactions:</h3>
+                <p className="text-muted-foreground">
+                  Pet tweets, adventures, likes, comments, event participation, sitter or business listings, and group ("pack") memberships
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-2">AI Paw Coach:</h3>
+                <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                  <li>Pet-related questions are sent to OpenAI's API for advice</li>
+                  <li>We do not share your email, location, or sensitive data in those requests</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-2">Analytics (Mixpanel):</h3>
+                <p className="text-muted-foreground">
+                  Feature usage tracking exists in the codebase but is currently disabled in production
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">2. How We Use the Data</h2>
+            <p className="text-muted-foreground mb-4">We use your data to:</p>
+            <ul className="list-disc list-inside text-muted-foreground space-y-2">
+              <li>Authenticate and manage your user account</li>
+              <li>Show content and location-based features when opted in</li>
+              <li>Allow interaction with other pets and users</li>
+              <li>Enable pet profile search via usernames</li>
+              <li>Power community features: sitter bookings, groups, deals, and events</li>
+              <li>Improve your experience with in-app tools such as AI Paw Coach</li>
+            </ul>
+            <p className="text-foreground font-medium mt-4">
+              No ads, no third-party data sales
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">3. Data Storage & Security</h2>
+            <p className="text-muted-foreground mb-4">
+              All data is securely stored on Supabase:
+            </p>
+            <ul className="list-disc list-inside text-muted-foreground space-y-2">
+              <li>Encrypted in transit (TLS/HTTPS)</li>
+              <li>Encrypted at rest (AES‑256)</li>
+              <li>Passwords are hashed using bcrypt</li>
+              <li>Row-level security (RLS) ensures user-specific access</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">4. Your Rights and Controls</h2>
+            <p className="text-muted-foreground mb-4">You can:</p>
+            <ul className="list-disc list-inside text-muted-foreground space-y-2">
+              <li>Set your profile to Private to limit visibility to friends only</li>
+              <li>Revoke location access via your device or toggle "Ready to Play" OFF</li>
+              <li>Delete your own:
+                <ul className="list-disc list-inside ml-6 mt-2 space-y-1">
+                  <li>Pet tweets 🐾</li>
+                  <li>Pet adventures 🌍</li>
+                  <li>Uploaded pet photos</li>
+                  <li>Entire pet profiles</li>
+                </ul>
+              </li>
+              <li>Fully delete your account and data from:
+                <ul className="list-disc list-inside ml-6 mt-2 space-y-1">
+                  <li>⚙️ Settings page in the app, or</li>
+                  <li>🌐 pawcultapp.com/delete-account</li>
+                </ul>
+              </li>
+            </ul>
+            <p className="text-muted-foreground mt-4">
+              📧 For data-related questions: <a href="mailto:info.pawcult@gmail.com" className="text-primary hover:underline">info.pawcult@gmail.com</a>
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">5. Children's Privacy</h2>
+            <p className="text-muted-foreground">
+              Pawcult is not intended for users under the age of 13. We do not knowingly collect data from minors.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">6. Changes to This Policy</h2>
+            <p className="text-muted-foreground">
+              Any updates will be posted on: <a href="https://pawcultapp.com/privacy" className="text-primary hover:underline">https://pawcultapp.com/privacy</a>
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">7. Contact Us</h2>
+            <p className="text-muted-foreground">
+              📧 <a href="mailto:info.pawcult@gmail.com" className="text-primary hover:underline">info.pawcult@gmail.com</a>
+            </p>
+          </section>
+
+        </div>
       </div>
     </div>
   );
