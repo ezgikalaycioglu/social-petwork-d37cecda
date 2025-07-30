@@ -535,7 +535,10 @@ const UserSettings = () => {
                   <Button
                     type="button"
                     variant="destructive"
-                    onClick={() => navigate('/delete-account')}
+                    onClick={() => {
+                      console.log('Delete account button clicked, navigating to /delete-account');
+                      navigate('/delete-account');
+                    }}
                     className="w-full"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />

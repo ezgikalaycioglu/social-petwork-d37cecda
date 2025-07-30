@@ -13,6 +13,8 @@ const DeleteAccount = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  console.log('DeleteAccount component loaded');
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
@@ -20,6 +22,7 @@ const DeleteAccount = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Delete account form submitted with email:', email);
     setIsLoading(true);
 
     try {
