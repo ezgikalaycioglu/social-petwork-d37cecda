@@ -206,7 +206,6 @@ const Dashboard = () => {
             <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
               🐾 PawCult
             </h1>
-            <p className="text-gray-600 mt-1">Hello {userEmail}! Welcome back to your pet community.</p>
           </div>
         </div>
 
