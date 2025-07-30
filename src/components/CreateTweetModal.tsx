@@ -30,6 +30,13 @@ export const CreateTweetModal: React.FC<CreateTweetModalProps> = ({
   const [photoUrl, setPhotoUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  
+  // Set first pet as default when pets are available
+  useEffect(() => {
+    if (pets.length > 0 && !selectedPetId) {
+      setSelectedPetId(pets[0].id);
+    }
+  }, [pets, selectedPetId]);
 
   const handleSubmit = async () => {
     if (!content.trim() || !selectedPetId) {

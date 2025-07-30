@@ -231,6 +231,33 @@ const UserSettings = () => {
     }
   };
 
+  const handleDeleteAllData = async () => {
+    if (!userId) return;
+
+    try {
+      const { error } = await supabase.rpc('delete_user_data_only', {
+        user_id_to_clear: userId
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Data Cleared",
+        description: "All your data has been deleted successfully. Your account remains active.",
+      });
+
+      // Optionally refresh the page to show clean state
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error deleting user data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete your data. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -546,7 +573,43 @@ const UserSettings = () => {
                     Permanently delete your account and all associated data
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
+                  {/* Delete All Data Button */}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" className="w-full border-orange-300 text-orange-600 hover:bg-orange-50">
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete All My Data
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete All Your Data?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete all your data but keep your account active. You'll lose:
+                          <ul className="list-disc list-inside mt-2 space-y-1">
+                            <li>All your pets and their profiles</li>
+                            <li>All tweets and adventures</li>
+                            <li>Pack memberships and messages</li>
+                            <li>Sitter and business profiles</li>
+                            <li>All photos and interactions</li>
+                          </ul>
+                          <p className="mt-2 font-medium">Your account will remain active and you can start fresh.</p>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDeleteAllData}
+                          className="bg-orange-600 hover:bg-orange-700"
+                        >
+                          Yes, Delete All Data
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+
+                  {/* Delete Account Button */}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive" className="w-full">

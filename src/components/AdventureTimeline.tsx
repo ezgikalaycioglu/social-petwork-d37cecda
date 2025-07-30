@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, MapPin, Camera, Plus } from 'lucide-react';
+import { Calendar, MapPin, Camera, Plus, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
 import LogAdventureModal from './LogAdventureModal';
 
@@ -88,6 +89,31 @@ const AdventureTimeline = ({ petId, petName, isOwner }: AdventureTimelineProps) 
     });
   };
 
+  const handleDeleteAdventure = async (adventureId: string) => {
+    try {
+      const { error } = await supabase
+        .from('adventures')
+        .delete()
+        .eq('id', adventureId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Adventure deleted successfully",
+      });
+      
+      fetchAdventures();
+    } catch (error) {
+      console.error('Error deleting adventure:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete adventure",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -142,7 +168,37 @@ const AdventureTimeline = ({ petId, petName, isOwner }: AdventureTimelineProps) 
       ) : (
         <div className="space-y-6">
           {adventures.map((adventure) => (
-            <Card key={adventure.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card key={adventure.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
+              {isOwner && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2 z-10 opacity-75 hover:opacity-100"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Adventure</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete "{adventure.title}"? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteAdventure(adventure.id)}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <CardTitle className="text-lg">{adventure.title}</CardTitle>

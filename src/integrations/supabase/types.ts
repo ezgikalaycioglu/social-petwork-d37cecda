@@ -1579,6 +1579,10 @@ export type Database = {
         Args: { user_id_to_delete: string }
         Returns: undefined
       }
+      delete_user_data_only: {
+        Args: { user_id_to_clear: string }
+        Returns: undefined
+      }
       generate_redemption_code: {
         Args: Record<PropertyKey, never>
         Returns: string
