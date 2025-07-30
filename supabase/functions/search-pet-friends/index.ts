@@ -77,15 +77,13 @@ Deno.serve(async (req) => {
       excludedPetIds.add(f.requester_pet_id === petId ? f.recipient_pet_id : f.requester_pet_id);
     });
 
-    // Search for pets by pet_username only
+    // Search for pets by name only
     const { data: searchResults, error: searchError } = await supabase
       .from('pet_profiles')
       .select('*')
       .neq('id', petId)
       .eq('is_available', true)
-      .ilike('pet_username', `%${searchQuery}%`)
-      .not('latitude', 'is', null)
-      .not('longitude', 'is', null)
+      .ilike('name', `%${searchQuery}%`)
       .limit(20);
 
     if (searchError) {
@@ -113,18 +111,6 @@ Deno.serve(async (req) => {
       // Skip if already friends or user's own pet
       if (excludedPetIds.has(pet.id)) continue;
 
-      let distance: number | null = null;
-      
-      // Calculate distance if user location is provided
-      if (latitude && longitude && pet.latitude && pet.longitude) {
-        distance = calculateDistance(latitude, longitude, pet.latitude, pet.longitude);
-        
-        // Skip if too far away
-        if (distance > maxDistance) continue;
-        
-        distance = Math.round(distance * 10) / 10; // round to 1 decimal
-      }
-
       results.push({
         id: pet.id,
         name: pet.name,
@@ -138,7 +124,7 @@ Deno.serve(async (req) => {
         vaccination_status: pet.vaccination_status,
         user_id: pet.user_id,
         owner_name: userProfileMap.get(pet.user_id) || null,
-        distance
+        distance: null
       });
     }
 
