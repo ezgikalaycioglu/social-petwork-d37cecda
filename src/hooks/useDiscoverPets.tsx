@@ -28,11 +28,7 @@ export const useDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseDiscover
       if (userPetIds.length === 0) {
         const { data, error } = await supabase
           .from('pet_profiles')
-          .select(`
-            *,
-            user_profiles!pet_profiles_user_id_fkey(is_private)
-          `)
-          .eq('user_profiles.is_private', false)
+          .select('*')
           .limit(12);
 
         if (error) throw error;
@@ -57,14 +53,10 @@ export const useDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseDiscover
       // Combine user's own pets and their friends/pending requests to exclude
       const excludedPetIds = [...new Set([...userPetIds, ...friendIds])];
 
-      // 2. Fetch pets excluding the ones already connected to user and from private accounts
+      // 2. Fetch pets excluding the ones already connected to user  
       let query = supabase
         .from('pet_profiles')
-        .select(`
-          *,
-          user_profiles!pet_profiles_user_id_fkey(is_private)
-        `)
-        .eq('user_profiles.is_private', false);
+        .select('*');
 
       // Only apply the exclusion filter if there are pets to exclude
       if (excludedPetIds.length > 0) {
