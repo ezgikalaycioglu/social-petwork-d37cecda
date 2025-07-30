@@ -52,7 +52,7 @@ const DesktopSidebar = () => {
   }
 
   return (
-    <div className="fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 shadow-sm z-40 hidden md:block">
+    <div className="fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 shadow-sm z-40 hidden xl:block">
       <div className="flex flex-col h-full">
         {/* Logo Section */}
         <div className="flex items-center space-x-3 p-6 border-b border-gray-200">
