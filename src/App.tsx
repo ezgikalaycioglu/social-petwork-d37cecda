@@ -42,6 +42,7 @@ import CreatePost from "./pages/CreatePost";
 import Notifications from "./pages/Notifications";
 import PackSettingsPage from "./components/PackSettingsPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import DeleteAccount from "./pages/DeleteAccount";
 
 
 const queryClient = new QueryClient({
@@ -68,6 +69,7 @@ const App = () => {
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/changelog" element={<ChangelogPage />} />
+                <Route path="/delete-account" element={<DeleteAccount />} />
                 
                 {/* Protected Routes */}
                 <Route path="/dashboard" element={
