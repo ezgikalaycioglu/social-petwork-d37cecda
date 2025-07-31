@@ -10,12 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, User, Bell, Loader2, LogOut, Globe, Smartphone, ChevronDown, Shield, ExternalLink, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Settings, User, Bell, Loader2, LogOut, Globe, Smartphone, ChevronDown, Shield, ExternalLink, Trash2, Eye, EyeOff, Flag } from 'lucide-react';
 import Layout from '@/components/Layout';
 import type { Tables } from '@/integrations/supabase/types';
 import PushNotificationSettings from '@/components/PushNotificationSettings';
 import { useAuth } from '@/contexts/AuthContext';
 import PWAInstallContent from '@/components/PWAInstallContent';
+import ReportAbuseModal from '@/components/ReportAbuseModal';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
@@ -42,6 +43,7 @@ const UserSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   const form = useForm<SettingsFormData>({
     defaultValues: {
@@ -648,6 +650,30 @@ const UserSettings = () => {
                 </CardContent>
               </Card>
 
+              {/* Report Abuse Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Flag className="w-5 h-5" />
+                    Report Abuse
+                  </CardTitle>
+                  <CardDescription>
+                    Report inappropriate content or users to our moderation team
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowReportModal(true)}
+                    className="w-full justify-between"
+                  >
+                    Report a User or Content
+                    <Flag className="w-4 h-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+
               {/* Privacy & Legal Section */}
               <Card>
                 <CardHeader>
@@ -659,7 +685,7 @@ const UserSettings = () => {
                     Review our privacy policy and data handling practices
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-3">
                   <Button
                     type="button"
                     variant="outline"
@@ -667,6 +693,15 @@ const UserSettings = () => {
                     className="w-full justify-between"
                   >
                     Privacy Policy
+                    <ExternalLink className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate('/child-safety')}
+                    className="w-full justify-between"
+                  >
+                    Child Safety Policy
                     <ExternalLink className="w-4 h-4" />
                   </Button>
                 </CardContent>
@@ -710,6 +745,12 @@ const UserSettings = () => {
           </Form>
         </div>
       </div>
+      
+      <ReportAbuseModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        contentType="user"
+      />
     </Layout>
   );
 };

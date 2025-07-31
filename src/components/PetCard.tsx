@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin, UserPlus } from 'lucide-react';
 import BoopButton from './BoopButton';
+import ReportAbuseButton from './ReportAbuseButton';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -139,6 +140,15 @@ const PetCard: React.FC<PetCardProps> = ({
                     Add Friend
                   </Button>
                 )}
+                
+                <ReportAbuseButton
+                  contentType="pet_profile"
+                  contentId={pet.id}
+                  petName={pet.name}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs px-2 py-1 h-auto"
+                />
               </div>
               
               {showVaccinationStatus && pet.vaccination_status && (

@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      abuse_reports: {
+        Row: {
+          abuse_type: string
+          created_at: string
+          description: string | null
+          id: string
+          reported_content_id: string | null
+          reported_content_type: string
+          reported_pet_name: string | null
+          reported_user_name: string | null
+          reporter_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          abuse_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          reported_content_id?: string | null
+          reported_content_type: string
+          reported_pet_name?: string | null
+          reported_user_name?: string | null
+          reporter_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          abuse_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          reported_content_id?: string | null
+          reported_content_type?: string
+          reported_pet_name?: string | null
+          reported_user_name?: string | null
+          reporter_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       adventures: {
         Row: {
           adventure_date: string

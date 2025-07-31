@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Heart, MessageCircle, Smile, Laugh, Frown, Eye, Send } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { enUS } from "date-fns/locale";
+import ReportAbuseButton from "./ReportAbuseButton";
 
 interface TweetCardProps {
   tweet: {
@@ -262,6 +263,13 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
               })}
             </p>
           </div>
+          <ReportAbuseButton
+            contentType="tweet"
+            contentId={tweet.id}
+            petName={petInfo.name}
+            size="sm"
+            variant="ghost"
+          />
         </div>
       </CardHeader>
 
