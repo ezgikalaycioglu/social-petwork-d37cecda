@@ -112,7 +112,7 @@ export const ReportAbuseModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto mb-16 sm:mb-0">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Flag className="h-5 w-5 text-destructive" />
@@ -120,7 +120,7 @@ export const ReportAbuseModal = ({
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 pb-4">
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
