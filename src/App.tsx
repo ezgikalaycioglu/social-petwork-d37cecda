@@ -42,6 +42,7 @@ import CreatePost from "./pages/CreatePost";
 import Notifications from "./pages/Notifications";
 import PackSettingsPage from "./components/PackSettingsPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ChildSafety from "./pages/ChildSafety";
 import DeleteAccount from "./pages/DeleteAccount";
 import DeleteData from "./pages/DeleteData";
 
@@ -69,6 +70,7 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/child-safety" element={<ChildSafety />} />
                 <Route path="/changelog" element={<ChangelogPage />} />
                 <Route path="/delete-account" element={<DeleteAccount />} />
                 <Route path="/delete-data" element={<DeleteData />} />
