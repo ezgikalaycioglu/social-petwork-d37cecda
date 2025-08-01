@@ -11,6 +11,8 @@ interface DiscoverPetsGridProps {
   isLoading?: boolean;
   onSendFriendRequest?: (petId: string) => void;
   userPetIds?: string[];
+  loadingRequests?: Record<string, boolean>;
+  sentRequests?: Set<string>;
 }
 
 const DiscoverPetsGrid: React.FC<DiscoverPetsGridProps> = ({ 
@@ -18,7 +20,9 @@ const DiscoverPetsGrid: React.FC<DiscoverPetsGridProps> = ({
   onPetSelect,
   isLoading = false,
   onSendFriendRequest,
-  userPetIds = []
+  userPetIds = [],
+  loadingRequests = {},
+  sentRequests = new Set()
 }) => {
   if (isLoading) {
     return (
@@ -53,6 +57,8 @@ const DiscoverPetsGrid: React.FC<DiscoverPetsGridProps> = ({
           showFriendRequestButton={true}
           onSendFriendRequest={onSendFriendRequest}
           userPetIds={userPetIds}
+          friendRequestSent={sentRequests.has(pet.id)}
+          isLoadingFriendRequest={loadingRequests[pet.id] || false}
         />
       ))}
     </div>

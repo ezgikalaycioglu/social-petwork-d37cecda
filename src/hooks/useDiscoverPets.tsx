@@ -16,6 +16,7 @@ export const useDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseDiscover
   const [availablePets, setAvailablePets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingRequests, setLoadingRequests] = useState<Record<string, boolean>>({});
+  const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchAvailablePets();
@@ -136,6 +137,9 @@ export const useDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseDiscover
 
       if (error) throw error;
 
+      // Mark the request as sent
+      setSentRequests(prev => new Set(prev).add(recipientPetId));
+
       toast({
         title: "Friend Request Sent! ❤️",
         description: "Your friend request has been sent successfully.",
@@ -157,6 +161,7 @@ export const useDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseDiscover
     availablePets,
     loading,
     loadingRequests,
+    sentRequests,
     handleSendFriendRequest,
   };
 };

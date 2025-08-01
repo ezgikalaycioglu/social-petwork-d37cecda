@@ -20,6 +20,8 @@ interface PetCardProps {
   showFriendRequestButton?: boolean;
   onSendFriendRequest?: (petId: string) => void;
   userPetIds?: string[];
+  friendRequestSent?: boolean;
+  isLoadingFriendRequest?: boolean;
 }
 
 const PetCard: React.FC<PetCardProps> = ({ 
@@ -30,7 +32,9 @@ const PetCard: React.FC<PetCardProps> = ({
   showVaccinationStatus = true,
   showFriendRequestButton = false,
   onSendFriendRequest,
-  userPetIds = []
+  userPetIds = [],
+  friendRequestSent = false,
+  isLoadingFriendRequest = false
 }) => {
   const [currentBoopCount, setCurrentBoopCount] = useState(pet.boop_count || 0);
 
@@ -126,18 +130,26 @@ const PetCard: React.FC<PetCardProps> = ({
                   />
                 )}
                 
-                {showFriendRequestButton && onSendFriendRequest && userPetIds.length > 0 && (
+                {showFriendRequestButton && userPetIds.length > 0 && (
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant={friendRequestSent ? "default" : "outline"}
                     onClick={(e) => {
                       e.stopPropagation();
-                      onSendFriendRequest(pet.id);
+                      if (!friendRequestSent && onSendFriendRequest) {
+                        onSendFriendRequest(pet.id);
+                      }
                     }}
+                    disabled={friendRequestSent || isLoadingFriendRequest}
                     className="text-xs px-2 py-1 h-auto"
                   >
                     <UserPlus className="w-3 h-3 mr-1" />
-                    Add Friend
+                    {isLoadingFriendRequest 
+                      ? "Sending..." 
+                      : friendRequestSent 
+                        ? "Invitation Sent!" 
+                        : "Add Friend"
+                    }
                   </Button>
                 )}
                 

@@ -18,6 +18,8 @@ const DiscoverPets = ({ userPetIds, onFriendRequestSent }: DiscoverPetsProps) =>
   const {
     availablePets,
     loading,
+    loadingRequests,
+    sentRequests,
     handleSendFriendRequest,
   } = useDiscoverPets({ userPetIds, onFriendRequestSent });
 
@@ -45,6 +47,8 @@ const DiscoverPets = ({ userPetIds, onFriendRequestSent }: DiscoverPetsProps) =>
           isLoading={loading}
           onSendFriendRequest={handleSendFriendRequest}
           userPetIds={userPetIds}
+          loadingRequests={loadingRequests}
+          sentRequests={sentRequests}
         />
       )}
 
