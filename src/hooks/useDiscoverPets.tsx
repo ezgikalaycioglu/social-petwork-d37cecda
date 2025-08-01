@@ -53,19 +53,35 @@ export const useDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseDiscover
         return;
       }
 
-      // 1. Get user's existing friendships (both accepted and pending)
+      // 1. Get user's existing friendships (only accepted ones to exclude)
       const { data: friendships, error: friendshipsError } = await supabase
         .from('pet_friendships')
         .select('requester_pet_id, recipient_pet_id, status')
         .or(`requester_pet_id.in.(${userPetIds.join(',')}),recipient_pet_id.in.(${userPetIds.join(',')})`)
-        .in('status', ['accepted', 'pending']);
+        .eq('status', 'accepted'); // Only exclude accepted friendships, keep pending ones visible
 
       if (friendshipsError) throw friendshipsError;
 
-      // Extract friend IDs (pets that are already friends or have pending requests)
+      // Extract friend IDs (pets that are already accepted friends)
       const friendIds = friendships?.map(f => 
         userPetIds.includes(f.requester_pet_id) ? f.recipient_pet_id : f.requester_pet_id
       ) || [];
+
+      // Get existing pending requests to track sent status
+      const { data: pendingRequests, error: pendingError } = await supabase
+        .from('pet_friendships')
+        .select('requester_pet_id, recipient_pet_id')
+        .or(`requester_pet_id.in.(${userPetIds.join(',')}),recipient_pet_id.in.(${userPetIds.join(',')})`)
+        .eq('status', 'pending');
+
+      if (pendingError) throw pendingError;
+
+      // Track which pets have pending requests sent by current user
+      const sentRequestIds = pendingRequests?.filter(req => 
+        userPetIds.includes(req.requester_pet_id)
+      ).map(req => req.recipient_pet_id) || [];
+      
+      setSentRequests(new Set(sentRequestIds));
       
       // Combine user's own pets and their friends/pending requests to exclude
       const excludedPetIds = [...new Set([...userPetIds, ...friendIds])];
