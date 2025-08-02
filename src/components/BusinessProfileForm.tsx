@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useSecurity } from '@/hooks/useSecurity';
 import { LocationAutocomplete } from '@/components/LocationAutocomplete';
-import { Building2 } from 'lucide-react';
+import { Building2, ChevronDown, Check } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 import { 
   validateBusinessProfile, 
@@ -100,9 +102,16 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
   });
   
   const [phoneCode, setPhoneCode] = useState('+1');
+  const [phoneCodeOpen, setPhoneCodeOpen] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
-    const sanitizedValue = sanitizeInput(value);
+    let sanitizedValue = sanitizeInput(value);
+    
+    // For website field, remove any http:// or https:// prefix since we prepend https://
+    if (field === 'website') {
+      sanitizedValue = sanitizedValue.replace(/^https?:\/\//, '');
+    }
+    
     setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
     
     // Clear error for this field when user starts typing
@@ -161,6 +170,10 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
       const businessData = {
         user_id: user.id,
         ...formData,
+        // Store the complete phone number with country code
+        phone: formData.phone ? `${phoneCode} ${formData.phone}` : '',
+        // Store the complete website URL
+        website: formData.website ? `https://${formData.website}` : '',
       };
 
       let result;
@@ -300,21 +313,57 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
             <div>
               <Label htmlFor="phone">Phone Number</Label>
               <div className="flex gap-2">
-                <Select value={phoneCode} onValueChange={setPhoneCode}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                    {COUNTRY_CODES.map((country) => (
-                      <SelectItem key={country.code} value={country.code}>
+                <Popover open={phoneCodeOpen} onOpenChange={setPhoneCodeOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={phoneCodeOpen}
+                      className="w-32 justify-between"
+                    >
+                      {phoneCode ? (
                         <span className="flex items-center gap-2">
-                          <span>{country.flag}</span>
-                          <span>{country.code}</span>
+                          <span>{COUNTRY_CODES.find(country => country.code === phoneCode)?.flag}</span>
+                          <span>{phoneCode}</span>
                         </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                      ) : (
+                        "Select..."
+                      )}
+                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-0">
+                    <Command>
+                      <CommandInput placeholder="Search country code..." />
+                      <CommandList className="max-h-60">
+                        <CommandEmpty>No country code found.</CommandEmpty>
+                        <CommandGroup>
+                          {COUNTRY_CODES.map((country) => (
+                            <CommandItem
+                              key={country.code}
+                              value={`${country.code} ${country.country}`}
+                              onSelect={() => {
+                                setPhoneCode(country.code);
+                                setPhoneCodeOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={`mr-2 h-4 w-4 ${
+                                  phoneCode === country.code ? "opacity-100" : "opacity-0"
+                                }`}
+                              />
+                              <span className="flex items-center gap-2">
+                                <span>{country.flag}</span>
+                                <span>{country.code}</span>
+                                <span className="text-muted-foreground">({country.country})</span>
+                              </span>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 <Input
                   id="phone"
                   type="tel"
