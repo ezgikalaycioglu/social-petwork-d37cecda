@@ -110,6 +110,10 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
     // For website field, remove any http:// or https:// prefix since we prepend https://
     if (field === 'website') {
       sanitizedValue = sanitizedValue.replace(/^https?:\/\//, '');
+      // Ensure website starts with www. if it doesn't already have it and it's not empty
+      if (sanitizedValue && !sanitizedValue.startsWith('www.')) {
+        sanitizedValue = `www.${sanitizedValue}`;
+      }
     }
     
     setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
@@ -393,7 +397,7 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({ profile, onCl
                   type="text"
                   value={formData.website}
                   onChange={(e) => handleInputChange('website', e.target.value)}
-                  placeholder="www.pawsome.com"
+                  placeholder="example.com or www.example.com"
                   maxLength={INPUT_LIMITS.WEBSITE.max}
                   className={`pl-20 ${errors.website ? 'border-red-500' : ''}`}
                 />
