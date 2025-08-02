@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -72,7 +72,10 @@ const Packs = () => {
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Pet Packs</h1>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+                <Users className="w-8 h-8 text-green-600" />
+                Pet Packs
+              </h1>
               <p className="text-gray-600">
                 Join or create packs with other pet owners in your area
               </p>
