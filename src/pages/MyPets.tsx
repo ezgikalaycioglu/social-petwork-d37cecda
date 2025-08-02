@@ -55,6 +55,7 @@ interface PetProfile {
   personality_traits: string[] | null;
   vaccination_status: string | null;
   is_available: boolean | null;
+  friend_count?: number;
 }
 
 const MyPets = () => {
@@ -117,7 +118,27 @@ const MyPets = () => {
         throw error;
       }
 
-      setPets(data || []);
+      const pets = data || [];
+
+      // Fetch friend counts for each pet
+      const petsWithFriendCounts = await Promise.all(
+        pets.map(async (pet) => {
+          const { data: friendships, error: friendError } = await supabase
+            .from('pet_friendships')
+            .select('id')
+            .or(`requester_pet_id.eq.${pet.id},recipient_pet_id.eq.${pet.id}`)
+            .eq('status', 'accepted');
+
+          if (friendError) {
+            console.error('Error fetching friend count for pet:', pet.id, friendError);
+            return { ...pet, friend_count: 0 };
+          }
+
+          return { ...pet, friend_count: friendships?.length || 0 };
+        })
+      );
+
+      setPets(petsWithFriendCounts);
     } catch (error) {
       console.error('Error fetching pets:', error);
       toast({
@@ -353,15 +374,21 @@ const MyPets = () => {
                         </div>
                       </div>
                       
-                      <div className="space-y-1">
-                        <p className="text-muted-foreground font-medium">{pet.breed}</p>
-                        {pet.age && (
-                          <p className="text-sm text-muted-foreground">{pet.age} years old</p>
-                        )}
-                        {pet.gender && (
-                          <p className="text-sm text-muted-foreground capitalize">{pet.gender}</p>
-                        )}
-                      </div>
+                       <div className="space-y-1">
+                         <p className="text-muted-foreground font-medium">{pet.breed}</p>
+                         {pet.friend_count !== undefined && (
+                           <div className="flex items-center gap-1 text-accent">
+                             <Users className="w-4 h-4" />
+                             <span className="text-sm font-medium">{pet.friend_count} friends</span>
+                           </div>
+                         )}
+                         {pet.age && (
+                           <p className="text-sm text-muted-foreground">{pet.age} years old</p>
+                         )}
+                         {pet.gender && (
+                           <p className="text-sm text-muted-foreground capitalize">{pet.gender}</p>
+                         )}
+                       </div>
                     </div>
 
                     {/* Personality Traits */}
