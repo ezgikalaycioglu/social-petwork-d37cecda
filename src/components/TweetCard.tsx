@@ -382,7 +382,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
               variant="ghost"
               size="sm"
               onClick={() => userReaction ? handleReaction(userReaction.reaction_type) : setShowReactionPopup(!showReactionPopup)}
-              onMouseLeave={() => setShowReactionPopup(false)}
+              onMouseEnter={() => setShowReactionPopup(true)}
               disabled={userPets.length === 0}
               className={`flex items-center justify-center gap-2 h-10 w-full transition-colors ${
                 userReaction ? reactionColors[userReaction.reaction_type as keyof typeof reactionColors] : 'text-muted-foreground hover:text-foreground'
