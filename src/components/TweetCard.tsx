@@ -83,6 +83,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
   const [selectedPetId, setSelectedPetId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const reactionPopupRef = useRef<HTMLDivElement>(null);
+  const tweetCardRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -297,7 +298,11 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
   };
 
   return (
-    <Card className="mb-4">
+    <Card 
+      ref={tweetCardRef}
+      className="mb-4"
+      onMouseLeave={() => setShowReactionPopup(false)}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
