@@ -159,21 +159,29 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      // Check if reaction already exists
-      const existingReaction = reactions.find(
-        r => r.pet_id === petToUse && r.reaction_type === reactionType
-      );
-
+      // Check if user already has ANY reaction to this tweet
+      const existingReaction = reactions.find(r => r.pet_id === petToUse);
+      
       if (existingReaction) {
-        // Remove reaction
-        const { error } = await supabase
-          .from('tweet_reactions')
-          .delete()
-          .eq('id', existingReaction.id);
+        if (existingReaction.reaction_type === reactionType) {
+          // Same reaction - remove it
+          const { error } = await supabase
+            .from('tweet_reactions')
+            .delete()
+            .eq('id', existingReaction.id);
 
-        if (error) throw error;
+          if (error) throw error;
+        } else {
+          // Different reaction - update it
+          const { error } = await supabase
+            .from('tweet_reactions')
+            .update({ reaction_type: reactionType })
+            .eq('id', existingReaction.id);
+
+          if (error) throw error;
+        }
       } else {
-        // Add reaction
+        // No existing reaction - add new one
         const { error } = await supabase
           .from('tweet_reactions')
           .insert({
