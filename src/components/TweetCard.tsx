@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Heart, MessageCircle, Smile, Laugh, Frown, Eye, Send } from "lucide-react";
+import { Heart, MessageCircle, Smile, Laugh, Frown, Eye, Send, ThumbsUp } from "lucide-react";
 
 // Custom Love icon with two intertwined hearts
 const LoveIcon = ({ className }: { className?: string }) => (
@@ -78,15 +78,31 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [showReactionsDetail, setShowReactionsDetail] = useState(false);
+  const [showReactionPopup, setShowReactionPopup] = useState(false);
   const [replyContent, setReplyContent] = useState('');
   const [selectedPetId, setSelectedPetId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const reactionPopupRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchReactions();
     fetchReplies();
   }, [tweet.id]);
+
+  // Close reaction popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (reactionPopupRef.current && !reactionPopupRef.current.contains(event.target as Node)) {
+        setShowReactionPopup(false);
+      }
+    };
+
+    if (showReactionPopup) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showReactionPopup]);
 
   const fetchReactions = async () => {
     try {
@@ -271,6 +287,15 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
     return acc;
   }, {} as Record<string, Reaction[]>);
 
+  // Get current user's reaction if any
+  const petToUse = selectedPetId || (userPets.length === 1 ? userPets[0]?.id : '');
+  const userReaction = reactions.find(r => r.pet_id === petToUse);
+
+  const handleReactionSelect = (type: string) => {
+    handleReaction(type);
+    setShowReactionPopup(false);
+  };
+
   return (
     <Card className="mb-4">
       <CardHeader className="pb-3">
@@ -349,38 +374,65 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
           </div>
         )}
 
-        {/* Action Buttons - Updated layout with icons above text */}
-        <div className="grid grid-cols-6 gap-1 mb-3">
-          {Object.keys(reactionIcons).map((type) => {
-            const Icon = reactionIcons[type as keyof typeof reactionIcons];
-            const petToUse = selectedPetId || (userPets.length === 1 ? userPets[0]?.id : '');
-            const hasReacted = reactions.some(
-              r => r.pet_id === petToUse && r.reaction_type === type
-            );
-            return (
-              <Button
-                key={type}
-                variant={hasReacted ? "default" : "ghost"}
-                size="sm"
-                onClick={() => handleReaction(type)}
-                disabled={userPets.length === 0}
-                className="flex flex-col items-center p-2 h-auto text-xs font-bold"
-              >
-                <Icon className={`h-4 w-4 mb-1 font-bold ${hasReacted ? 'text-white' : reactionColors[type as keyof typeof reactionColors]}`} />
-                <span className="leading-none font-bold">
-                  {type === 'like' ? 'Like' : type === 'love' ? 'Love' : type === 'laugh' ? 'Laugh' : type === 'wow' ? 'Wow' : 'Sad'}
-                </span>
-              </Button>
-            );
-          })}
+        {/* Facebook-style Action Buttons */}
+        <div className="flex items-center gap-4 mb-3 border-t border-b py-2">
+          {/* Main Reaction Button with Popup */}
+          <div className="relative flex-1" ref={reactionPopupRef}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => userReaction ? handleReaction(userReaction.reaction_type) : setShowReactionPopup(!showReactionPopup)}
+              onMouseEnter={() => setShowReactionPopup(true)}
+              disabled={userPets.length === 0}
+              className={`flex items-center justify-center gap-2 h-10 w-full transition-colors ${
+                userReaction ? reactionColors[userReaction.reaction_type as keyof typeof reactionColors] : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {userReaction ? (
+                <>
+                  {React.createElement(reactionIcons[userReaction.reaction_type as keyof typeof reactionIcons], { 
+                    className: `h-5 w-5 ${reactionColors[userReaction.reaction_type as keyof typeof reactionColors]}` 
+                  })}
+                  <span className="font-medium capitalize">{userReaction.reaction_type}</span>
+                </>
+              ) : (
+                <>
+                  <ThumbsUp className="h-5 w-5" />
+                  <span className="font-medium">Like</span>
+                </>
+              )}
+            </Button>
+
+            {/* Reaction Popup */}
+            {showReactionPopup && (
+              <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-800 border rounded-lg shadow-lg p-2 flex gap-1 z-10 animate-fade-in">
+                {Object.entries(reactionIcons).map(([type, Icon]) => (
+                  <Button
+                    key={type}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleReactionSelect(type)}
+                    className={`flex flex-col items-center p-2 h-auto hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hover:scale-110 ${
+                      userReaction?.reaction_type === type ? 'bg-gray-100 dark:bg-gray-700' : ''
+                    }`}
+                  >
+                    <Icon className={`h-6 w-6 ${reactionColors[type as keyof typeof reactionColors]}`} />
+                    <span className="text-xs mt-1 capitalize">{type}</span>
+                  </Button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Comment Button */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowReplyForm(!showReplyForm)}
-            className="flex flex-col items-center p-2 h-auto text-xs font-bold"
+            className="flex items-center justify-center gap-2 h-10 flex-1 text-muted-foreground hover:text-foreground"
           >
-            <MessageCircle className="h-4 w-4 mb-1 font-bold" />
-            <span className="leading-none font-bold">Reply</span>
+            <MessageCircle className="h-5 w-5" />
+            <span className="font-medium">Comment</span>
           </Button>
         </div>
 
