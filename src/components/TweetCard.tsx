@@ -484,6 +484,14 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
               placeholder="Write your reply..."
               value={replyContent}
               onChange={(e) => setReplyContent(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (!isLoading && replyContent.trim() && userPets.length > 0) {
+                    handleReply();
+                  }
+                }
+              }}
               className="mb-2"
               rows={2}
             />
