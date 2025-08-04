@@ -18,6 +18,7 @@ import { handleAuthError } from '@/utils/authErrorHandler';
 import PWAInstallPopup from '@/components/PWAInstallPopup';
 import QuickTour from '@/components/QuickTour';
 import type { Tables } from '@/integrations/supabase/types';
+import { isWeb } from '@/utils/isWeb';
 
 type PetProfile = Tables<'pet_profiles'>;
 
@@ -192,7 +193,7 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <PWAInstallPopup />
+      {isWeb && <PWAInstallPopup />}
       {showQuickTour && (
         <QuickTour
           onComplete={handleTourComplete}

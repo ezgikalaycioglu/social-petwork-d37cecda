@@ -19,6 +19,7 @@ import PWAInstallContent from '@/components/PWAInstallContent';
 import ReportAbuseModal from '@/components/ReportAbuseModal';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { isWeb } from '@/utils/isWeb';
 
 type UserProfile = Tables<'user_profiles'>;
 type NotificationPreferences = Tables<'notification_preferences'>;
@@ -379,30 +380,32 @@ const UserSettings = () => {
               </Card>
 
               {/* PWA Install Guide Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Smartphone className="w-5 h-5" />
-                    Get the App Experience
-                  </CardTitle>
-                  <CardDescription>
-                    Learn how to install PawCult on your device for the best experience
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Collapsible>
-                    <CollapsibleTrigger asChild>
-                      <Button variant="outline" className="w-full justify-between">
-                        App Installation Guide
-                        <ChevronDown className="h-4 w-4" />
-                      </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4">
-                      <PWAInstallContent />
-                    </CollapsibleContent>
-                  </Collapsible>
-                </CardContent>
-              </Card>
+              {isWeb() &&
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Smartphone className="w-5 h-5" />
+                      Get the App Experience
+                    </CardTitle>
+                    <CardDescription>
+                      Learn how to install PawCult on your device for the best experience
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <Button variant="outline" className="w-full justify-between">
+                          App Installation Guide
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-4">
+                        <PWAInstallContent />
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </CardContent>
+                </Card>
+              }
 
               {/* Push Notifications Section */}
               <PushNotificationSettings />
