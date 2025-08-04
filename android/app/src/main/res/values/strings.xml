@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PawCult App</string>
+    <string name="title_activity_main">PawCult App</string>
+    <string name="package_name">com.pawcultapp</string>
+    <string name="custom_url_scheme">com.pawcultapp</string>
+</resources>
