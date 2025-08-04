@@ -157,7 +157,7 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
                   </div>
                 </div>
                 
-                <div className="flex space-x-2">
+                <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
                   <Button
                     size="sm"
                     onClick={() => handleRequest(request.id, 'accepted')}
