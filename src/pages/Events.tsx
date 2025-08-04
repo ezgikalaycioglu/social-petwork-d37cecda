@@ -79,7 +79,8 @@ const Events = () => {
 
   const fetchUserEvents = async (userId: string) => {
     try {
-      const { data, error } = await supabase
+      // First get all events where user is creator or invited
+      const { data: events, error } = await supabase
         .from('events')
         .select(`
           *,
@@ -89,7 +90,27 @@ const Events = () => {
         .order('scheduled_time', { ascending: true });
 
       if (error) throw error;
-      setEvents(data || []);
+
+      // Also get events where user has responses (backup query)
+      const { data: responseEvents, error: responseError } = await supabase
+        .from('events')
+        .select(`
+          *,
+          event_responses!inner(user_id, response)
+        `)
+        .eq('event_responses.user_id', userId)
+        .order('scheduled_time', { ascending: true });
+
+      if (responseError) throw responseError;
+
+      // Combine and deduplicate events
+      const allEvents = [...(events || []), ...(responseEvents || [])];
+      const uniqueEvents = allEvents.filter((event, index, array) => 
+        array.findIndex(e => e.id === event.id) === index
+      );
+
+      console.log('Fetched events:', uniqueEvents);
+      setEvents(uniqueEvents);
     } catch (error) {
       console.error('Error fetching events:', error);
     }
@@ -175,8 +196,20 @@ const Events = () => {
   };
 
   const incomingRequests = events.filter(event => {
-    // Events where user is invited and hasn't responded yet (or has pending status)
-    return event.invited_participants?.includes(userId) && getUserResponse(event) === 'pending';
+    // Events where user is invited (not creator) and hasn't responded yet or has pending status
+    const isInvited = event.invited_participants?.includes(userId);
+    const isNotCreator = event.creator_id !== userId;
+    const response = getUserResponse(event);
+    
+    console.log('Event filter debug:', { 
+      eventId: event.id, 
+      isInvited, 
+      isNotCreator, 
+      response,
+      invited_participants: event.invited_participants 
+    });
+    
+    return isInvited && isNotCreator && response === 'pending';
   });
 
   const outgoingRequests = events.filter(
