@@ -8,22 +8,30 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, Clock, MapPin, Users, Send } from 'lucide-react';
+import PetInviteSelector from './PetInviteSelector';
+import type { Tables } from '@/integrations/supabase/types';
+
+type PetProfile = Tables<'pet_profiles'>;
 
 interface GroupWalkModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   userId: string;
+  userPets: PetProfile[];
 }
 
 const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
-  userId
+  userId,
+  userPets
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [invitedPets, setInvitedPets] = useState<string[]>([]);
+  const [invitedUsers, setInvitedUsers] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     date: '',
@@ -50,12 +58,17 @@ const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
       // Combine date and time
       const scheduledDateTime = new Date(`${formData.date}T${formData.time}`);
 
+      // Prepare participants list
+      const allParticipants = [userId, ...invitedUsers];
+
       const { error } = await supabase
         .from('events')
         .insert({
           event_type: 'group_walk',
           creator_id: userId,
-          participants: [userId], // Creator is initially the only participant
+          participants: allParticipants,
+          invited_pet_ids: invitedPets,
+          invited_participants: invitedUsers,
           status: 'confirmed', // Group walks are auto-confirmed
           location_name: formData.location,
           scheduled_time: scheduledDateTime.toISOString(),
@@ -70,7 +83,7 @@ const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
         description: "Your group walk has been created successfully.",
       });
 
-      // Reset form
+      // Reset form and invitations
       setFormData({
         title: '',
         date: '',
@@ -78,6 +91,8 @@ const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
         location: '',
         description: ''
       });
+      setInvitedPets([]);
+      setInvitedUsers([]);
 
       onSuccess();
       onClose();
@@ -98,6 +113,26 @@ const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
       ...prev,
       [field]: value
     }));
+  };
+
+  const handlePetToggle = (petId: string, petOwnerId: string) => {
+    setInvitedPets(prev => {
+      const isSelected = prev.includes(petId);
+      if (isSelected) {
+        // Remove pet and potentially the user if no more pets are selected
+        const newPets = prev.filter(id => id !== petId);
+        setInvitedUsers(prevUsers => {
+          return prevUsers.filter(userId => userId !== petOwnerId);
+        });
+        return newPets;
+      } else {
+        // Add pet and user
+        setInvitedUsers(prevUsers => 
+          prevUsers.includes(petOwnerId) ? prevUsers : [...prevUsers, petOwnerId]
+        );
+        return [...prev, petId];
+      }
+    });
   };
 
   return (
@@ -173,6 +208,13 @@ const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
               required
             />
           </div>
+
+          {/* Pet Invitation Selector */}
+          <PetInviteSelector
+            userPetIds={userPets.map(pet => pet.id)}
+            selectedPets={invitedPets}
+            onPetToggle={handlePetToggle}
+          />
 
           <div className="space-y-2">
             <Label htmlFor="description">

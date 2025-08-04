@@ -453,6 +453,7 @@ const Social = () => {
         onClose={() => setShowGroupWalkModal(false)}
         onSuccess={handleRefresh}
         userId={user?.id || ''}
+        userPets={pets}
       />
     </Layout>
   );

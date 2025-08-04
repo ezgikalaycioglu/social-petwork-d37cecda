@@ -158,7 +158,8 @@ const Events = () => {
   };
 
   const incomingRequests = events.filter(
-    event => event.creator_id !== userId && event.status === 'pending'
+    event => (event.creator_id !== userId && event.status === 'pending') || 
+             (event.invited_participants?.includes(userId) && event.status === 'pending')
   );
 
   const outgoingRequests = events.filter(
@@ -486,6 +487,7 @@ const Events = () => {
         onClose={() => setShowGroupWalkModal(false)}
         onSuccess={() => fetchUserEvents(userId)}
         userId={userId}
+        userPets={userPets}
       />
     </Layout>
   );

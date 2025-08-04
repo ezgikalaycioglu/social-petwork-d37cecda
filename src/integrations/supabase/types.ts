@@ -296,6 +296,8 @@ export type Database = {
           creator_id: string
           event_type: string
           id: string
+          invited_participants: string[] | null
+          invited_pet_ids: string[] | null
           location_lat: number | null
           location_lon: number | null
           location_name: string
@@ -311,6 +313,8 @@ export type Database = {
           creator_id: string
           event_type: string
           id?: string
+          invited_participants?: string[] | null
+          invited_pet_ids?: string[] | null
           location_lat?: number | null
           location_lon?: number | null
           location_name: string
@@ -326,6 +330,8 @@ export type Database = {
           creator_id?: string
           event_type?: string
           id?: string
+          invited_participants?: string[] | null
+          invited_pet_ids?: string[] | null
           location_lat?: number | null
           location_lon?: number | null
           location_name?: string

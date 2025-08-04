@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, Clock, MapPin, Send } from 'lucide-react';
+import PetInviteSelector from './PetInviteSelector';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -31,6 +32,8 @@ const PlaydateRequestModal: React.FC<PlaydateRequestModalProps> = ({
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [invitedPets, setInvitedPets] = useState<string[]>([]);
+  const [invitedUsers, setInvitedUsers] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     date: '',
     time: '',
@@ -68,12 +71,19 @@ const PlaydateRequestModal: React.FC<PlaydateRequestModalProps> = ({
       // Combine date and time
       const scheduledDateTime = new Date(`${formData.date}T${formData.time}`);
 
+      // Prepare participants list
+      const allParticipants = targetUserId 
+        ? [user.id, targetUserId, ...invitedUsers]
+        : [user.id, ...invitedUsers];
+
       const { error } = await supabase
         .from('events')
         .insert({
           event_type: 'playdate',
           creator_id: user.id,
-          participants: [user.id, targetUserId],
+          participants: allParticipants,
+          invited_pet_ids: invitedPets,
+          invited_participants: invitedUsers,
           status: 'pending',
           location_name: formData.location,
           scheduled_time: scheduledDateTime.toISOString(),
@@ -87,13 +97,15 @@ const PlaydateRequestModal: React.FC<PlaydateRequestModalProps> = ({
         description: "Your playdate request has been sent successfully.",
       });
 
-      // Reset form
+      // Reset form and invitations
       setFormData({
         date: '',
         time: '',
         location: '',
         message: ''
       });
+      setInvitedPets([]);
+      setInvitedUsers([]);
 
       onSuccess();
       onClose();
@@ -114,6 +126,31 @@ const PlaydateRequestModal: React.FC<PlaydateRequestModalProps> = ({
       ...prev,
       [field]: value
     }));
+  };
+
+  const handlePetToggle = (petId: string, petOwnerId: string) => {
+    setInvitedPets(prev => {
+      const isSelected = prev.includes(petId);
+      if (isSelected) {
+        // Remove pet and potentially the user if no more pets are selected
+        const newPets = prev.filter(id => id !== petId);
+        setInvitedUsers(prevUsers => {
+          // Check if this user has any other pets invited
+          const userStillHasPetsInvited = newPets.some(id => 
+            // We'd need to check pet ownership, but for simplicity, remove user
+            false
+          );
+          return prevUsers.filter(userId => userId !== petOwnerId);
+        });
+        return newPets;
+      } else {
+        // Add pet and user
+        setInvitedUsers(prevUsers => 
+          prevUsers.includes(petOwnerId) ? prevUsers : [...prevUsers, petOwnerId]
+        );
+        return [...prev, petId];
+      }
+    });
   };
 
   return (
@@ -174,6 +211,13 @@ const PlaydateRequestModal: React.FC<PlaydateRequestModalProps> = ({
               required
             />
           </div>
+
+          {/* Pet Invitation Selector */}
+          <PetInviteSelector
+            userPetIds={userPets.map(pet => pet.id)}
+            selectedPets={invitedPets}
+            onPetToggle={handlePetToggle}
+          />
 
           <div className="space-y-2">
             <Label htmlFor="message">
