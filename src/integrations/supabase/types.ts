@@ -290,12 +290,41 @@ export type Database = {
           },
         ]
       }
+      event_responses: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          response: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          response?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          response?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           created_at: string
           creator_id: string
           event_type: string
           id: string
+          invited_participants: string[] | null
+          invited_pet_ids: string[] | null
           location_lat: number | null
           location_lon: number | null
           location_name: string
@@ -311,6 +340,8 @@ export type Database = {
           creator_id: string
           event_type: string
           id?: string
+          invited_participants?: string[] | null
+          invited_pet_ids?: string[] | null
           location_lat?: number | null
           location_lon?: number | null
           location_name: string
@@ -326,6 +357,8 @@ export type Database = {
           creator_id?: string
           event_type?: string
           id?: string
+          invited_participants?: string[] | null
+          invited_pet_ids?: string[] | null
           location_lat?: number | null
           location_lon?: number | null
           location_name?: string

@@ -79,14 +79,38 @@ const Events = () => {
 
   const fetchUserEvents = async (userId: string) => {
     try {
-      const { data, error } = await supabase
+      // First get all events where user is creator or invited
+      const { data: events, error } = await supabase
         .from('events')
-        .select('*')
-        .or(`creator_id.eq.${userId},participants.cs.{${userId}}`)
+        .select(`
+          *,
+          event_responses!left(user_id, response)
+        `)
+        .or(`creator_id.eq.${userId},invited_participants.cs.{${userId}}`)
         .order('scheduled_time', { ascending: true });
 
       if (error) throw error;
-      setEvents(data || []);
+
+      // Also get events where user has responses (backup query)
+      const { data: responseEvents, error: responseError } = await supabase
+        .from('events')
+        .select(`
+          *,
+          event_responses!inner(user_id, response)
+        `)
+        .eq('event_responses.user_id', userId)
+        .order('scheduled_time', { ascending: true });
+
+      if (responseError) throw responseError;
+
+      // Combine and deduplicate events
+      const allEvents = [...(events || []), ...(responseEvents || [])];
+      const uniqueEvents = allEvents.filter((event, index, array) => 
+        array.findIndex(e => e.id === event.id) === index
+      );
+
+      console.log('Fetched events:', uniqueEvents);
+      setEvents(uniqueEvents);
     } catch (error) {
       console.error('Error fetching events:', error);
     }
@@ -94,17 +118,21 @@ const Events = () => {
 
   const handleAcceptRequest = async (eventId: string) => {
     try {
-      const { error } = await supabase
-        .from('events')
-        .update({ status: 'confirmed' })
-        .eq('id', eventId);
+      // Update user's response to accepted
+      const { error: responseError } = await supabase
+        .from('event_responses')
+        .upsert({
+          event_id: eventId,
+          user_id: userId,
+          response: 'accepted'
+        });
 
-      if (error) throw error;
+      if (responseError) throw responseError;
 
       await fetchUserEvents(userId);
       toast({
         title: "Request Accepted",
-        description: "The playdate has been confirmed!",
+        description: "You've accepted this invitation!",
       });
     } catch (error) {
       console.error('Error accepting request:', error);
@@ -118,17 +146,21 @@ const Events = () => {
 
   const handleDeclineRequest = async (eventId: string) => {
     try {
-      const { error } = await supabase
-        .from('events')
-        .update({ status: 'declined' })
-        .eq('id', eventId);
+      // Update user's response to declined
+      const { error: responseError } = await supabase
+        .from('event_responses')
+        .upsert({
+          event_id: eventId,
+          user_id: userId,
+          response: 'declined'
+        });
 
-      if (error) throw error;
+      if (responseError) throw responseError;
 
       await fetchUserEvents(userId);
       toast({
         title: "Request Declined",
-        description: "The playdate request has been declined.",
+        description: "You've declined this invitation.",
       });
     } catch (error) {
       console.error('Error declining request:', error);
@@ -157,17 +189,41 @@ const Events = () => {
     });
   };
 
-  const incomingRequests = events.filter(
-    event => event.creator_id !== userId && event.status === 'pending'
-  );
+  // Helper function to get user's response to an event
+  const getUserResponse = (event: any) => {
+    const userResponse = event.event_responses?.find((response: any) => response.user_id === userId);
+    return userResponse?.response || 'pending';
+  };
+
+  const incomingRequests = events.filter(event => {
+    // Events where user is invited (not creator) and hasn't responded yet or has pending status
+    const isInvited = event.invited_participants?.includes(userId);
+    const isNotCreator = event.creator_id !== userId;
+    const response = getUserResponse(event);
+    
+    console.log('Event filter debug:', { 
+      eventId: event.id, 
+      isInvited, 
+      isNotCreator, 
+      response,
+      invited_participants: event.invited_participants 
+    });
+    
+    return isInvited && isNotCreator && response === 'pending';
+  });
 
   const outgoingRequests = events.filter(
     event => event.creator_id === userId && event.status === 'pending'
   );
 
-  const upcomingEvents = events.filter(
-    event => event.status === 'confirmed' && new Date(event.scheduled_time) > new Date()
-  );
+  const upcomingEvents = events.filter(event => {
+    const isInFuture = new Date(event.scheduled_time) > new Date();
+    const userAccepted = getUserResponse(event) === 'accepted';
+    const isCreator = event.creator_id === userId;
+    
+    // Show if user is creator or has accepted the invitation
+    return isInFuture && (isCreator || userAccepted);
+  });
 
   if (loading) {
     return (
@@ -247,6 +303,18 @@ const Events = () => {
                   className="border-red-500 text-red-600 hover:bg-red-50 flex-1"
                 >
                   Decline
+                </Button>
+              </div>
+            )}
+            {type === 'upcoming' && event.creator_id !== userId && (
+              <div className="flex gap-2 mt-4">
+                <Button
+                  onClick={() => handleDeclineRequest(event.id)}
+                  variant="outline"
+                  size="sm"
+                  className="border-red-500 text-red-600 hover:bg-red-50"
+                >
+                  Can't Attend
                 </Button>
               </div>
             )}
@@ -330,6 +398,18 @@ const Events = () => {
                       className="border-red-500 text-red-600 hover:bg-red-50 flex-1"
                     >
                       Decline
+                    </Button>
+                  </div>
+                )}
+                {type === 'upcoming' && event.creator_id !== userId && (
+                  <div className="flex gap-2 w-full mt-2">
+                    <Button
+                      onClick={() => handleDeclineRequest(event.id)}
+                      variant="outline"
+                      size="sm"
+                      className="border-red-500 text-red-600 hover:bg-red-50 flex-1"
+                    >
+                      Can't Attend
                     </Button>
                   </div>
                 )}
@@ -486,6 +566,7 @@ const Events = () => {
         onClose={() => setShowGroupWalkModal(false)}
         onSuccess={() => fetchUserEvents(userId)}
         userId={userId}
+        userPets={userPets}
       />
     </Layout>
   );
