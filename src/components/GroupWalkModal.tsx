@@ -69,7 +69,7 @@ const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
           participants: allParticipants,
           invited_pet_ids: invitedPets,
           invited_participants: invitedUsers,
-          status: 'confirmed', // Group walks are auto-confirmed
+          status: 'pending', // Will move to confirmed when participants accept
           location_name: formData.location,
           scheduled_time: scheduledDateTime.toISOString(),
           title: formData.title,
