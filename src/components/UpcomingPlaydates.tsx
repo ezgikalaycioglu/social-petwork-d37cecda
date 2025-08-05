@@ -15,6 +15,11 @@ interface UpcomingPlaydate {
   title: string | null;
   participants: string[];
   status: string;
+  creator_id: string;
+  event_responses?: Array<{
+    user_id: string;
+    response: string;
+  }>;
 }
 
 const UpcomingPlaydates: React.FC = () => {
@@ -31,23 +36,36 @@ const UpcomingPlaydates: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
+      // Get events where user is creator or invited
+      const { data: allEvents, error } = await supabase
         .from('events')
         .select('*')
-        .or(`creator_id.eq.${user.id},participants.cs.{${user.id}}`)
-        .eq('status', 'confirmed')
+        .or(`creator_id.eq.${user.id},invited_participants.cs.{${user.id}}`)
         .gte('scheduled_time', new Date().toISOString())
-        .order('scheduled_time', { ascending: true })
-        .limit(5);
+        .order('scheduled_time', { ascending: true });
 
       if (error) throw error;
 
-      // Filter out past events in case of time zone issues
-      const upcomingEvents = (data || []).filter(event => 
-        !isPast(new Date(event.scheduled_time))
-      );
+      // Get user's responses to events
+      const { data: userResponses, error: responsesError } = await supabase
+        .from('event_responses')
+        .select('*')
+        .eq('user_id', user.id);
 
-      setPlaydates(upcomingEvents);
+      if (responsesError) throw responsesError;
+
+      // Filter events where user is creator OR has accepted
+      const upcomingEvents = (allEvents || []).filter(event => {
+        const isCreator = event.creator_id === user.id;
+        const userResponse = (userResponses || []).find(r => r.event_id === event.id);
+        const hasAccepted = userResponse?.response === 'accepted';
+        const isInFuture = !isPast(new Date(event.scheduled_time));
+        
+        return isInFuture && (isCreator || hasAccepted);
+      });
+
+      // Only show the first upcoming event
+      setPlaydates(upcomingEvents.slice(0, 1));
     } catch (error) {
       console.error('Error fetching upcoming playdates:', error);
       toast({

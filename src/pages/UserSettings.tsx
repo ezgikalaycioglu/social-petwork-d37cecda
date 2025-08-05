@@ -197,7 +197,8 @@ const UserSettings = () => {
         title: t('settings.signOut'),
         description: "You have been successfully signed out.",
       });
-      navigate('/');
+      // Navigate to top of landing page
+      window.location.href = '/';
     } catch (error) {
       toast({
         title: "Error",
