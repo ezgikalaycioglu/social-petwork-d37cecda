@@ -49,7 +49,8 @@ const AuthButton = () => {
           title: 'Signed out',
           description: 'You have been successfully signed out.',
         });
-        navigate('/');
+        // Navigate to top of landing page
+        window.location.href = '/';
       }
     } catch (error) {
       toast({
