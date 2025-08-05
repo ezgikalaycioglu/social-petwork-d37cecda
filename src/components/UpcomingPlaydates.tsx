@@ -36,44 +36,36 @@ const UpcomingPlaydates: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get events where user is creator
-      const { data: creatorEvents, error: creatorError } = await supabase
+      // Get events where user is creator or invited
+      const { data: allEvents, error } = await supabase
         .from('events')
         .select('*')
-        .eq('creator_id', user.id)
+        .or(`creator_id.eq.${user.id},invited_participants.cs.{${user.id}}`)
         .gte('scheduled_time', new Date().toISOString())
         .order('scheduled_time', { ascending: true });
 
-      if (creatorError) throw creatorError;
+      if (error) throw error;
 
-      // Get events where user has accepted responses
-      const { data: acceptedEvents, error: acceptedError } = await supabase
-        .from('events')
-        .select(`
-          *,
-          event_responses!inner(user_id, response)
-        `)
-        .eq('event_responses.user_id', user.id)
-        .eq('event_responses.response', 'accepted')
-        .gte('scheduled_time', new Date().toISOString())
-        .order('scheduled_time', { ascending: true });
+      // Get user's responses to events
+      const { data: userResponses, error: responsesError } = await supabase
+        .from('event_responses')
+        .select('*')
+        .eq('user_id', user.id);
 
-      if (acceptedError) throw acceptedError;
+      if (responsesError) throw responsesError;
 
-      // Combine and deduplicate events
-      const allEvents = [...(creatorEvents || []), ...(acceptedEvents || [])];
-      const uniqueEvents = allEvents.filter((event, index, array) => 
-        array.findIndex(e => e.id === event.id) === index
-      );
+      // Filter events where user is creator OR has accepted
+      const upcomingEvents = (allEvents || []).filter(event => {
+        const isCreator = event.creator_id === user.id;
+        const userResponse = (userResponses || []).find(r => r.event_id === event.id);
+        const hasAccepted = userResponse?.response === 'accepted';
+        const isInFuture = !isPast(new Date(event.scheduled_time));
+        
+        return isInFuture && (isCreator || hasAccepted);
+      });
 
-      const data = uniqueEvents.slice(0, 1); // Only show the first upcoming event
-
-      // Filter out past events
-      const upcomingEvents = (data || []).filter(event => 
-        !isPast(new Date(event.scheduled_time))
-      );
-
-      setPlaydates(upcomingEvents);
+      // Only show the first upcoming event
+      setPlaydates(upcomingEvents.slice(0, 1));
     } catch (error) {
       console.error('Error fetching upcoming playdates:', error);
       toast({

@@ -84,65 +84,34 @@ const Events = () => {
 
   const fetchUserEvents = async (userId: string) => {
     try {
-      // Get events where user is creator
-      const { data: creatorEvents, error: creatorError } = await supabase
+      // Get all events where user is creator or invited
+      const { data: allEvents, error } = await supabase
         .from('events')
-        .select(`
-          *,
-          event_responses(user_id, response)
-        `)
-        .eq('creator_id', userId)
+        .select('*')
+        .or(`creator_id.eq.${userId},invited_participants.cs.{${userId}}`)
         .order('scheduled_time', { ascending: true });
 
-      if (creatorError) throw creatorError;
+      if (error) throw error;
 
-      // Get events where user is in invited_participants
-      const { data: invitedEvents, error: invitedError } = await supabase
-        .from('events')
-        .select(`
-          *,
-          event_responses(user_id, response)
-        `)
-        .contains('invited_participants', [userId])
-        .order('scheduled_time', { ascending: true });
-
-      if (invitedError) throw invitedError;
-
-      // Get events where user has responses (for cases where invite list might be missing)
-      const { data: responseEvents, error: responseError } = await supabase
+      // Get user's responses to events
+      const { data: userResponses, error: responsesError } = await supabase
         .from('event_responses')
-        .select(`
-          event_id,
-          user_id,
-          response,
-          events (
-            *
-          )
-        `)
+        .select('*')
         .eq('user_id', userId);
 
-      if (responseError) throw responseError;
+      if (responsesError) throw responsesError;
 
-      // Transform response events to match our structure
-      const transformedResponseEvents = (responseEvents || [])
-        .filter(r => r.events && typeof r.events === 'object')
-        .map(r => ({
-          ...(r.events as any),
-          event_responses: [{ user_id: r.user_id, response: r.response }]
-        }));
+      // Combine events with user responses
+      const eventsWithResponses = (allEvents || []).map(event => {
+        const userResponse = (userResponses || []).find(r => r.event_id === event.id);
+        return {
+          ...event,
+          event_responses: userResponse ? [userResponse] : []
+        };
+      });
 
-      // Combine and deduplicate events
-      const allEvents = [
-        ...(creatorEvents || []),
-        ...(invitedEvents || []),
-        ...transformedResponseEvents
-      ];
-      const uniqueEvents = allEvents.filter((event, index, array) => 
-        array.findIndex(e => e.id === event.id) === index
-      );
-
-      console.log('Fetched events with responses:', uniqueEvents);
-      setEvents(uniqueEvents as Event[]);
+      console.log('Fetched events with responses:', eventsWithResponses);
+      setEvents(eventsWithResponses as Event[]);
     } catch (error) {
       console.error('Error fetching events:', error);
     }
@@ -222,7 +191,7 @@ const Events = () => {
   };
 
   // Helper function to get user's response to an event
-  const getUserResponse = (event: any) => {
+  const getUserResponse = (event: Event) => {
     const userResponse = event.event_responses?.find((response: any) => response.user_id === userId);
     return userResponse?.response || 'pending';
   };
