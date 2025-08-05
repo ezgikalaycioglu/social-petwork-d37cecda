@@ -193,7 +193,7 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      {isWeb && <PWAInstallPopup />}
+      {isWeb() && <PWAInstallPopup />}
       {showQuickTour && (
         <QuickTour
           onComplete={handleTourComplete}
