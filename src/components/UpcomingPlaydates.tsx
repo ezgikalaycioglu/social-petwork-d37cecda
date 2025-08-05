@@ -15,6 +15,11 @@ interface UpcomingPlaydate {
   title: string | null;
   participants: string[];
   status: string;
+  creator_id: string;
+  event_responses?: Array<{
+    user_id: string;
+    response: string;
+  }>;
 }
 
 const UpcomingPlaydates: React.FC = () => {
@@ -31,18 +36,39 @@ const UpcomingPlaydates: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
+      // Get events where user is creator
+      const { data: creatorEvents, error: creatorError } = await supabase
         .from('events')
         .select('*')
-        .or(`creator_id.eq.${user.id},participants.cs.{${user.id}}`)
-        .eq('status', 'confirmed')
+        .eq('creator_id', user.id)
         .gte('scheduled_time', new Date().toISOString())
-        .order('scheduled_time', { ascending: true })
-        .limit(5);
+        .order('scheduled_time', { ascending: true });
 
-      if (error) throw error;
+      if (creatorError) throw creatorError;
 
-      // Filter out past events in case of time zone issues
+      // Get events where user has accepted responses
+      const { data: acceptedEvents, error: acceptedError } = await supabase
+        .from('events')
+        .select(`
+          *,
+          event_responses!inner(user_id, response)
+        `)
+        .eq('event_responses.user_id', user.id)
+        .eq('event_responses.response', 'accepted')
+        .gte('scheduled_time', new Date().toISOString())
+        .order('scheduled_time', { ascending: true });
+
+      if (acceptedError) throw acceptedError;
+
+      // Combine and deduplicate events
+      const allEvents = [...(creatorEvents || []), ...(acceptedEvents || [])];
+      const uniqueEvents = allEvents.filter((event, index, array) => 
+        array.findIndex(e => e.id === event.id) === index
+      );
+
+      const data = uniqueEvents.slice(0, 1); // Only show the first upcoming event
+
+      // Filter out past events
       const upcomingEvents = (data || []).filter(event => 
         !isPast(new Date(event.scheduled_time))
       );

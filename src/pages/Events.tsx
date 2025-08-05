@@ -13,7 +13,12 @@ import GroupWalkModal from '@/components/GroupWalkModal';
 import UpcomingPlaydates from '@/components/UpcomingPlaydates';
 import type { Tables } from '@/integrations/supabase/types';
 
-type Event = Tables<'events'>;
+type Event = Tables<'events'> & {
+  event_responses?: Array<{
+    user_id: string;
+    response: string;
+  }>;
+};
 type PetProfile = Tables<'pet_profiles'>;
 
 const Events = () => {
@@ -79,38 +84,65 @@ const Events = () => {
 
   const fetchUserEvents = async (userId: string) => {
     try {
-      // First get all events where user is creator or invited
-      const { data: events, error } = await supabase
+      // Get events where user is creator
+      const { data: creatorEvents, error: creatorError } = await supabase
         .from('events')
         .select(`
           *,
-          event_responses!left(user_id, response)
+          event_responses(user_id, response)
         `)
-        .or(`creator_id.eq.${userId},invited_participants.cs.{${userId}}`)
+        .eq('creator_id', userId)
         .order('scheduled_time', { ascending: true });
 
-      if (error) throw error;
+      if (creatorError) throw creatorError;
 
-      // Also get events where user has responses (backup query)
+      // Get events where user is in invited_participants
+      const { data: invitedEvents, error: invitedError } = await supabase
+        .from('events')
+        .select(`
+          *,
+          event_responses(user_id, response)
+        `)
+        .contains('invited_participants', [userId])
+        .order('scheduled_time', { ascending: true });
+
+      if (invitedError) throw invitedError;
+
+      // Get events where user has responses (for cases where invite list might be missing)
       const { data: responseEvents, error: responseError } = await supabase
-        .from('events')
+        .from('event_responses')
         .select(`
-          *,
-          event_responses!inner(user_id, response)
+          event_id,
+          user_id,
+          response,
+          events (
+            *
+          )
         `)
-        .eq('event_responses.user_id', userId)
-        .order('scheduled_time', { ascending: true });
+        .eq('user_id', userId);
 
       if (responseError) throw responseError;
 
+      // Transform response events to match our structure
+      const transformedResponseEvents = (responseEvents || [])
+        .filter(r => r.events && typeof r.events === 'object')
+        .map(r => ({
+          ...(r.events as any),
+          event_responses: [{ user_id: r.user_id, response: r.response }]
+        }));
+
       // Combine and deduplicate events
-      const allEvents = [...(events || []), ...(responseEvents || [])];
+      const allEvents = [
+        ...(creatorEvents || []),
+        ...(invitedEvents || []),
+        ...transformedResponseEvents
+      ];
       const uniqueEvents = allEvents.filter((event, index, array) => 
         array.findIndex(e => e.id === event.id) === index
       );
 
-      console.log('Fetched events:', uniqueEvents);
-      setEvents(uniqueEvents);
+      console.log('Fetched events with responses:', uniqueEvents);
+      setEvents(uniqueEvents as Event[]);
     } catch (error) {
       console.error('Error fetching events:', error);
     }
@@ -196,32 +228,39 @@ const Events = () => {
   };
 
   const incomingRequests = events.filter(event => {
-    // Events where user is invited (not creator) and hasn't responded yet or has pending status
+    // Events where user is invited (not creator) and has pending response
     const isInvited = event.invited_participants?.includes(userId);
     const isNotCreator = event.creator_id !== userId;
     const response = getUserResponse(event);
+    const isInFuture = new Date(event.scheduled_time) > new Date();
     
-    console.log('Event filter debug:', { 
+    console.log('Incoming request filter debug:', { 
       eventId: event.id, 
       isInvited, 
       isNotCreator, 
       response,
-      invited_participants: event.invited_participants 
+      isInFuture,
+      invited_participants: event.invited_participants,
+      event_responses: event.event_responses
     });
     
-    return isInvited && isNotCreator && response === 'pending';
+    return isInvited && isNotCreator && response === 'pending' && isInFuture;
   });
 
-  const outgoingRequests = events.filter(
-    event => event.creator_id === userId && event.status === 'pending'
-  );
+  const outgoingRequests = events.filter(event => {
+    const isCreator = event.creator_id === userId;
+    const hasInvitations = event.invited_participants && event.invited_participants.length > 0;
+    const isInFuture = new Date(event.scheduled_time) > new Date();
+    
+    return isCreator && hasInvitations && isInFuture;
+  });
 
   const upcomingEvents = events.filter(event => {
     const isInFuture = new Date(event.scheduled_time) > new Date();
     const userAccepted = getUserResponse(event) === 'accepted';
     const isCreator = event.creator_id === userId;
     
-    // Show if user is creator or has accepted the invitation
+    // Show if user is creator OR has accepted the invitation
     return isInFuture && (isCreator || userAccepted);
   });
 
