@@ -38,7 +38,6 @@ export const INPUT_LIMITS = {
 // Sanitization function to remove potentially harmful characters while preserving spaces
 export const sanitizeInput = (input: string): string => {
   return input
-    .trim()
     .replace(/[<>]/g, '') // Remove angle brackets to prevent XSS
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, ''); // Remove control characters except newlines and spaces
 };
