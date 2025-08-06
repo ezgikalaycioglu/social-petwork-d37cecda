@@ -1,4 +1,3 @@
-
 // Email validation regex pattern (RFC 5322 compliant)
 const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
@@ -36,12 +35,12 @@ export const INPUT_LIMITS = {
   DEAL_TERMS: { min: 0, max: 500 }
 } as const;
 
-// Sanitization function to remove potentially harmful characters
+// Sanitization function to remove potentially harmful characters while preserving spaces
 export const sanitizeInput = (input: string): string => {
   return input
     .trim()
     .replace(/[<>]/g, '') // Remove angle brackets to prevent XSS
-    .replace(/[\x00-\x1f\x7f-\x9f]/g, ''); // Remove control characters
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, ''); // Remove control characters except newlines and spaces
 };
 
 // Email validation
