@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Clock, MapPin, Users } from 'lucide-react';
 import { format, formatDistanceToNow, isPast } from 'date-fns';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import EventDetailsModal from '@/components/EventDetailsModal';
 
 interface UpcomingPlaydate {
   id: string;
@@ -13,9 +14,11 @@ interface UpcomingPlaydate {
   scheduled_time: string;
   location_name: string;
   title: string | null;
+  message: string | null;
   participants: string[];
   status: string;
   creator_id: string;
+  invited_participants?: string[];
   event_responses?: Array<{
     user_id: string;
     response: string;
@@ -25,6 +28,9 @@ interface UpcomingPlaydate {
 const UpcomingPlaydates: React.FC = () => {
   const [playdates, setPlaydates] = useState<UpcomingPlaydate[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState<UpcomingPlaydate | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string>('');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -35,6 +41,8 @@ const UpcomingPlaydates: React.FC = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+      
+      setCurrentUserId(user.id);
 
       // Get events where user is creator or invited
       const { data: allEvents, error } = await supabase
@@ -91,6 +99,20 @@ const UpcomingPlaydates: React.FC = () => {
     };
   };
 
+  const handleEventClick = (event: UpcomingPlaydate) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+  };
+
+  const handleEventUpdate = () => {
+    fetchUpcomingPlaydates();
+  };
+
   if (loading) {
     return (
       <div className="mb-6">
@@ -137,7 +159,8 @@ const UpcomingPlaydates: React.FC = () => {
             return (
               <Card 
                 key={playdate.id} 
-                className="w-72 flex-shrink-0 bg-gradient-to-r from-green-50 to-blue-50 border-l-4 border-l-green-500 hover:shadow-md transition-shadow cursor-pointer"
+                className="w-72 flex-shrink-0 bg-gradient-to-r from-green-50 to-blue-50 border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300 cursor-pointer active:scale-95"
+                onClick={() => handleEventClick(playdate)}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-2">
@@ -177,9 +200,17 @@ const UpcomingPlaydates: React.FC = () => {
           })}
         </div>
         <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-    </div>
-  );
-};
+        </ScrollArea>
+        
+        <EventDetailsModal
+          event={selectedEvent}
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          currentUserId={currentUserId}
+          onEventUpdate={handleEventUpdate}
+        />
+      </div>
+    );
+  };
 
-export default UpcomingPlaydates;
+  export default UpcomingPlaydates;
