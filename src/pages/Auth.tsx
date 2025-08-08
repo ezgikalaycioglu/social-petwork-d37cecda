@@ -9,6 +9,7 @@ import { validateEmail } from '@/utils/validation';
 import { useSecurity } from '@/hooks/useSecurity';
 import { Eye, EyeOff, Heart, PawPrint, ArrowLeft, Mail, Lock, User } from 'lucide-react';
 import authIllustration from '@/assets/auth-pets-illustration.jpg';
+import SocialLogin from '@/components/SocialLogin';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -364,6 +365,9 @@ const Auth = () => {
                         )}
                       </Button>
                     </form>
+
+                    {/* Social Login Options */}
+                    <SocialLogin mode={isSignUp ? 'signup' : 'signin'} />
 
                     {/* Forgot Password Link - only show on sign in */}
                     {!isSignUp && !showForgotPassword && (
