@@ -122,6 +122,16 @@ const Events = () => {
 
   const handleAcceptRequest = async (eventId: string) => {
     try {
+      // Prevent accepting past events
+      const ev = events.find(e => e.id === eventId);
+      if (ev && Date.parse(ev.scheduled_time) < Date.now()) {
+        toast({
+          title: 'Event Passed',
+          description: "You can't accept an event that has already passed.",
+          variant: 'destructive',
+        });
+        return;
+      }
       // Update user's response to accepted
       const { error: responseError } = await supabase
         .from('event_responses')
@@ -255,6 +265,7 @@ const Events = () => {
 
   // Mobile Card Component
   const EventCard = ({ event, type }: { event: Event; type: 'incoming' | 'outgoing' | 'upcoming' }) => {
+    const isPast = Date.parse(event.scheduled_time) < Date.now();
     if (!isMobile) {
       // Desktop card layout (existing)
       return (
@@ -314,9 +325,10 @@ const Events = () => {
                     e.stopPropagation();
                     handleAcceptRequest(event.id);
                   }}
+                  disabled={isPast}
                   className="bg-green-600 hover:bg-green-700 text-white flex-1"
                 >
-                  Accept
+                  {isPast ? 'Event Passed' : 'Accept'}
                 </Button>
                 <Button
                   onClick={(e) => {
@@ -419,10 +431,11 @@ const Events = () => {
                         e.stopPropagation();
                         handleAcceptRequest(event.id);
                       }}
+                      disabled={isPast}
                       size="sm"
                       className="bg-green-600 hover:bg-green-700 text-white flex-1"
                     >
-                      Accept
+                      {isPast ? 'Event Passed' : 'Accept'}
                     </Button>
                     <Button
                       onClick={(e) => {

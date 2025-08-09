@@ -64,6 +64,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
   const userResponse = event.event_responses?.find(r => r.user_id === currentUserId);
   const currentUserResponse = userResponse?.response || 'pending';
   const isAttending = currentUserResponse === 'accepted';
+  const isPast = Date.parse(event.scheduled_time) < Date.now();
 
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -75,7 +76,19 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
   const handleRSVPChange = async (newResponse: 'accepted' | 'declined') => {
     if (isUpdating) return;
-    
+
+    if (newResponse === 'accepted') {
+      const scheduledMs = Date.parse(event.scheduled_time);
+      if (!isNaN(scheduledMs) && scheduledMs < Date.now()) {
+        toast({
+          title: "Event Passed",
+          description: "This event has already passed. You can't accept it.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setIsUpdating(true);
     try {
       const { error } = await supabase
@@ -227,6 +240,12 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
           {/* Action Buttons */}
           <div className="space-y-3">
+            {!isCreator && isPast && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <AlertTriangle className="w-4 h-4" />
+                This event has already passed.
+              </div>
+            )}
             {isCreator ? (
               // Creator actions
               <Button
@@ -265,11 +284,11 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                     </Button>
                     <Button
                       onClick={() => handleRSVPChange('accepted')}
-                      disabled={isUpdating}
+                      disabled={isUpdating || isPast}
                       className="bg-green-600 hover:bg-green-700 text-white"
                     >
                       <Check className="w-4 h-4 mr-2" />
-                      {isUpdating ? 'Updating...' : 'Accept'}
+                      {isUpdating ? 'Updating...' : isPast ? 'Event Passed' : 'Accept'}
                     </Button>
                   </>
                 ) : (
@@ -286,11 +305,11 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                     </Button>
                     <Button
                       onClick={() => handleRSVPChange('accepted')}
-                      disabled={isUpdating}
+                      disabled={isUpdating || isPast}
                       className="bg-green-600 hover:bg-green-700 text-white"
                     >
                       <Check className="w-4 h-4 mr-2" />
-                      {isUpdating ? 'Updating...' : 'Accept'}
+                      {isUpdating ? 'Updating...' : isPast ? 'Event Passed' : 'Accept'}
                     </Button>
                   </>
                 )}
