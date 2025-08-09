@@ -129,7 +129,7 @@ const Events = () => {
           event_id: eventId,
           user_id: userId,
           response: 'accepted'
-        });
+        }, { onConflict: 'event_id,user_id' });
 
       if (responseError) throw responseError;
 
@@ -157,7 +157,7 @@ const Events = () => {
           event_id: eventId,
           user_id: userId,
           response: 'declined'
-        });
+        }, { onConflict: 'event_id,user_id' });
 
       if (responseError) throw responseError;
 

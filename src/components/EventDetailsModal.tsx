@@ -84,7 +84,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
           event_id: event.id,
           user_id: currentUserId,
           response: newResponse
-        });
+        }, { onConflict: 'event_id,user_id' });
 
       if (error) throw error;
 
