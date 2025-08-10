@@ -322,7 +322,7 @@ const PetSitters = () => {
         <div className="bg-white/80 backdrop-blur-sm border-b border-border/50">
           <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="text-center">
-              <h1 className="page-title mb-2">Pet Sitters</h1>
+              <h1 className="page-title mb-2 flex items-center justify-center gap-2"><UserCheck className="w-7 h-7 text-primary" aria-hidden="true" /> Pet Sitters</h1>
               <p className="page-subtitle">Trusted care for your furry family members</p>
             </div>
           </div>

@@ -156,7 +156,8 @@ const PackDiscovery = () => {
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
-            <h1 className="page-title">
+            <h1 className="page-title flex items-center justify-center gap-2">
+              <Users className="w-7 h-7 text-primary" aria-hidden="true" />
               Discover Packs
             </h1>
             <p className="page-subtitle leading-relaxed max-w-2xl mx-auto">
