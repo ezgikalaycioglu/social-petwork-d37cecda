@@ -207,15 +207,15 @@ const Business = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
+      <div className="min-h-screen bg-background">
         {/* Header */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-border/50">
           <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="text-center">
-              <h1 className="text-4xl font-bold text-foreground mb-2">
+              <h1 className="page-title mb-2">
                 🏢 Business Portal
               </h1>
-              <p className="text-xl text-muted-foreground">
+              <p className="page-subtitle">
                 Connect with pet owners and grow your business
               </p>
             </div>

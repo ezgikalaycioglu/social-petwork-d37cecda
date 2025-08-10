@@ -165,3 +165,8 @@ html {
   .border-orange-custom-medium { border-color: var(--orange-medium); }
   .border-green-custom-medium { border-color: var(--green-medium); }
 }
+
+@layer components {
+  .page-title { @apply font-dm-sans text-4xl md:text-5xl font-bold text-foreground tracking-tight; }
+  .page-subtitle { @apply text-xl text-muted-foreground; }
+}

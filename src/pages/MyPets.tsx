@@ -199,14 +199,14 @@ const MyPets = () => {
     <Layout>
       <div className="min-h-screen bg-background font-sans tracking-tighter leading-relaxed">
         {/* Page Header */}
-        <div className="bg-gradient-to-br from-green-50 to-blue-50 p-4">
+        <div className="p-4">
           <div className="max-w-7xl mx-auto">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+              <h1 className="page-title flex items-center gap-2">
                 <PawPrint className="w-8 h-8 text-green-600" />
                 My Pets
               </h1>
-              <p className="text-gray-600">
+              <p className="page-subtitle">
                 Manage your furry friends and connect with the pet community
               </p>
             </div>

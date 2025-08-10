@@ -68,15 +68,15 @@ const Packs = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
+      <div className="min-h-screen bg-background p-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+              <h1 className="page-title flex items-center gap-2">
                 <Users className="w-8 h-8 text-green-600" />
                 Pet Packs
               </h1>
-              <p className="text-gray-600">
+              <p className="page-subtitle">
                 Join or create packs with other pet owners in your area
               </p>
             </div>

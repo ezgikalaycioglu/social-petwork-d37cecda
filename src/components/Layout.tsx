@@ -20,7 +20,7 @@ const Layout = ({ children }: LayoutProps) => {
   const showTopNav = showNavigation && !petProfilePage;
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full">
+    <div className="min-h-screen bg-background w-full">
       {/* Mobile Top Navigation */}
       {showTopNav && <MobileTopNav />}
       

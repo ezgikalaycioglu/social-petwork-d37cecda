@@ -184,14 +184,14 @@ export default function FindSitter() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-teal/5">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b">
         <div className="max-w-6xl mx-auto px-4 py-8">
-          <h1 className="text-4xl font-bold text-center text-primary mb-2">
+          <h1 className="page-title text-center mb-2">
             Find the perfect sitter for your best friend
           </h1>
-          <p className="text-center text-muted-foreground">
+          <p className="page-subtitle text-center">
             Trusted, loving care when you can't be there
           </p>
         </div>
