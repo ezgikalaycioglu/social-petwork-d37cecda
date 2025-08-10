@@ -109,7 +109,20 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUploaded, bucketName, className }
   return (
     <div className={`flex flex-col items-center space-y-4 ${className}`}>
       <div className="relative">
-        <Avatar className="w-32 h-32 border-4 border-green-200">
+        <Avatar
+          className="w-32 h-32 border-4 border-green-200 cursor-pointer transition-transform duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          onClick={triggerFileInput}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              triggerFileInput();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label={previewUrl ? 'Change photo' : 'Upload photo'}
+          title={previewUrl ? 'Change photo' : 'Upload photo'}
+        >
           <AvatarImage src={previewUrl} alt="Pet photo" />
           <AvatarFallback className="bg-green-100 text-green-600 text-2xl">
             <Camera className="w-8 h-8" />
