@@ -201,8 +201,8 @@ const MyPets = () => {
         {/* Page Header */}
         <div className="p-4">
           <div className="max-w-7xl mx-auto">
-            <div className="mb-8">
-              <h1 className="page-title flex items-center gap-2">
+            <div className="mb-8 text-center">
+              <h1 className="page-title flex items-center justify-center gap-2">
                 <PawPrint className="w-8 h-8 text-green-600" />
                 My Pets
               </h1>
