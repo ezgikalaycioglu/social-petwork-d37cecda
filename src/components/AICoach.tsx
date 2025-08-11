@@ -17,26 +17,19 @@ export const AICoach = ({ petId, petName }: AICoachProps) => {
   const { toast } = useToast();
 
   const generateTip = async () => {
+    // Temporary placeholder until AI tips launch
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-coach', {
-        body: { petId }
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      setTip(data.tip);
+      setTip("Coming soon!");
       toast({
-        title: "New tip generated!",
-        description: `PawCoach has a fresh tip for ${petName}`,
+        title: "Coming soon!",
+        description: "AI PawCoach tips will be available shortly.",
       });
     } catch (error) {
       console.error('Error generating tip:', error);
       toast({
         title: "Error",
-        description: "Failed to generate tip. Please try again.",
+        description: "Please try again later.",
         variant: "destructive",
       });
     } finally {
