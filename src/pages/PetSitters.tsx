@@ -101,16 +101,22 @@ const PetSitters = () => {
   const fetchSitters = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('sitter_profiles')
         .select(`
           *,
           sitter_services (service_type),
           sitter_photos (photo_url, is_primary),
           user_profiles!inner (display_name)
-        `)
-        .eq('is_active', true)
-        .neq('user_id', user?.id || '');
+        `);
+
+      if (user?.id) {
+        query = query.or(`is_active.eq.true,user_id.eq.${user.id}`);
+      } else {
+        query = query.eq('is_active', true);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setSitters((data || []) as unknown as SitterData[]);
