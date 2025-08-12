@@ -45,6 +45,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ChildSafety from "./pages/ChildSafety";
 import DeleteAccount from "./pages/DeleteAccount";
 import DeleteData from "./pages/DeleteData";
+import Beta from "./pages/Beta";
 
 
 const queryClient = new QueryClient({
@@ -74,6 +75,7 @@ const App = () => {
                 <Route path="/changelog" element={<ChangelogPage />} />
                 <Route path="/delete-account" element={<DeleteAccount />} />
                 <Route path="/delete-data" element={<DeleteData />} />
+                <Route path="/beta" element={<Beta />} />
                 
                 {/* Protected Routes */}
                 <Route path="/dashboard" element={
