@@ -77,7 +77,14 @@ const Business = () => {
         .from('deals')
         .select(`
           *,
-          business_profiles (*)
+          business_profiles (
+            id,
+            business_name,
+            business_category,
+            logo_url,
+            website,
+            is_verified
+          )
         `)
         .eq('is_active', true)
         .order('created_at', { ascending: false });
@@ -330,12 +337,7 @@ const Business = () => {
                                 {deal.discount_percentage}% OFF {deal.discount_amount ? `($${deal.discount_amount} off)` : ''}
                               </span>
                             </div>
-                            {deal.business_profiles?.address && (
-                              <div className="flex items-center text-sm text-gray-600">
-                                <MapPin className="w-4 h-4 mr-2" />
-                                {deal.business_profiles.address}
-                              </div>
-                            )}
+                            {/* Remove address display for security - only show to business owners */}
                             <div className="flex items-center text-sm text-gray-600">
                               <Clock className="w-4 h-4 mr-2" />
                               Valid until {deal.valid_until ? new Date(deal.valid_until).toLocaleDateString() : 'No expiry'}
