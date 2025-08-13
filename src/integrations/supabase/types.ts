@@ -243,13 +243,6 @@ export type Database = {
             referencedRelation: "pet_profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "deal_redemptions_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       deals: {
@@ -304,13 +297,6 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "business_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "deals_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "business_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -560,13 +546,6 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pack_contest_submissions_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -927,24 +906,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "pet_friendships_recipient_pet_id_fkey"
-            columns: ["recipient_pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "pet_friendships_requester_pet_id_fkey"
             columns: ["requester_pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pet_friendships_requester_pet_id_fkey"
-            columns: ["requester_pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1052,13 +1017,6 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pet_tweets_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1257,13 +1215,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_sitter_bookings_pet_profiles"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "fk_sitter_bookings_sitter_profiles"
             columns: ["sitter_id"]
             isOneToOne: false
@@ -1275,13 +1226,6 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sitter_bookings_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1460,13 +1404,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "tweet_reactions_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "tweet_reactions_tweet_id_fkey"
             columns: ["tweet_id"]
             isOneToOne: false
@@ -1509,13 +1446,6 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tweet_replies_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
             referencedColumns: ["id"]
           },
           {
@@ -1583,129 +1513,9 @@ export type Database = {
       }
     }
     Views: {
-      business_profiles_public: {
-        Row: {
-          business_category: string | null
-          business_name: string | null
-          created_at: string | null
-          description: string | null
-          id: string | null
-          is_verified: boolean | null
-          logo_url: string | null
-          updated_at: string | null
-          user_id: string | null
-          website: string | null
-        }
-        Insert: {
-          business_category?: string | null
-          business_name?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          is_verified?: boolean | null
-          logo_url?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          website?: string | null
-        }
-        Update: {
-          business_category?: string | null
-          business_name?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          is_verified?: boolean | null
-          logo_url?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          website?: string | null
-        }
-        Relationships: []
-      }
-      feed_items_view: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          event_id: string | null
-          id: string | null
-          image_url: string | null
-          item_type: string | null
-          location_name: string | null
-          title: string | null
-          user_display_name: string | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
-      pet_profiles_public: {
-        Row: {
-          about: string | null
-          age: number | null
-          approx_latitude: number | null
-          approx_longitude: number | null
-          bio: string | null
-          breed: string | null
-          created_at: string | null
-          gender: string | null
-          id: string | null
-          is_available: boolean | null
-          name: string | null
-          personality_traits: string[] | null
-          photos: string[] | null
-          profile_photo_url: string | null
-          unique_code: string | null
-          updated_at: string | null
-          user_id: string | null
-          vaccination_status: string | null
-        }
-        Insert: {
-          about?: string | null
-          age?: number | null
-          approx_latitude?: never
-          approx_longitude?: never
-          bio?: string | null
-          breed?: string | null
-          created_at?: string | null
-          gender?: string | null
-          id?: string | null
-          is_available?: boolean | null
-          name?: string | null
-          personality_traits?: string[] | null
-          photos?: string[] | null
-          profile_photo_url?: string | null
-          unique_code?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          vaccination_status?: string | null
-        }
-        Update: {
-          about?: string | null
-          age?: number | null
-          approx_latitude?: never
-          approx_longitude?: never
-          bio?: string | null
-          breed?: string | null
-          created_at?: string | null
-          gender?: string | null
-          id?: string | null
-          is_available?: boolean | null
-          name?: string | null
-          personality_traits?: string[] | null
-          photos?: string[] | null
-          profile_photo_url?: string | null
-          unique_code?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          vaccination_status?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
-      can_view_business_sensitive_data: {
-        Args: { business_user_id: string; viewer_id: string }
-        Returns: boolean
-      }
       can_view_user_content: {
         Args: { content_owner_id: string; viewer_id: string }
         Returns: boolean
