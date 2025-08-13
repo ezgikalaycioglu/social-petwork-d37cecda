@@ -306,6 +306,13 @@ export type Database = {
             referencedRelation: "business_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "deals_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       event_responses: {
@@ -1576,6 +1583,45 @@ export type Database = {
       }
     }
     Views: {
+      business_profiles_public: {
+        Row: {
+          business_category: string | null
+          business_name: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          is_verified: boolean | null
+          logo_url: string | null
+          updated_at: string | null
+          user_id: string | null
+          website: string | null
+        }
+        Insert: {
+          business_category?: string | null
+          business_name?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          logo_url?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Update: {
+          business_category?: string | null
+          business_name?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          logo_url?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       feed_items_view: {
         Row: {
           created_at: string | null
@@ -1656,6 +1702,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_view_business_sensitive_data: {
+        Args: { business_user_id: string; viewer_id: string }
+        Returns: boolean
+      }
       can_view_user_content: {
         Args: { content_owner_id: string; viewer_id: string }
         Returns: boolean
