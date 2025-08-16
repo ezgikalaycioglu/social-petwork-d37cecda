@@ -1544,6 +1544,10 @@ export type Database = {
         Args: { base_name: string }
         Returns: string
       }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       secure_delete_user_account: {
         Args: { user_email: string; user_password: string }
         Returns: Json
