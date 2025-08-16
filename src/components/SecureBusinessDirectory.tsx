@@ -41,6 +41,8 @@ const SecureBusinessDirectory: React.FC<SecureBusinessDirectoryProps> = ({
   const fetchBusinesses = async () => {
     setLoading(true);
     try {
+      // Only fetch non-sensitive fields for public listing
+      // Sensitive fields (email, phone, address) are protected by RLS
       let query = supabase
         .from('business_profiles')
         .select(`
@@ -66,14 +68,25 @@ const SecureBusinessDirectory: React.FC<SecureBusinessDirectoryProps> = ({
   };
 
   const fetchSensitiveBusinessData = async (businessId: string) => {
-    // Only fetch sensitive data when user explicitly requests it
-    const { data, error } = await supabase
-      .from('business_profiles')
-      .select('email, phone, address')
-      .eq('id', businessId)
-      .single();
-    
-    return { data, error };
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      // Only business owners can see sensitive data (email, phone, address)
+      // This relies on the RLS policy "Business owners can view their complete profile"
+      const { data: business, error } = await supabase
+        .from('business_profiles')
+        .select('user_id, email, phone, address')
+        .eq('id', businessId)
+        .eq('user_id', user.id) // This ensures only the owner can access sensitive data
+        .single();
+
+      if (error || !business) return null;
+      return business;
+    } catch (error) {
+      console.error('Error fetching sensitive business data:', error);
+      return null;
+    }
   };
 
   const isBusinessOwner = (business: SecureBusinessProfile) => {
@@ -83,7 +96,7 @@ const SecureBusinessDirectory: React.FC<SecureBusinessDirectoryProps> = ({
   const handleContactRequest = async (business: SecureBusinessProfile) => {
     if (isBusinessOwner(business)) {
       // Owner can see their own contact info
-      const { data } = await fetchSensitiveBusinessData(business.id);
+      const data = await fetchSensitiveBusinessData(business.id);
       if (data) {
         alert(`Contact: ${data.email} | ${data.phone || 'No phone'} | ${data.address || 'No address'}`);
       }

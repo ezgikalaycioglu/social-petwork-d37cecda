@@ -106,6 +106,9 @@ export const useSecureDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseSe
         
         return {
           ...pet,
+          // Privacy protection: Remove exact location coordinates for non-owners
+          latitude: isOwnPet ? pet.latitude : undefined,
+          longitude: isOwnPet ? pet.longitude : undefined,
           // Show approximate location to others (rounded to nearest 0.01 degree ~1km)
           approx_latitude: !isOwnPet && pet.latitude ? Math.round(pet.latitude * 100) / 100 : null,
           approx_longitude: !isOwnPet && pet.longitude ? Math.round(pet.longitude * 100) / 100 : null,
