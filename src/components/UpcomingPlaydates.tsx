@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Clock, MapPin, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar, Clock, MapPin, Users, Plus } from 'lucide-react';
 import { format, formatDistanceToNow, isPast } from 'date-fns';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import EventDetailsModal from '@/components/EventDetailsModal';
+import GroupWalkModal from '@/components/GroupWalkModal';
 
 interface UpcomingPlaydate {
   id: string;
@@ -30,7 +32,9 @@ const UpcomingPlaydates: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<UpcomingPlaydate | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isGroupWalkModalOpen, setIsGroupWalkModalOpen] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string>('');
+  const [userPets, setUserPets] = useState<any[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -43,6 +47,13 @@ const UpcomingPlaydates: React.FC = () => {
       if (!user) return;
       
       setCurrentUserId(user.id);
+
+      // Fetch user pets for group walk modal
+      const { data: pets } = await supabase
+        .from('pet_profiles')
+        .select('*')
+        .eq('user_id', user.id);
+      setUserPets(pets || []);
 
       // Get events where user is creator or invited
       const { data: allEvents, error } = await supabase
@@ -113,6 +124,15 @@ const UpcomingPlaydates: React.FC = () => {
     fetchUpcomingPlaydates();
   };
 
+  const handleGroupWalkSuccess = () => {
+    setIsGroupWalkModalOpen(false);
+    fetchUpcomingPlaydates();
+    toast({
+      title: "Success",
+      description: "Group walk event created successfully!",
+    });
+  };
+
   if (loading) {
     return (
       <div className="mb-6">
@@ -132,7 +152,17 @@ const UpcomingPlaydates: React.FC = () => {
   if (playdates.length === 0) {
     return (
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-3 px-4">Upcoming Playdates</h2>
+        <div className="flex items-center justify-between mb-3 px-4">
+          <h2 className="text-lg font-semibold text-gray-800">Upcoming Playdates</h2>
+          <Button
+            onClick={() => setIsGroupWalkModalOpen(true)}
+            size="sm"
+            className="bg-primary hover:bg-primary/90"
+          >
+            <Plus className="w-3 h-3 mr-1" />
+            Create Group Walk
+          </Button>
+        </div>
         <div className="px-4">
           <Card className="border-dashed border-2 border-gray-300">
             <CardContent className="flex items-center justify-center py-8">
@@ -143,13 +173,31 @@ const UpcomingPlaydates: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+        
+        <GroupWalkModal
+          isOpen={isGroupWalkModalOpen}
+          onClose={() => setIsGroupWalkModalOpen(false)}
+          onSuccess={handleGroupWalkSuccess}
+          userId={currentUserId}
+          userPets={userPets}
+        />
       </div>
     );
   }
 
   return (
     <div className="mb-6">
-      <h2 className="text-lg font-semibold text-gray-800 mb-3 px-4">Upcoming Playdates</h2>
+      <div className="flex items-center justify-between mb-3 px-4">
+        <h2 className="text-lg font-semibold text-gray-800">Upcoming Playdates</h2>
+        <Button
+          onClick={() => setIsGroupWalkModalOpen(true)}
+          size="sm"
+          className="bg-primary hover:bg-primary/90"
+        >
+          <Plus className="w-3 h-3 mr-1" />
+          Create Group Walk
+        </Button>
+      </div>
       <ScrollArea className="w-full whitespace-nowrap">
         <div className="flex w-max space-x-4 px-4 pb-4">
           {playdates.map((playdate) => {
@@ -208,6 +256,14 @@ const UpcomingPlaydates: React.FC = () => {
           onClose={handleModalClose}
           currentUserId={currentUserId}
           onEventUpdate={handleEventUpdate}
+        />
+        
+        <GroupWalkModal
+          isOpen={isGroupWalkModalOpen}
+          onClose={() => setIsGroupWalkModalOpen(false)}
+          onSuccess={handleGroupWalkSuccess}
+          userId={currentUserId}
+          userPets={userPets}
         />
       </div>
     );
