@@ -123,6 +123,9 @@ export default function FindSitter() {
 
   const fetchSitters = async () => {
     try {
+      // Get current user to exclude them from results
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { data: sittersData, error } = await supabase
         .from('sitter_profiles')
         .select(`
@@ -130,7 +133,8 @@ export default function FindSitter() {
           sitter_services(service_type),
           sitter_photos(photo_url, is_primary)
         `)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .neq('user_id', user?.id || '');
 
       if (error) throw error;
 
