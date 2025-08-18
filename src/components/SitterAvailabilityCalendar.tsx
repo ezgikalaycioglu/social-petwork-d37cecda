@@ -13,7 +13,7 @@ interface SitterAvailabilityCalendarProps {
 
 const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({ sitterId }) => {
   const { toast } = useToast();
-  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+  const [dateRange, setDateRange] = useState<{start: Date | null; end: Date | null}>({start: null, end: null});
   const [savedAvailableDates, setSavedAvailableDates] = useState<Date[]>([]);
   const [pendingChanges, setPendingChanges] = useState<{
     toAdd: Date[];
@@ -54,39 +54,70 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
   const handleDateSelect = (date: Date | undefined) => {
     if (!date || isBefore(date, startOfDay(new Date()))) return;
 
-    const dateStr = format(date, 'yyyy-MM-dd');
-    const isCurrentlySelected = selectedDates.some(d => format(d, 'yyyy-MM-dd') === dateStr);
-    const isCurrentlySaved = savedAvailableDates.some(d => format(d, 'yyyy-MM-dd') === dateStr);
-
-    let newSelectedDates: Date[];
-    let newPendingChanges = { ...pendingChanges };
-
-    if (isCurrentlySelected) {
-      // Deselecting a date
-      newSelectedDates = selectedDates.filter(d => format(d, 'yyyy-MM-dd') !== dateStr);
-      
-      if (isCurrentlySaved) {
-        // Was saved and now being deselected - mark for removal
-        newPendingChanges.toRemove = [...newPendingChanges.toRemove.filter(d => format(d, 'yyyy-MM-dd') !== dateStr), date];
-        newPendingChanges.toAdd = newPendingChanges.toAdd.filter(d => format(d, 'yyyy-MM-dd') !== dateStr);
-      } else {
-        // Was not saved and being deselected - remove from toAdd
-        newPendingChanges.toAdd = newPendingChanges.toAdd.filter(d => format(d, 'yyyy-MM-dd') !== dateStr);
-      }
-    } else {
-      // Selecting a date
-      newSelectedDates = [...selectedDates, date];
-      
-      if (isCurrentlySaved) {
-        // Was saved and now being selected again - remove from toRemove
-        newPendingChanges.toRemove = newPendingChanges.toRemove.filter(d => format(d, 'yyyy-MM-dd') !== dateStr);
-      } else {
-        // Was not saved and being selected - mark for addition
-        newPendingChanges.toAdd = [...newPendingChanges.toAdd.filter(d => format(d, 'yyyy-MM-dd') !== dateStr), date];
-      }
+    // If no start date is selected, set this as start
+    if (!dateRange.start) {
+      setDateRange({ start: date, end: null });
+      return;
     }
 
-    setSelectedDates(newSelectedDates);
+    // If start is selected but no end, set end date
+    if (dateRange.start && !dateRange.end) {
+      const start = dateRange.start;
+      const end = date;
+      
+      // Ensure end date is after start date
+      if (isBefore(end, start)) {
+        setDateRange({ start: end, end: start });
+      } else {
+        setDateRange({ start, end });
+      }
+      
+      // Generate all dates in the range and update pending changes
+      const rangeDates = generateDateRange(dateRange.start, date);
+      updatePendingChangesForRange(rangeDates);
+      return;
+    }
+
+    // If both start and end are selected, reset and start new selection
+    if (dateRange.start && dateRange.end) {
+      setDateRange({ start: date, end: null });
+      return;
+    }
+  };
+
+  const generateDateRange = (start: Date, end: Date): Date[] => {
+    const dates: Date[] = [];
+    let current = new Date(start);
+    let endDate = new Date(end);
+    
+    if (isBefore(endDate, start)) {
+      [current, endDate] = [endDate, current];
+    }
+    
+    while (current <= endDate) {
+      dates.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+    }
+    
+    return dates;
+  };
+
+  const updatePendingChangesForRange = (rangeDates: Date[]) => {
+    let newPendingChanges = { toAdd: [], toRemove: [] };
+    
+    rangeDates.forEach(date => {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      const isCurrentlySaved = savedAvailableDates.some(d => format(d, 'yyyy-MM-dd') === dateStr);
+      
+      if (isCurrentlySaved) {
+        // If date is saved, mark for removal
+        newPendingChanges.toRemove.push(date);
+      } else {
+        // If date is not saved, mark for addition
+        newPendingChanges.toAdd.push(date);
+      }
+    });
+    
     setPendingChanges(newPendingChanges);
   };
 
@@ -121,7 +152,7 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
 
       // Reload availability and reset state
       await loadAvailability();
-      setSelectedDates([]);
+      setDateRange({ start: null, end: null });
       setPendingChanges({ toAdd: [], toRemove: [] });
 
       toast({
@@ -141,15 +172,24 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
   };
 
   const handleClearSelection = () => {
-    setSelectedDates([]);
+    setDateRange({ start: null, end: null });
     setPendingChanges({ toAdd: [], toRemove: [] });
   };
 
   const hasPendingChanges = pendingChanges.toAdd.length > 0 || pendingChanges.toRemove.length > 0;
 
+  // Get dates in current range for display
+  const getSelectedDates = () => {
+    if (!dateRange.start) return [];
+    if (!dateRange.end) return [dateRange.start];
+    return generateDateRange(dateRange.start, dateRange.end);
+  };
+
   const modifiers = {
     saved: savedAvailableDates,
-    selected: selectedDates,
+    selected: getSelectedDates(),
+    rangeStart: dateRange.start ? [dateRange.start] : [],
+    rangeEnd: dateRange.end ? [dateRange.end] : [],
     disabled: (date: Date) => isBefore(date, startOfDay(new Date()))
   };
 
@@ -163,6 +203,18 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
       backgroundColor: '#7A5FFF',
       color: 'white',
       fontWeight: '600'
+    },
+    rangeStart: {
+      backgroundColor: '#7A5FFF',
+      color: 'white',
+      fontWeight: '600',
+      borderRadius: '50% 0 0 50%'
+    },
+    rangeEnd: {
+      backgroundColor: '#7A5FFF',
+      color: 'white',
+      fontWeight: '600',
+      borderRadius: '0 50% 50% 0'
     },
     disabled: {
       backgroundColor: '#E0E0E0',
@@ -178,8 +230,18 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
           Manage Your Availability
         </CardTitle>
         <p className="text-gray-600 mt-2" style={{ fontFamily: 'DM Sans', lineHeight: '1.4' }}>
-          Select the dates when you're available to provide pet sitting services
+          Click to select start date, then click end date to create an availability range
         </p>
+        {dateRange.start && !dateRange.end && (
+          <div className="text-sm text-purple-600 mt-2 px-3 py-2 bg-purple-50 rounded-lg" style={{ fontFamily: 'DM Sans' }}>
+            📅 Start: {format(dateRange.start, 'MMM dd, yyyy')} - Click end date to complete range
+          </div>
+        )}
+        {dateRange.start && dateRange.end && (
+          <div className="text-sm text-green-600 mt-2 px-3 py-2 bg-green-50 rounded-lg" style={{ fontFamily: 'DM Sans' }}>
+            📅 Range: {format(dateRange.start, 'MMM dd')} - {format(dateRange.end, 'MMM dd, yyyy')} ({getSelectedDates().length} days)
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="space-y-8">
@@ -195,9 +257,8 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
             {/* Calendar */}
             <div className="flex-1">
               <Calendar
-                mode="multiple"
-                selected={selectedDates}
-                onSelect={(_, date) => handleDateSelect(date)}
+                mode="single"
+                onSelect={handleDateSelect}
                 modifiers={modifiers}
                 modifiersStyles={modifiersStyles}
                 className="w-full rounded-xl border border-gray-200 p-4"
