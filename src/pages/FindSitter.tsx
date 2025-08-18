@@ -134,7 +134,7 @@ export default function FindSitter() {
           sitter_photos(photo_url, is_primary)
         `)
         .eq('is_active', true)
-        .neq('user_id', user?.id || '');
+        .neq('user_id', user?.user_id || '');
 
       if (error) throw error;
 
