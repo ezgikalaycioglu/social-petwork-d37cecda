@@ -126,28 +126,101 @@ export default function FindSitter() {
       // Get current user to exclude them from results
       const { data: { user } } = await supabase.auth.getUser();
       
-      const { data: sittersData, error } = await supabase
+      // If no user, fetch all active sitters without exclusion
+      if (!user) {
+        const { data: sittersData, error } = await supabase
+          .from('sitter_profiles')
+          .select(`
+            *,
+            sitter_services(service_type),
+            sitter_photos(photo_url, is_primary)
+          `)
+          .eq('is_active', true);
+
+        if (error) throw error;
+
+        if (sittersData && sittersData.length > 0) {
+          const userIds = sittersData.map(sitter => sitter.user_id);
+          const { data: profilesData } = await supabase
+            .from('user_profiles')
+            .select('id, display_name')
+            .in('id', userIds);
+
+          const enrichedSitters = sittersData.map(sitter => ({
+            ...sitter,
+            display_name: profilesData?.find(p => p.id === sitter.user_id)?.display_name || 'Sitter'
+          }));
+
+          setSitters(enrichedSitters);
+          setFilteredSitters(enrichedSitters);
+        } else {
+          setSitters([]);
+          setFilteredSitters([]);
+        }
+        return;
+      }
+
+      const authUserId = user.id;
+      let myProfileId: string | null = null;
+
+      // Determine current profile ID - try both schema variants
+      try {
+        // Variant A: user_profiles.id === auth.user.id
+        let { data: profileData } = await supabase
+          .from('user_profiles')
+          .select('id')
+          .eq('id', authUserId)
+          .maybeSingle();
+
+        if (profileData) {
+          myProfileId = profileData.id;
+        } else {
+          // Variant B: user_profiles.auth_uid === auth.user.id (if this column exists)
+          // For now, we'll assume the standard schema where user_profiles.id maps directly to auth.users.id
+          myProfileId = authUserId;
+        }
+      } catch (error) {
+        console.warn('Could not fetch user profile, using auth ID only:', error);
+        myProfileId = authUserId;
+      }
+
+      // Build server-side exclusion query
+      let query = supabase
         .from('sitter_profiles')
         .select(`
           *,
           sitter_services(service_type),
           sitter_photos(photo_url, is_primary)
         `)
-        .eq('is_active', true)
-        .neq('user_id', user?.id || '');
+        .eq('is_active', true);
+
+      // Exclude current user's sitter profile using the best-known identifier
+      if (myProfileId) {
+        query = query.neq('user_id', myProfileId);
+      }
+
+      const { data: sittersData, error } = await query;
 
       if (error) throw error;
 
+      // Client-side fallback filtering to ensure no self-inclusion
+      let filteredSittersData = sittersData || [];
+      if (authUserId || myProfileId) {
+        filteredSittersData = filteredSittersData.filter(sitter => 
+          sitter.user_id !== authUserId && sitter.user_id !== myProfileId
+        );
+      }
+
       // Fetch user profiles separately
-      if (sittersData && sittersData.length > 0) {
-        const userIds = sittersData.map(sitter => sitter.user_id);
+      if (filteredSittersData.length > 0) {
+        const userIds = filteredSittersData.map(sitter => sitter.user_id);
         const { data: profilesData } = await supabase
           .from('user_profiles')
           .select('id, display_name')
           .in('id', userIds);
 
         // Combine the data
-        const enrichedSitters = sittersData.map(sitter => ({
+        const enrichedSitters = filteredSittersData.map(sitter => ({
           ...sitter,
           display_name: profilesData?.find(p => p.id === sitter.user_id)?.display_name || 'Sitter'
         }));
