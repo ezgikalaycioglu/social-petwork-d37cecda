@@ -234,7 +234,7 @@ export default function SitterProfile() {
       const { error } = await supabase
         .from('sitter_bookings')
         .insert({
-          sitter_id: sitter.user_id,
+          sitter_id: sitter.id,
           owner_id: user.id,
           pet_id: selectedPet,
           start_date: format(dateRange.from, 'yyyy-MM-dd'),
