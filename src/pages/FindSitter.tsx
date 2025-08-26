@@ -41,7 +41,7 @@ function SitterCard({ sitter, onViewProfile }: SitterCardProps) {
   const primaryPhoto = sitter.sitter_photos.find(p => p.is_primary)?.photo_url || 
                        sitter.sitter_photos[0]?.photo_url;
   
-  const displayName = sitter.display_name || 'Sitter';
+  const displayName = sitter.display_name || 'Pet Sitter';
   const firstName = displayName.split(' ')[0];
 
   return (
@@ -143,13 +143,20 @@ export default function FindSitter() {
           const userIds = sittersData.map(sitter => sitter.user_id);
           const { data: profilesData } = await supabase
             .from('user_profiles')
-            .select('id, display_name')
+            .select('id, display_name, email')
             .in('id', userIds);
 
-          const enrichedSitters = sittersData.map(sitter => ({
-            ...sitter,
-            display_name: profilesData?.find(p => p.id === sitter.user_id)?.display_name || 'Sitter'
-          }));
+          const enrichedSitters = sittersData.map(sitter => {
+            const profile = profilesData?.find(p => p.id === sitter.user_id);
+            const displayName = profile?.display_name && profile.display_name.trim() 
+              ? profile.display_name 
+              : profile?.email?.split('@')[0] || 'Pet Sitter';
+            
+            return {
+              ...sitter,
+              display_name: displayName
+            };
+          });
 
           setSitters(enrichedSitters);
           setFilteredSitters(enrichedSitters);
@@ -216,14 +223,21 @@ export default function FindSitter() {
         const userIds = filteredSittersData.map(sitter => sitter.user_id);
         const { data: profilesData } = await supabase
           .from('user_profiles')
-          .select('id, display_name')
+          .select('id, display_name, email')
           .in('id', userIds);
 
         // Combine the data
-        const enrichedSitters = filteredSittersData.map(sitter => ({
-          ...sitter,
-          display_name: profilesData?.find(p => p.id === sitter.user_id)?.display_name || 'Sitter'
-        }));
+        const enrichedSitters = filteredSittersData.map(sitter => {
+          const profile = profilesData?.find(p => p.id === sitter.user_id);
+          const displayName = profile?.display_name && profile.display_name.trim() 
+            ? profile.display_name 
+            : profile?.email?.split('@')[0] || 'Pet Sitter';
+          
+          return {
+            ...sitter,
+            display_name: displayName
+          };
+        });
 
         setSitters(enrichedSitters);
         setFilteredSitters(enrichedSitters);
