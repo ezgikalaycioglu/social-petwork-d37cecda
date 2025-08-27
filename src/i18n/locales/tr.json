@@ -91,19 +91,27 @@
   },
   "landing": {
     "hero": {
-      "title": "Evcil Hayvanınızı Dünyayla Buluşturun",
-      "subtitle": "Evcil hayvan severler için tasarlanmış sosyal ağ. Profiller oluşturun, oyun randevuları bulun ve sevimli dostlarınız etrafında bir topluluk oluşturun.",
-      "getStarted": "Başlayın",
-      "joinCommunity": "Topluluğa Katılın"
+      "title": "Evcil hayvanınızın sosyal hayatı burada başlar.",
+      "subtitle": "Oyun arkadaşları bulun, maceraları takip edin ve evcil hayvan dostu yerleri keşfedin, hepsi tek bir uygulamada.",
+      "getStarted": "Ücretsiz Başlayın",
+      "learnMore": "Daha Fazla Bilgi",
+      "waitlistText": "Başlattığımızda haberdar olun ve özel güncellemeler alın!"
     },
     "features": {
-      "title": "Evcil Hayvanınızın Sosyalleşmesi için İhtiyaç Duyduğu Her Şey",
+      "title": "Evcil Hayvanınızın Sosyalleşmek İçin İhtiyaç Duyduğu Her Şey",
       "petProfiles": "Evcil Hayvan Profilleri",
       "petProfilesDesc": "Her evcil hayvanınız için detaylı profiller oluşturun",
-      "findPlaydates": "Oyun Randevuları Bulun",
-      "findPlaydatesDesc": "Eğlenceli aktiviteler için yakındaki evcil hayvanlarla bağlantı kurun",
+      "findPlaydates": "Oyun Arkadaşları Bulun",
+      "findPlaydatesDesc": "Eğlenceli aktiviteler için yakınlardaki evcil hayvanlarla bağlantı kurun",
       "localEvents": "Yerel Etkinlikler",
       "localEventsDesc": "Bölgenizdeki evcil hayvan dostu etkinlikleri keşfedin"
+    },
+    "navigation": {
+      "features": "Özellikler",
+      "benefits": "Faydalar",
+      "appPreview": "Uygulama Önizlemesi",
+      "problemSolution": "Sorun ve Çözüm",
+      "getStarted": "Başlayın"
     }
   }
 }

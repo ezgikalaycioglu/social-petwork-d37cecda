@@ -91,10 +91,11 @@
   },
   "landing": {
     "hero": {
-      "title": "Conecta a Tus Mascotas con el Mundo",
-      "subtitle": "La red social diseñada para amantes de mascotas. Crea perfiles, encuentra citas de juego y construye una comunidad alrededor de tus amigos peludos.",
-      "getStarted": "Comenzar",
-      "joinCommunity": "Únete a la Comunidad"
+      "title": "La vida social de tu mascota comienza aquí.",
+      "subtitle": "Encuentra compañeros de juego, rastrea aventuras y descubre lugares amigables para mascotas, todo en una aplicación.",
+      "getStarted": "Comenzar Gratis",
+      "learnMore": "Saber Más",
+      "waitlistText": "¡Recibe notificaciones cuando lancemos y obtén actualizaciones exclusivas!"
     },
     "features": {
       "title": "Todo lo que Tu Mascota Necesita para Socializar",
@@ -104,6 +105,13 @@
       "findPlaydatesDesc": "Conecta con mascotas cercanas para actividades divertidas",
       "localEvents": "Eventos Locales",
       "localEventsDesc": "Descubre eventos amigables para mascotas en tu área"
+    },
+    "navigation": {
+      "features": "Características",
+      "benefits": "Beneficios",
+      "appPreview": "Vista Previa de la App",
+      "problemSolution": "Problema y Solución",
+      "getStarted": "Comenzar"
     }
   }
 }
