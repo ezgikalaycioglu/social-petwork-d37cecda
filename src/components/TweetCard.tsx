@@ -339,8 +339,9 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
         {tweet.photo_url && (
           <img
             src={tweet.photo_url}
-            alt="Tweet photo"
-            className="rounded-lg max-h-64 w-full object-cover mb-3"
+            alt={`${petInfo.name}'s tweet photo`}
+            loading="lazy"
+            className="rounded-lg w-full h-auto object-contain mb-3"
           />
         )}
 

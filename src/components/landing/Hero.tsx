@@ -4,12 +4,15 @@ import { ArrowRight, Menu, X } from 'lucide-react';
 import AuthButton from '../AuthButton';
 import WaitlistForm from '../WaitlistForm';
 import PromotionalPopup from '../PromotionalPopup';
+import LanguageSwitcher from '../LanguageSwitcher';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
 const Hero = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const scrollToSection = (sectionId: string) => {
@@ -25,11 +28,11 @@ const Hero = () => {
   };
 
   const navigationItems = [
-    { label: 'Features', id: 'features' },
-    { label: 'Benefits', id: 'benefits' },
-    { label: 'App Preview', id: 'app-preview' },
-    { label: 'Problem & Solution', id: 'problem-solution' },
-    { label: 'Get Started', id: 'final-cta' }
+    { label: t('landing.navigation.features'), id: 'features' },
+    { label: t('landing.navigation.benefits'), id: 'benefits' },
+    { label: t('landing.navigation.appPreview'), id: 'app-preview' },
+    { label: t('landing.navigation.problemSolution'), id: 'problem-solution' },
+    { label: t('landing.navigation.getStarted'), id: 'final-cta' }
   ];
 
   return (
@@ -49,7 +52,7 @@ const Hero = () => {
           </div>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex items-center space-x-8">
             {navigationItems.map((item) => (
               <button
                 key={item.id}
@@ -59,10 +62,12 @@ const Hero = () => {
                 {item.label}
               </button>
             ))}
+            <LanguageSwitcher variant="compact" className="ml-4" />
           </nav>
           
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center space-x-2">
+            <LanguageSwitcher variant="compact" />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="text-gray-800 hover:text-pink-600 focus:outline-none transition-colors duration-200"
@@ -110,12 +115,12 @@ const Hero = () => {
         {/* Main Headline */}
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6" style={{ color: '#FFB3A7' }}>
-            Your pet's social life starts here.
+            {t('landing.hero.title')}
           </h1>
           
           {/* Subheading */}
           <p className="text-xl md:text-2xl text-gray-700 leading-relaxed mb-8 max-w-3xl mx-auto">
-            Find playmates, track adventures, and discover pet-friendly places, all in one app.
+            {t('landing.hero.subtitle')}
           </p>
           
           {/* CTA Button */}
@@ -129,14 +134,14 @@ const Hero = () => {
                 boxShadow: '0 10px 30px rgba(255, 179, 167, 0.4)'
               }}
             >
-              Get Started for Free
+              {t('landing.hero.getStarted')}
             </Button>
             
             <button 
               onClick={() => scrollToSection('features')}
               className="flex items-center font-medium hover:opacity-80 transition-opacity text-lg px-6 py-3 text-gray-600 hover:text-gray-800"
             >
-              Learn More <ArrowRight className="ml-2 h-5 w-5" />
+              {t('landing.hero.learnMore')} <ArrowRight className="ml-2 h-5 w-5" />
             </button>
           </div>
           
@@ -144,7 +149,7 @@ const Hero = () => {
           <div className="max-w-md mx-auto">
             <div className="text-center mb-4">
               <p className="text-gray-600 text-sm">
-                Get notified when we launch and receive exclusive updates!
+                {t('landing.hero.waitlistText')}
               </p>
             </div>
             <WaitlistForm />

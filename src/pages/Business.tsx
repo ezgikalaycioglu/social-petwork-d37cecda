@@ -77,7 +77,14 @@ const Business = () => {
         .from('deals')
         .select(`
           *,
-          business_profiles (*)
+          business_profiles (
+            id,
+            business_name,
+            business_category,
+            logo_url,
+            website,
+            is_verified
+          )
         `)
         .eq('is_active', true)
         .order('created_at', { ascending: false });
@@ -207,15 +214,15 @@ const Business = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
+      <div className="min-h-screen bg-background">
         {/* Header */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-border/50">
           <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="text-center">
-              <h1 className="text-4xl font-bold text-foreground mb-2">
+              <h1 className="page-title mb-2">
                 🏢 Business Portal
               </h1>
-              <p className="text-xl text-muted-foreground">
+              <p className="page-subtitle">
                 Connect with pet owners and grow your business
               </p>
             </div>
@@ -330,12 +337,7 @@ const Business = () => {
                                 {deal.discount_percentage}% OFF {deal.discount_amount ? `($${deal.discount_amount} off)` : ''}
                               </span>
                             </div>
-                            {deal.business_profiles?.address && (
-                              <div className="flex items-center text-sm text-gray-600">
-                                <MapPin className="w-4 h-4 mr-2" />
-                                {deal.business_profiles.address}
-                              </div>
-                            )}
+                            {/* Remove address display for security - only show to business owners */}
                             <div className="flex items-center text-sm text-gray-600">
                               <Clock className="w-4 h-4 mr-2" />
                               Valid until {deal.valid_until ? new Date(deal.valid_until).toLocaleDateString() : 'No expiry'}

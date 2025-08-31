@@ -14,11 +14,15 @@ const Layout = ({ children }: LayoutProps) => {
   // Pages that should not show navigation (landing page, auth, etc.)
   const noNavPages = ['/', '/auth', '/changelog'];
   const showNavigation = !noNavPages.includes(location.pathname);
+  
+  // Pet profile pages should only show sidebar, not top navigation
+  const petProfilePage = location.pathname.startsWith('/pet-adventures/');
+  const showTopNav = showNavigation && !petProfilePage;
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full">
+    <div className="min-h-screen bg-background w-full">
       {/* Mobile Top Navigation */}
-      {showNavigation && <MobileTopNav />}
+      {showTopNav && <MobileTopNav />}
       
       {/* Desktop Sidebar */}
       {showNavigation && <DesktopSidebar />}
@@ -26,7 +30,7 @@ const Layout = ({ children }: LayoutProps) => {
       {/* Main Content */}
       <main className={`${
         showNavigation 
-          ? 'xl:ml-64 pt-14 pb-20 xl:pt-0 xl:pb-0 min-h-screen' // Add top padding for mobile top nav, left margin for desktop sidebar, bottom padding for mobile nav
+          ? `xl:ml-64 ${showTopNav ? 'pt-14' : 'pt-0'} pb-20 xl:pt-0 xl:pb-0 min-h-screen` // Add top padding for mobile top nav only when showing, left margin for desktop sidebar, bottom padding for mobile nav
           : 'min-h-screen'
       }`}>
         {children}

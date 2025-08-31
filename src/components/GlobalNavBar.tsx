@@ -9,6 +9,7 @@ import { Home, PawPrint, Users, User, Settings, LogOut, Menu, X, MapPin } from '
 import { useToast } from '@/hooks/use-toast';
 import SocialPetworkLogo from './SocialPetworkLogo';
 import AuthButton from './AuthButton';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const GlobalNavBar = () => {
   const [user, setUser] = useState<any>(null);
@@ -117,6 +118,7 @@ const GlobalNavBar = () => {
               {t('navigation.petSitters')}
             </Link>
             
+            <LanguageSwitcher variant="compact" className="ml-2" />
             <AuthButton />
           </div>
 

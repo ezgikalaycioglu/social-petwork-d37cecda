@@ -128,13 +128,17 @@ export default function SitterProfile() {
       // Get user profile separately
       const { data: userProfile } = await supabase
         .from('user_profiles')
-        .select('display_name')
+        .select('display_name, email')
         .eq('id', data.user_id)
         .single();
 
+      const displayName = userProfile?.display_name && userProfile.display_name.trim() 
+        ? userProfile.display_name 
+        : userProfile?.email?.split('@')[0] || 'Pet Sitter';
+
       const enrichedSitter = {
         ...data,
-        display_name: userProfile?.display_name || 'Sitter'
+        display_name: displayName
       };
 
       setSitter(enrichedSitter);
@@ -234,7 +238,7 @@ export default function SitterProfile() {
       const { error } = await supabase
         .from('sitter_bookings')
         .insert({
-          sitter_id: sitter.user_id,
+          sitter_id: sitter.id,
           owner_id: user.id,
           pet_id: selectedPet,
           start_date: format(dateRange.from, 'yyyy-MM-dd'),

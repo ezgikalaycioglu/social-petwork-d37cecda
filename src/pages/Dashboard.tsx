@@ -200,13 +200,11 @@ const Dashboard = () => {
           onSkip={handleTourSkip}
         />
       )}
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-4 py-6">
           <div className="max-w-6xl mx-auto">
-            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              🐾 PawCult
-            </h1>
+            {/* Title removed for brand consistency */}
           </div>
         </div>
 

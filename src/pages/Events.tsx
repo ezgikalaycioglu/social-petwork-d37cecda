@@ -11,6 +11,7 @@ import Layout from '@/components/Layout';
 import PlaydateRequestModal from '@/components/PlaydateRequestModal';
 import GroupWalkModal from '@/components/GroupWalkModal';
 import UpcomingPlaydates from '@/components/UpcomingPlaydates';
+import EventDetailsModal from '@/components/EventDetailsModal';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Event = Tables<'events'> & {
@@ -31,6 +32,8 @@ const Events = () => {
   const [showPlaydateModal, setShowPlaydateModal] = useState(false);
   const [showGroupWalkModal, setShowGroupWalkModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -119,6 +122,16 @@ const Events = () => {
 
   const handleAcceptRequest = async (eventId: string) => {
     try {
+      // Prevent accepting past events
+      const ev = events.find(e => e.id === eventId);
+      if (ev && Date.parse(ev.scheduled_time) < Date.now()) {
+        toast({
+          title: 'Event Passed',
+          description: "You can't accept an event that has already passed.",
+          variant: 'destructive',
+        });
+        return;
+      }
       // Update user's response to accepted
       const { error: responseError } = await supabase
         .from('event_responses')
@@ -126,7 +139,7 @@ const Events = () => {
           event_id: eventId,
           user_id: userId,
           response: 'accepted'
-        });
+        }, { onConflict: 'event_id,user_id' });
 
       if (responseError) throw responseError;
 
@@ -154,7 +167,7 @@ const Events = () => {
           event_id: eventId,
           user_id: userId,
           response: 'declined'
-        });
+        }, { onConflict: 'event_id,user_id' });
 
       if (responseError) throw responseError;
 
@@ -196,22 +209,26 @@ const Events = () => {
     return userResponse?.response || 'pending';
   };
 
+  const handleEventClick = (event: Event) => {
+    setSelectedEvent(event);
+    setIsEventModalOpen(true);
+  };
+
+  const handleEventModalClose = () => {
+    setIsEventModalOpen(false);
+    setSelectedEvent(null);
+  };
+
+  const handleEventUpdate = () => {
+    fetchUserEvents(userId);
+  };
+
   const incomingRequests = events.filter(event => {
     // Events where user is invited (not creator) and has pending response
     const isInvited = event.invited_participants?.includes(userId);
     const isNotCreator = event.creator_id !== userId;
     const response = getUserResponse(event);
     const isInFuture = new Date(event.scheduled_time) > new Date();
-    
-    console.log('Incoming request filter debug:', { 
-      eventId: event.id, 
-      isInvited, 
-      isNotCreator, 
-      response,
-      isInFuture,
-      invited_participants: event.invited_participants,
-      event_responses: event.event_responses
-    });
     
     return isInvited && isNotCreator && response === 'pending' && isInFuture;
   });
@@ -248,10 +265,14 @@ const Events = () => {
 
   // Mobile Card Component
   const EventCard = ({ event, type }: { event: Event; type: 'incoming' | 'outgoing' | 'upcoming' }) => {
+    const isPast = Date.parse(event.scheduled_time) < Date.now();
     if (!isMobile) {
       // Desktop card layout (existing)
       return (
-        <Card className="bg-white shadow-lg">
+        <Card 
+          className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-95"
+          onClick={() => handleEventClick(event)}
+        >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {event.event_type === 'playdate' ? '🐕 Playdate Request' : '🚶 Group Walk'}
@@ -300,13 +321,20 @@ const Events = () => {
             {type === 'incoming' && (
               <div className="flex gap-2 mt-4">
                 <Button
-                  onClick={() => handleAcceptRequest(event.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAcceptRequest(event.id);
+                  }}
+                  disabled={isPast}
                   className="bg-green-600 hover:bg-green-700 text-white flex-1"
                 >
-                  Accept
+                  {isPast ? 'Event Passed' : 'Accept'}
                 </Button>
                 <Button
-                  onClick={() => handleDeclineRequest(event.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeclineRequest(event.id);
+                  }}
                   variant="outline"
                   className="border-red-500 text-red-600 hover:bg-red-50 flex-1"
                 >
@@ -317,7 +345,10 @@ const Events = () => {
             {type === 'upcoming' && event.creator_id !== userId && (
               <div className="flex gap-2 mt-4">
                 <Button
-                  onClick={() => handleDeclineRequest(event.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeclineRequest(event.id);
+                  }}
                   variant="outline"
                   size="sm"
                   className="border-red-500 text-red-600 hover:bg-red-50"
@@ -333,7 +364,10 @@ const Events = () => {
 
     // Mobile card layout (similar to pet sitters)
     return (
-      <Card className="hover:shadow-lg transition-all duration-300 border-0 bg-white">
+      <Card 
+        className="hover:shadow-lg transition-all duration-300 border-0 bg-white cursor-pointer active:scale-95"
+        onClick={() => handleEventClick(event)}
+      >
         <CardContent className="p-4">
           <div className="flex items-start space-x-3">
             {/* Event Icon */}
@@ -393,14 +427,21 @@ const Events = () => {
                 {type === 'incoming' && (
                   <div className="flex gap-2 w-full">
                     <Button
-                      onClick={() => handleAcceptRequest(event.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAcceptRequest(event.id);
+                      }}
+                      disabled={isPast}
                       size="sm"
                       className="bg-green-600 hover:bg-green-700 text-white flex-1"
                     >
-                      Accept
+                      {isPast ? 'Event Passed' : 'Accept'}
                     </Button>
                     <Button
-                      onClick={() => handleDeclineRequest(event.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeclineRequest(event.id);
+                      }}
                       variant="outline"
                       size="sm"
                       className="border-red-500 text-red-600 hover:bg-red-50 flex-1"
@@ -412,7 +453,10 @@ const Events = () => {
                 {type === 'upcoming' && event.creator_id !== userId && (
                   <div className="flex gap-2 w-full mt-2">
                     <Button
-                      onClick={() => handleDeclineRequest(event.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeclineRequest(event.id);
+                      }}
                       variant="outline"
                       size="sm"
                       className="border-red-500 text-red-600 hover:bg-red-50 flex-1"
@@ -575,6 +619,14 @@ const Events = () => {
         onSuccess={() => fetchUserEvents(userId)}
         userId={userId}
         userPets={userPets}
+      />
+
+      <EventDetailsModal
+        event={selectedEvent}
+        isOpen={isEventModalOpen}
+        onClose={handleEventModalClose}
+        currentUserId={userId}
+        onEventUpdate={handleEventUpdate}
       />
     </Layout>
   );

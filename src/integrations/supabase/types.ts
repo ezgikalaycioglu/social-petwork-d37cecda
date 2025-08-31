@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -131,6 +131,24 @@ export type Database = {
         }
         Relationships: []
       }
+      beta_testers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
       business_profiles: {
         Row: {
           address: string | null
@@ -223,13 +241,6 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "deal_redemptions_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -535,13 +546,6 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pack_contest_submissions_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -902,24 +906,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "pet_friendships_recipient_pet_id_fkey"
-            columns: ["recipient_pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "pet_friendships_requester_pet_id_fkey"
             columns: ["requester_pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pet_friendships_requester_pet_id_fkey"
-            columns: ["requester_pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1027,13 +1017,6 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pet_tweets_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1232,13 +1215,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_sitter_bookings_pet_profiles"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "fk_sitter_bookings_sitter_profiles"
             columns: ["sitter_id"]
             isOneToOne: false
@@ -1250,13 +1226,6 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sitter_bookings_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1435,13 +1404,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "tweet_reactions_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "tweet_reactions_tweet_id_fkey"
             columns: ["tweet_id"]
             isOneToOne: false
@@ -1484,13 +1446,6 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tweet_replies_pet_id_fkey"
-            columns: ["pet_id"]
-            isOneToOne: false
-            referencedRelation: "pet_profiles_public"
             referencedColumns: ["id"]
           },
           {
@@ -1558,84 +1513,7 @@ export type Database = {
       }
     }
     Views: {
-      feed_items_view: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          event_id: string | null
-          id: string | null
-          image_url: string | null
-          item_type: string | null
-          location_name: string | null
-          title: string | null
-          user_display_name: string | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
-      pet_profiles_public: {
-        Row: {
-          about: string | null
-          age: number | null
-          approx_latitude: number | null
-          approx_longitude: number | null
-          bio: string | null
-          breed: string | null
-          created_at: string | null
-          gender: string | null
-          id: string | null
-          is_available: boolean | null
-          name: string | null
-          personality_traits: string[] | null
-          photos: string[] | null
-          profile_photo_url: string | null
-          unique_code: string | null
-          updated_at: string | null
-          user_id: string | null
-          vaccination_status: string | null
-        }
-        Insert: {
-          about?: string | null
-          age?: number | null
-          approx_latitude?: never
-          approx_longitude?: never
-          bio?: string | null
-          breed?: string | null
-          created_at?: string | null
-          gender?: string | null
-          id?: string | null
-          is_available?: boolean | null
-          name?: string | null
-          personality_traits?: string[] | null
-          photos?: string[] | null
-          profile_photo_url?: string | null
-          unique_code?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          vaccination_status?: string | null
-        }
-        Update: {
-          about?: string | null
-          age?: number | null
-          approx_latitude?: never
-          approx_longitude?: never
-          bio?: string | null
-          breed?: string | null
-          created_at?: string | null
-          gender?: string | null
-          id?: string | null
-          is_available?: boolean | null
-          name?: string | null
-          personality_traits?: string[] | null
-          photos?: string[] | null
-          profile_photo_url?: string | null
-          unique_code?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          vaccination_status?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       can_view_user_content: {
@@ -1665,6 +1543,10 @@ export type Database = {
       generate_unique_pet_username: {
         Args: { base_name: string }
         Returns: string
+      }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
       secure_delete_user_account: {
         Args: { user_email: string; user_password: string }

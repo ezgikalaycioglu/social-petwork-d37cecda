@@ -91,10 +91,11 @@
   },
   "landing": {
     "hero": {
-      "title": "Connect Your Pets with the World",
-      "subtitle": "The social network designed for pet lovers. Create profiles, find playdates, and build a community around your furry friends.",
-      "getStarted": "Get Started",
-      "joinCommunity": "Join the Community"
+      "title": "Your pet's social life starts here.",
+      "subtitle": "Find playmates, track adventures, and discover pet-friendly places, all in one app.",
+      "getStarted": "Get Started for Free",
+      "learnMore": "Learn More",
+      "waitlistText": "Get notified when we launch and receive exclusive updates!"
     },
     "features": {
       "title": "Everything Your Pet Needs to Socialize",
@@ -104,6 +105,13 @@
       "findPlaydatesDesc": "Connect with nearby pets for fun activities",
       "localEvents": "Local Events",
       "localEventsDesc": "Discover pet-friendly events in your area"
+    },
+    "navigation": {
+      "features": "Features",
+      "benefits": "Benefits",
+      "appPreview": "App Preview",
+      "problemSolution": "Problem & Solution",
+      "getStarted": "Get Started"
     }
   }
 }

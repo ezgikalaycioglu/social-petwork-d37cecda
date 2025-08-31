@@ -63,6 +63,7 @@ const PetSitters = () => {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab');
+  const [userType, setUserType] = useState<'owner' | 'sitter'>('owner');
   const [activeTab, setActiveTab] = useState(tabFromUrl || 'find');
   const [loading, setLoading] = useState(false);
   
@@ -101,16 +102,27 @@ const PetSitters = () => {
   const fetchSitters = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Get current user to exclude them from results
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      let query = supabase
         .from('sitter_profiles')
         .select(`
           *,
           sitter_services (service_type),
           sitter_photos (photo_url, is_primary),
           user_profiles!inner (display_name)
-        `)
-        .eq('is_active', true)
-        .neq('user_id', user?.id || '');
+        `);
+
+      // Only show active sitters
+      query = query.eq('is_active', true);
+      
+      // Exclude current user if they are logged in
+      if (user?.id) {
+        query = query.neq('user_id', user.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setSitters((data || []) as unknown as SitterData[]);
@@ -317,57 +329,128 @@ const PetSitters = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
+      <div className="min-h-screen bg-background">
         {/* Header */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-border/50">
           <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="text-center">
-              <h1 className="text-4xl font-bold text-foreground mb-2">
-                🐾 Pet Sitters
-              </h1>
-              <p className="text-xl text-muted-foreground">
-                Trusted care for your furry family members
-              </p>
+              <h1 className="page-title mb-2 flex items-center justify-center gap-2"><UserCheck className="w-7 h-7 text-primary" aria-hidden="true" /> Pet Sitters</h1>
+              <p className="page-subtitle">Trusted care for your furry family members</p>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="-mx-4 w-[calc(100%+2rem)] min-h-[96px] grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-6 bg-white rounded-2xl p-4 shadow-sm md:mx-0 md:w-full md:grid-cols-4 md:grid-rows-1 md:gap-x-2 md:gap-y-0">
-              <TabsTrigger
-                value="find"
-                className="h-full flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Search className="w-4 h-4 mr-2" />
-                Find Sitters
-              </TabsTrigger>
-              <TabsTrigger 
-                value="bookings"
-                className="h-full flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                My Bookings
-              </TabsTrigger>
-              <TabsTrigger 
-                value="availability"
-                className="h-full flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <CalendarCheck className="w-4 h-4 mr-2" />
-                Sitter Availability
-              </TabsTrigger>
-              <TabsTrigger 
-                value="become"
-                className="h-full flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <UserCheck className="w-4 h-4 mr-2" />
-                Become a Sitter
-              </TabsTrigger>
-            </TabsList>
+          {/* User Type Selection */}
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm mb-8">
+            <CardContent className="p-6">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-semibold mb-2">What are you looking for?</h2>
+                <p className="text-muted-foreground">Choose your role to see relevant options</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                <Button
+                  variant={userType === 'owner' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setUserType('owner');
+                    setActiveTab('find');
+                  }}
+                  className="h-20 flex flex-col items-center justify-center space-y-2"
+                >
+                  <Heart className="w-6 h-6" />
+                  <div>
+                    <div className="font-medium">I need a pet sitter</div>
+                    <div className="text-xs opacity-80">Find trusted care for my pet</div>
+                  </div>
+                </Button>
+                <Button
+                  variant={userType === 'sitter' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setUserType('sitter');
+                    setActiveTab(userIsSitter ? 'availability' : 'become');
+                  }}
+                  className="h-20 flex flex-col items-center justify-center space-y-2"
+                >
+                  <PawPrint className="w-6 h-6" />
+                  <div>
+                    <div className="font-medium">I want to be a sitter</div>
+                    <div className="text-xs opacity-80">Earn money caring for pets</div>
+                  </div>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Find Sitters Tab */}
-            <TabsContent value="find" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+            {/* Pet Owner Tabs */}
+            {userType === 'owner' && (
+              <TabsList className="w-full grid grid-cols-1 md:grid-cols-2 gap-2 bg-white rounded-2xl p-2 shadow-sm h-auto">
+                <TabsTrigger
+                  value="find"
+                  className="h-16 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  <Search className="w-4 h-4 mr-2" />
+                  <div className="text-left">
+                    <div className="font-medium">Find Sitters</div>
+                    <div className="text-xs opacity-80">Browse available pet sitters</div>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="bookings"
+                  className="h-16 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  <Calendar className="w-4 h-4 mr-2" />
+                  <div className="text-left">
+                    <div className="font-medium">My Bookings</div>
+                    <div className="text-xs opacity-80">Track your sitter bookings</div>
+                  </div>
+                </TabsTrigger>
+              </TabsList>
+            )}
+
+            {/* Pet Sitter Tabs */}
+            {userType === 'sitter' && (
+              <TabsList className="w-full grid grid-cols-1 md:grid-cols-2 gap-2 bg-white rounded-2xl p-2 shadow-sm h-auto">
+                {userIsSitter ? (
+                  <TabsTrigger 
+                    value="availability"
+                    className="h-16 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
+                    <CalendarCheck className="w-4 h-4 mr-2" />
+                    <div className="text-left">
+                      <div className="font-medium">Manage Availability</div>
+                      <div className="text-xs opacity-80">Update your calendar</div>
+                    </div>
+                  </TabsTrigger>
+                ) : (
+                  <TabsTrigger 
+                    value="become"
+                    className="h-16 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
+                    <UserCheck className="w-4 h-4 mr-2" />
+                    <div className="text-left">
+                      <div className="font-medium">Become a Sitter</div>
+                      <div className="text-xs opacity-80">Start your sitter journey</div>
+                    </div>
+                  </TabsTrigger>
+                )}
+                <TabsTrigger 
+                  value="sitter-bookings"
+                  className="h-16 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  <div className="text-left">
+                    <div className="font-medium">My Clients</div>
+                    <div className="text-xs opacity-80">Manage sitter bookings</div>
+                  </div>
+                </TabsTrigger>
+              </TabsList>
+            )}
+
+            {/* Find Sitters Tab (Pet Owners) */}
+            {userType === 'owner' && (
+              <TabsContent value="find" className="space-y-6">
               <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -435,10 +518,12 @@ const PetSitters = () => {
                   </div>
                 )}
               </div>
-            </TabsContent>
+              </TabsContent>
+            )}
 
-            {/* My Bookings Tab */}
-            <TabsContent value="bookings" className="space-y-6">
+            {/* My Bookings Tab (Pet Owners) */}
+            {userType === 'owner' && (
+              <TabsContent value="bookings" className="space-y-6">
               <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -501,10 +586,12 @@ const PetSitters = () => {
                   )}
                 </CardContent>
               </Card>
-            </TabsContent>
+              </TabsContent>
+            )}
 
             {/* Sitter Availability Tab */}
-            <TabsContent value="availability" className="space-y-6">
+            {userType === 'sitter' && (
+              <TabsContent value="availability" className="space-y-6">
               {availabilityLoading ? (
                 <div className="text-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
@@ -635,12 +722,14 @@ const PetSitters = () => {
                       </div>
                     </CardContent>
                   </Card>
-                </div>
-              )}
-            </TabsContent>
+                 </div>
+               )}
+             </TabsContent>
+            )}
 
             {/* Become a Sitter Tab */}
-            <TabsContent value="become" className="space-y-6">
+            {userType === 'sitter' && (
+              <TabsContent value="become" className="space-y-6">
               <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -710,10 +799,36 @@ const PetSitters = () => {
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                 </CardContent>
+               </Card>
+               </TabsContent>
+             )}
+
+             {/* Sitter Bookings Tab (New) */}
+             {userType === 'sitter' && userIsSitter && (
+               <TabsContent value="sitter-bookings" className="space-y-6">
+                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
+                   <CardHeader>
+                     <CardTitle className="flex items-center gap-2">
+                       <CheckCircle className="w-5 h-5 text-primary" />
+                       Client Bookings
+                     </CardTitle>
+                   </CardHeader>
+                   <CardContent>
+                     <div className="text-center py-12">
+                       <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+                       <h3 className="text-xl font-semibold text-foreground mb-2">
+                         No client bookings yet
+                       </h3>
+                       <p className="text-muted-foreground">
+                         When clients book your services, they'll appear here
+                       </p>
+                     </div>
+                   </CardContent>
+                 </Card>
+               </TabsContent>
+             )}
+           </Tabs>
         </div>
       </div>
     </Layout>

@@ -198,15 +198,15 @@ const MyPets = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-background font-sans tracking-tighter leading-relaxed">
-        {/* Hero Header */}
-        <div className="bg-gradient-to-br from-primary-light via-accent-light to-coral-light border-b border-border/50">
-          <div className="max-w-7xl mx-auto px-8 py-16">
-            <div className="text-center space-y-6">
-              <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-sm">
-                <PawPrint className="w-8 h-8 text-primary" />
-                <h1 className="text-4xl font-bold text-foreground">My Pet Family</h1>
-              </div>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        {/* Page Header */}
+        <div className="p-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-8 text-center">
+              <h1 className="page-title flex items-center justify-center gap-2">
+                <PawPrint className="w-8 h-8 text-green-600" />
+                My Pets
+              </h1>
+              <p className="page-subtitle">
                 Manage your furry friends and connect with the pet community
               </p>
             </div>

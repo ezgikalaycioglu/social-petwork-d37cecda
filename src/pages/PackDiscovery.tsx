@@ -152,14 +152,15 @@ const PackDiscovery = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-primary-light to-background p-4">
+      <div className="min-h-screen bg-background p-4">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
-            <h1 className="text-5xl font-bold text-foreground tracking-tight">
+            <h1 className="page-title flex items-center justify-center gap-2">
+              <Users className="w-7 h-7 text-primary" aria-hidden="true" />
               Discover Packs
             </h1>
-            <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+            <p className="page-subtitle leading-relaxed max-w-2xl mx-auto">
               Find the perfect community for you and your pet
             </p>
           </div>
