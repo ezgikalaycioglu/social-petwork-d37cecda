@@ -17,27 +17,19 @@ const GoogleIcon = () => (
   </svg>
 );
 
-const FacebookIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="#1877F2">
-    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-  </svg>
-);
-
 const SocialLogin: React.FC<SocialLoginProps> = ({ mode }) => {
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [facebookLoading, setFacebookLoading] = useState(false);
   const { toast } = useToast();
   const { logSecurityEvent } = useSecurity();
 
-  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
-    const setLoading = provider === 'google' ? setGoogleLoading : setFacebookLoading;
-    setLoading(true);
+  const handleSocialLogin = async () => {
+    setGoogleLoading(true);
 
     try {
       // We'll skip logging the attempt since it's not a security concern
 
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/dashboard`,
           queryParams: {
@@ -57,7 +49,7 @@ const SocialLogin: React.FC<SocialLoginProps> = ({ mode }) => {
       await logSecurityEvent({
         event_type: 'failed_login',
         details: { 
-          provider,
+          provider: 'google',
           error: error.message,
           action: mode,
           login_type: 'social'
@@ -67,11 +59,11 @@ const SocialLogin: React.FC<SocialLoginProps> = ({ mode }) => {
 
       toast({
         title: "Login Failed",
-        description: error.message || `Failed to sign in with ${provider}`,
+        description: error.message || `Failed to sign in with Google`,
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setGoogleLoading(false);
     }
   };
 
@@ -94,8 +86,8 @@ const SocialLogin: React.FC<SocialLoginProps> = ({ mode }) => {
         <Button
           type="button"
           variant="outline"
-          onClick={() => handleSocialLogin('google')}
-          disabled={googleLoading || facebookLoading}
+          onClick={handleSocialLogin}
+          disabled={googleLoading}
           className="w-full h-12 border-2 border-border/50 hover:border-border bg-card hover:bg-accent/5 text-foreground rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg font-medium"
         >
           {googleLoading ? (
@@ -107,27 +99,6 @@ const SocialLogin: React.FC<SocialLoginProps> = ({ mode }) => {
             <div className="flex items-center gap-3">
               <GoogleIcon />
               <span>Continue with Google</span>
-            </div>
-          )}
-        </Button>
-
-        {/* Facebook Login */}
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => handleSocialLogin('facebook')}
-          disabled={googleLoading || facebookLoading}
-          className="w-full h-12 border-2 border-border/50 hover:border-border bg-card hover:bg-accent/5 text-foreground rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg font-medium"
-        >
-          {facebookLoading ? (
-            <div className="flex items-center gap-3">
-              <div className="w-5 h-5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-              <span>Connecting to Facebook...</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <FacebookIcon />
-              <span>Continue with Facebook</span>
             </div>
           )}
         </Button>
