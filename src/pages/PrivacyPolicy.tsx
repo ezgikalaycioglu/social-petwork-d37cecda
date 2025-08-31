@@ -38,56 +38,65 @@ const PrivacyPolicy = () => {
             
             <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-medium text-foreground mb-2">Email address & password:</h3>
+                <h3 className="text-lg font-medium text-foreground mb-2">Email address & password</h3>
                 <p className="text-muted-foreground">
-                  Required for secure login and account creation. We do not support third-party login methods.
+                  Required for secure login and account creation.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-foreground mb-2">Location data:</h3>
+                <h3 className="text-lg font-medium text-foreground mb-2">Google account login (OAuth)</h3>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                  <li>Requested at login and again on the Pet Map screen</li>
-                  <li>Only stored and shared when you toggle "Ready to Play" ON</li>
+                  <li>If you choose to log in with your Google account, we receive your name, email address, and profile picture (if available).</li>
+                  <li>We do not access other Google account data.</li>
+                  <li>Your Google email is stored in Supabase for login and account identification, the same way as email+password accounts.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-2">Location data</h3>
+                <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                  <li>Requested at login and again on the Pet Map screen.</li>
+                  <li>Only stored and shared when you toggle "Ready to Play" ON.</li>
                   <li>When toggled OFF, location storage stops. Permission remains until manually revoked via device/browser settings.</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-foreground mb-2">Photos & media:</h3>
+                <h3 className="text-lg font-medium text-foreground mb-2">Photos & media</h3>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                  <li>Users can upload images for pet profiles and pet tweets</li>
-                  <li>Only selected files are uploaded; we do not access your gallery automatically</li>
+                  <li>Users can upload images for pet profiles and pet tweets.</li>
+                  <li>Only selected files are uploaded; we do not access your gallery automatically.</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-foreground mb-2">Pet profiles & usernames:</h3>
+                <h3 className="text-lg font-medium text-foreground mb-2">Pet profiles & usernames</h3>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                  <li>Public or private profiles with optional pet usernames</li>
-                  <li>Users can search for others via pet usernames and send friend requests</li>
+                  <li>Public or private profiles with optional pet usernames.</li>
+                  <li>Users can search for others via pet usernames and send friend requests.</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-foreground mb-2">Content & Interactions:</h3>
+                <h3 className="text-lg font-medium text-foreground mb-2">Content & interactions</h3>
                 <p className="text-muted-foreground">
-                  Pet tweets, adventures, likes, comments, event participation, sitter or business listings, and group ("pack") memberships
+                  Pet tweets, adventures, likes, comments, event participation, sitter or business listings, and group ("pack") memberships.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-foreground mb-2">AI Paw Coach:</h3>
+                <h3 className="text-lg font-medium text-foreground mb-2">AI Paw Coach</h3>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                  <li>Pet-related questions are sent to OpenAI's API for advice</li>
-                  <li>We do not share your email, location, or sensitive data in those requests</li>
+                  <li>Pet-related questions are sent to OpenAI's API for advice.</li>
+                  <li>We do not share your email, location, or sensitive data in those requests.</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-foreground mb-2">Analytics (Mixpanel):</h3>
+                <h3 className="text-lg font-medium text-foreground mb-2">Analytics (Mixpanel)</h3>
                 <p className="text-muted-foreground">
-                  Feature usage tracking exists in the codebase but is currently disabled in production
+                  Feature usage tracking exists in the codebase but is currently disabled in production.
                 </p>
               </div>
             </div>
@@ -97,15 +106,15 @@ const PrivacyPolicy = () => {
             <h2 className="text-2xl font-semibold text-foreground mb-4">2. How We Use the Data</h2>
             <p className="text-muted-foreground mb-4">We use your data to:</p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2">
-              <li>Authenticate and manage your user account</li>
-              <li>Show content and location-based features when opted in</li>
-              <li>Allow interaction with other pets and users</li>
-              <li>Enable pet profile search via usernames</li>
-              <li>Power community features: sitter bookings, groups, deals, and events</li>
-              <li>Improve your experience with in-app tools such as AI Paw Coach</li>
+              <li>Authenticate and manage your user account (email/password or Google login).</li>
+              <li>Show content and location-based features when opted in.</li>
+              <li>Allow interaction with other pets and users.</li>
+              <li>Enable pet profile search via usernames.</li>
+              <li>Power community features: sitter bookings, groups, deals, and events.</li>
+              <li>Improve your experience with in-app tools such as AI Paw Coach.</li>
             </ul>
-            <p className="text-foreground font-medium mt-4">
-              No ads, no third-party data sales
+            <p className="text-muted-foreground mt-4">
+              👉 We do not sell your data, and we do not display ads.
             </p>
           </section>
 
