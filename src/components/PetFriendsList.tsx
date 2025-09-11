@@ -135,7 +135,7 @@ const PetFriendsList = ({ petId, petName, isOwner = false, onFriendRemoved }: Pe
             <Button 
               onClick={() => navigate(`/find-friends?petId=${petId}`)}
               size="sm"
-              className="bg-green-600 hover:bg-green-700 self-start md:self-auto"
+              className="bg-green-600 hover:bg-green-700 self-center md:self-auto"
             >
               <Search className="w-4 h-4 mr-2" />
               Find Friends
