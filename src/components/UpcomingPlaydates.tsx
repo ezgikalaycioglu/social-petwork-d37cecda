@@ -135,7 +135,7 @@ const UpcomingPlaydates: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="mb-6">
+      <div className="mb-3">
         <h2 className="text-lg font-semibold text-gray-800 mb-3 px-4">Upcoming Playdates</h2>
         <ScrollArea className="w-full whitespace-nowrap">
           <div className="flex w-max space-x-4 px-4 pb-4">
@@ -151,7 +151,7 @@ const UpcomingPlaydates: React.FC = () => {
 
   if (playdates.length === 0) {
     return (
-      <div className="mb-6">
+      <div className="mb-3">
         <div className="flex items-center justify-between mb-3 px-4">
           <h2 className="text-lg font-semibold text-gray-800">Upcoming Playdates</h2>
           <Button
@@ -186,7 +186,7 @@ const UpcomingPlaydates: React.FC = () => {
   }
 
   return (
-    <div className="mb-6">
+    <div className="mb-3">
       <div className="flex items-center justify-between mb-3 px-4">
         <h2 className="text-lg font-semibold text-gray-800">Upcoming Playdates</h2>
         <Button

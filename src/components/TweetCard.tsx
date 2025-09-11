@@ -309,12 +309,22 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
             <AvatarImage src={petInfo.profile_photo_url} />
             <AvatarFallback>{petInfo.name[0]}</AvatarFallback>
           </Avatar>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold">{petInfo.name}</h3>
-              <Badge variant="secondary" className="text-xs">
-                {petInfo.breed}
-              </Badge>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 justify-between mb-1">
+              <div className="flex items-center gap-2 min-w-0">
+                <h3 className="font-semibold truncate">{petInfo.name}</h3>
+                <Badge variant="secondary" className="text-xs flex-shrink-0">
+                  {petInfo.breed}
+                </Badge>
+              </div>
+              <ReportAbuseButton
+                contentType="tweet"
+                contentId={tweet.id}
+                petName={petInfo.name}
+                size="sm"
+                variant="ghost"
+                className="text-xs px-2 py-1 h-auto min-h-0 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:mr-0.5 flex-shrink-0"
+              />
             </div>
             <p className="text-sm text-muted-foreground">
               {formatDistanceToNow(new Date(tweet.created_at), { 
@@ -323,13 +333,6 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
               })}
             </p>
           </div>
-          <ReportAbuseButton
-            contentType="tweet"
-            contentId={tweet.id}
-            petName={petInfo.name}
-            size="sm"
-            variant="ghost"
-          />
         </div>
       </CardHeader>
 

@@ -67,6 +67,7 @@ interface FormData {
   // Services & Rates
   services: string[];
   rates: Record<string, string>;
+  currency: string;
   
   // Preferences & House Rules
   maxPets: string;
@@ -115,6 +116,7 @@ export default function BecomeSitter() {
     // Services & Rates
     services: [],
     rates: {},
+    currency: "USD",
     
     // Preferences & House Rules
     maxPets: "",
@@ -178,6 +180,7 @@ export default function BecomeSitter() {
           bio: formData.bio,
           location: `${formData.city}, ${formData.state} ${formData.zipCode}`,
           rate_per_day: parseFloat(formData.rates[formData.services[0]] || "0"),
+          currency: formData.currency,
           is_active: true
         })
         .select()
@@ -552,30 +555,63 @@ export default function BecomeSitter() {
                       </div>
                     ))}
                   </div>
-                </div>
+                 </div>
+
+                 <div className="space-y-2">
+                   <Label>Currency</Label>
+                   <Select
+                     value={formData.currency}
+                     onValueChange={(value) => handleInputChange('currency', value)}
+                   >
+                     <SelectTrigger>
+                       <SelectValue placeholder="Select currency" />
+                     </SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="USD">🇺🇸 US Dollar ($)</SelectItem>
+                       <SelectItem value="EUR">🇪🇺 Euro (€)</SelectItem>
+                       <SelectItem value="GBP">🇬🇧 British Pound (£)</SelectItem>
+                       <SelectItem value="CAD">🇨🇦 Canadian Dollar (C$)</SelectItem>
+                       <SelectItem value="AUD">🇦🇺 Australian Dollar (A$)</SelectItem>
+                       <SelectItem value="JPY">🇯🇵 Japanese Yen (¥)</SelectItem>
+                       <SelectItem value="CHF">🇨🇭 Swiss Franc (Fr)</SelectItem>
+                       <SelectItem value="SEK">🇸🇪 Swedish Krona (kr)</SelectItem>
+                       <SelectItem value="NOK">🇳🇴 Norwegian Krone (kr)</SelectItem>
+                       <SelectItem value="DKK">🇩🇰 Danish Krone (kr)</SelectItem>
+                     </SelectContent>
+                   </Select>
+                 </div>
 
                 {formData.services.length > 0 && (
                   <div className="space-y-4">
                     <Label>Set Rates for Selected Services *</Label>
                     <div className="grid gap-4">
                       {formData.services.map((service) => (
-                        <div key={service} className="flex items-center space-x-4">
-                          <Label className="min-w-0 flex-1">{service}</Label>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm">$</span>
-                            <Input
-                              type="number"
-                              placeholder="0.00"
-                              value={formData.rates[service] || ""}
-                              onChange={(e) => handleRateChange(service, e.target.value)}
-                              className="w-24"
-                            />
-                            <span className="text-sm text-muted-foreground">
-                              {service.includes('Walking') ? '/walk' : 
-                               service.includes('Visit') ? '/visit' : '/day'}
-                            </span>
-                          </div>
-                        </div>
+                         <div key={service} className="flex items-center space-x-4">
+                           <Label className="min-w-0 flex-1">{service}</Label>
+                           <div className="flex items-center space-x-2">
+                             <span className="text-sm">
+                               {formData.currency === 'USD' && '$'}
+                               {formData.currency === 'EUR' && '€'}
+                               {formData.currency === 'GBP' && '£'}
+                               {formData.currency === 'CAD' && 'C$'}
+                               {formData.currency === 'AUD' && 'A$'}
+                               {formData.currency === 'JPY' && '¥'}
+                               {formData.currency === 'CHF' && 'Fr'}
+                               {(formData.currency === 'SEK' || formData.currency === 'NOK' || formData.currency === 'DKK') && 'kr'}
+                             </span>
+                             <Input
+                               type="number"
+                               placeholder="0.00"
+                               value={formData.rates[service] || ""}
+                               onChange={(e) => handleRateChange(service, e.target.value)}
+                               className="w-24"
+                             />
+                             <span className="text-sm text-muted-foreground">
+                               {service.includes('Walking') ? '/walk' : 
+                                service.includes('Visit') ? '/visit' : '/day'}
+                             </span>
+                           </div>
+                         </div>
                       ))}
                     </div>
                   </div>

@@ -224,12 +224,12 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto shadow-lg rounded-xl">
-      <CardHeader className="pb-6">
-        <CardTitle className="text-2xl font-medium text-gray-800" style={{ fontFamily: 'DM Sans', letterSpacing: '-1px', lineHeight: '1.4' }}>
+    <Card className="w-full max-w-full mx-auto shadow-lg rounded-xl overflow-hidden">
+      <CardHeader className="pb-4 md:pb-6 px-2 sm:px-4 md:px-6">
+        <CardTitle className="text-lg sm:text-xl md:text-2xl font-medium text-gray-800" style={{ fontFamily: 'DM Sans', letterSpacing: '-1px', lineHeight: '1.4' }}>
           Manage Your Availability
         </CardTitle>
-        <p className="text-gray-600 mt-2" style={{ fontFamily: 'DM Sans', lineHeight: '1.4' }}>
+        <p className="text-xs sm:text-sm md:text-base text-gray-600 mt-2" style={{ fontFamily: 'DM Sans', lineHeight: '1.4' }}>
           Click to select start date, then click end date to create an availability range
         </p>
         {dateRange.start && !dateRange.end && (
@@ -244,7 +244,7 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
         )}
       </CardHeader>
 
-      <CardContent className="space-y-8">
+      <CardContent className="space-y-4 sm:space-y-6 md:space-y-8 px-2 sm:px-4 md:px-6 pb-4 md:pb-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
@@ -253,52 +253,66 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
             </span>
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-8 lg:space-y-0">
+          <div className="flex flex-col space-y-6 sm:space-y-8 lg:flex-row lg:space-x-8 lg:space-y-0">
             {/* Calendar */}
-            <div className="flex-1">
-              <Calendar
-                mode="single"
-                onSelect={handleDateSelect}
-                modifiers={modifiers}
-                modifiersStyles={modifiersStyles}
-                className="w-full rounded-xl border border-gray-200 p-4"
-                style={{ fontFamily: 'DM Sans' }}
-              />
+            <div className="flex-1 min-w-0">
+              <div className="w-full max-w-full overflow-hidden bg-white rounded-lg">
+                <Calendar
+                  mode="single"
+                  onSelect={handleDateSelect}
+                  modifiers={modifiers}
+                  modifiersStyles={modifiersStyles}
+                  className="w-full rounded-xl border border-gray-200 mx-auto 
+                    [&_.rdp]:w-full [&_.rdp]:max-w-none
+                    [&_.rdp-table]:w-full [&_.rdp-table]:table-fixed
+                    [&_.rdp-head_row]:flex [&_.rdp-head_row]:w-full
+                    [&_.rdp-head_cell]:flex-1 [&_.rdp-head_cell]:min-w-0 [&_.rdp-head_cell]:text-center [&_.rdp-head_cell]:text-xs [&_.rdp-head_cell]:sm:text-sm [&_.rdp-head_cell]:font-medium [&_.rdp-head_cell]:pb-2
+                    [&_.rdp-row]:flex [&_.rdp-row]:w-full
+                    [&_.rdp-cell]:flex-1 [&_.rdp-cell]:min-w-0 [&_.rdp-cell]:p-0 [&_.rdp-cell]:m-0
+                    [&_.rdp-day]:w-full [&_.rdp-day]:h-8 [&_.rdp-day]:sm:h-10 [&_.rdp-day]:min-w-0 [&_.rdp-day]:text-xs [&_.rdp-day]:sm:text-sm [&_.rdp-day]:rounded-md [&_.rdp-day]:flex [&_.rdp-day]:items-center [&_.rdp-day]:justify-center
+                    [&_.rdp-caption]:flex [&_.rdp-caption]:justify-center [&_.rdp-caption]:items-center [&_.rdp-caption]:relative [&_.rdp-caption]:px-10 [&_.rdp-caption]:pb-4
+                    [&_.rdp-caption_label]:text-sm [&_.rdp-caption_label]:sm:text-base [&_.rdp-caption_label]:font-medium
+                    [&_.rdp-nav]:absolute [&_.rdp-nav]:inset-0 [&_.rdp-nav]:flex [&_.rdp-nav]:justify-between [&_.rdp-nav]:items-center
+                    [&_.rdp-nav_button]:h-8 [&_.rdp-nav_button]:w-8 [&_.rdp-nav_button]:rounded-md [&_.rdp-nav_button]:border [&_.rdp-nav_button]:border-gray-200 [&_.rdp-nav_button]:bg-white [&_.rdp-nav_button]:flex [&_.rdp-nav_button]:items-center [&_.rdp-nav_button]:justify-center
+                    p-2 sm:p-3 md:p-4"
+                  style={{ fontFamily: 'DM Sans' }}
+                />
+              </div>
             </div>
 
             {/* Legend and Actions */}
-            <div className="lg:w-80 space-y-6">
+            <div className="lg:w-80 w-full space-y-4 sm:space-y-6">
               {/* Legend */}
-              <div className="bg-gray-50 rounded-xl p-6">
-                <h3 className="text-lg font-medium text-gray-800 mb-4" style={{ fontFamily: 'DM Sans', letterSpacing: '-1px' }}>
+              <div className="bg-gray-50 rounded-xl p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-medium text-gray-800 mb-3 sm:mb-4" style={{ fontFamily: 'DM Sans', letterSpacing: '-1px' }}>
                   Date Legend
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   <div className="flex items-center space-x-3">
-                    <div className="w-4 h-4 rounded-md bg-green-500"></div>
-                    <span className="text-sm text-gray-700" style={{ fontFamily: 'DM Sans' }}>Saved as Available</span>
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-green-500 flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700" style={{ fontFamily: 'DM Sans' }}>Saved as Available</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-4 h-4 rounded-md bg-purple-500"></div>
-                    <span className="text-sm text-gray-700" style={{ fontFamily: 'DM Sans' }}>Selected</span>
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-purple-500 flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700" style={{ fontFamily: 'DM Sans' }}>Selected</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-4 h-4 rounded-md bg-white border border-gray-300"></div>
-                    <span className="text-sm text-gray-700" style={{ fontFamily: 'DM Sans' }}>Not Available</span>
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-white border border-gray-300 flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700" style={{ fontFamily: 'DM Sans' }}>Not Available</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-4 h-4 rounded-md bg-gray-300"></div>
-                    <span className="text-sm text-gray-700" style={{ fontFamily: 'DM Sans' }}>Past Date</span>
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-gray-300 flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700" style={{ fontFamily: 'DM Sans' }}>Past Date</span>
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <Button
                   onClick={handleSaveAvailability}
                   disabled={!hasPendingChanges || isSaving}
-                  className="w-full h-12 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 disabled:scale-100"
+                  className="w-full h-10 sm:h-12 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 disabled:scale-100 text-sm sm:text-base"
                   style={{ 
                     backgroundColor: hasPendingChanges ? '#7A5FFF' : '#E0E0E0',
                     fontFamily: 'DM Sans',
@@ -307,13 +321,13 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
                 >
                   {isSaving ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Saving...
+                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />
+                      <span className="text-xs sm:text-sm">Saving...</span>
                     </>
                   ) : (
                     <>
-                      <CalendarCheck className="w-4 h-4 mr-2" />
-                      Save Availability
+                      <CalendarCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                      <span className="text-xs sm:text-sm">Save Availability</span>
                     </>
                   )}
                 </Button>
@@ -322,21 +336,21 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
                   onClick={handleClearSelection}
                   disabled={!hasPendingChanges || isSaving}
                   variant="outline"
-                  className="w-full h-12 rounded-xl font-medium transition-all duration-200 hover:scale-105 disabled:scale-100 border-gray-300"
+                  className="w-full h-10 sm:h-12 rounded-xl font-medium transition-all duration-200 hover:scale-105 disabled:scale-100 border-gray-300 text-sm sm:text-base"
                   style={{ 
                     fontFamily: 'DM Sans',
                     letterSpacing: '-1px'
                   }}
                 >
-                  <CalendarX className="w-4 h-4 mr-2" />
-                  Clear Selection
+                  <CalendarX className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                  <span className="text-xs sm:text-sm">Clear Selection</span>
                 </Button>
               </div>
 
               {/* Pending Changes Summary */}
               {hasPendingChanges && (
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                  <h4 className="text-sm font-medium text-blue-800 mb-2" style={{ fontFamily: 'DM Sans' }}>
+                <div className="bg-blue-50 rounded-xl p-3 sm:p-4 border border-blue-200">
+                  <h4 className="text-xs sm:text-sm font-medium text-blue-800 mb-2" style={{ fontFamily: 'DM Sans' }}>
                     Pending Changes
                   </h4>
                   {pendingChanges.toAdd.length > 0 && (

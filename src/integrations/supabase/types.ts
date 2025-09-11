@@ -1266,6 +1266,7 @@ export type Database = {
         Row: {
           bio: string | null
           created_at: string
+          currency: string
           id: string
           is_active: boolean | null
           location: string | null
@@ -1276,6 +1277,7 @@ export type Database = {
         Insert: {
           bio?: string | null
           created_at?: string
+          currency?: string
           id?: string
           is_active?: boolean | null
           location?: string | null
@@ -1286,6 +1288,7 @@ export type Database = {
         Update: {
           bio?: string | null
           created_at?: string
+          currency?: string
           id?: string
           is_active?: boolean | null
           location?: string | null
@@ -1543,6 +1546,18 @@ export type Database = {
       generate_unique_pet_username: {
         Args: { base_name: string }
         Returns: string
+      }
+      get_approximate_distance: {
+        Args: { pet_id: string; user_lat: number; user_lng: number }
+        Returns: string
+      }
+      get_nearby_pets_count: {
+        Args: { radius_km?: number; user_lat: number; user_lng: number }
+        Returns: number
+      }
+      get_waitlist_count: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
       is_admin: {
         Args: Record<PropertyKey, never>

@@ -9,7 +9,15 @@ import { Gift, QrCode, Copy, Check } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Deal = Tables<'deals'> & {
-  business_profiles: Tables<'business_profiles'>;
+  business_profiles: {
+    id?: string;
+    business_name?: string;
+    business_category?: string;
+    logo_url?: string | null;
+    website?: string | null;
+    is_verified?: boolean;
+    description?: string | null;
+  } | null;
 };
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -239,10 +247,11 @@ const ClaimDealModal: React.FC<ClaimDealModalProps> = ({ deal, onClose, onClaime
 
                 <div className="text-sm text-gray-600 space-y-1">
                   <p>📱 Show this screen to the business</p>
-                  <p>📍 Visit: {deal.business_profiles?.address}</p>
-                  {deal.business_profiles?.phone && (
-                    <p>📞 Call: {deal.business_profiles.phone}</p>
-                  )}
+                  <p>📍 Visit: {deal.business_profiles?.business_name}</p>
+                  {/* Contact information removed for privacy protection */}
+                  <p className="text-xs text-gray-500 mt-2">
+                    Contact details available through business directory
+                  </p>
                 </div>
               </div>
             </>

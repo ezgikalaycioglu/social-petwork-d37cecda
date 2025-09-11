@@ -125,9 +125,9 @@ const PetFriendsList = ({ petId, petName, isOwner = false, onFriendRemoved }: Pe
 
   return (
     <Card className="bg-white shadow-lg">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
+      <CardHeader className="pb-4 md:pb-6">
+        <div className="flex flex-col items-center space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0 md:space-x-4">
+          <CardTitle className="flex items-center gap-2 text-center md:text-left">
             <Users className="h-5 w-5 text-green-600" />
             {petName}'s Friends ({friends.length})
           </CardTitle>
@@ -135,7 +135,7 @@ const PetFriendsList = ({ petId, petName, isOwner = false, onFriendRemoved }: Pe
             <Button 
               onClick={() => navigate(`/find-friends?petId=${petId}`)}
               size="sm"
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 flex-shrink-0"
             >
               <Search className="w-4 h-4 mr-2" />
               Find Friends
@@ -158,9 +158,9 @@ const PetFriendsList = ({ petId, petName, isOwner = false, onFriendRemoved }: Pe
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {friends.map((friend) => (
-              <div key={friend.id} className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Avatar className="w-10 h-10">
+              <div key={friend.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 border rounded-lg space-y-4 sm:space-y-0">
+                <div className="flex items-center space-x-4 flex-1 min-w-0">
+                  <Avatar className="w-14 h-14 sm:w-10 sm:h-10 flex-shrink-0">
                     <AvatarImage 
                       src={friend.friend_pet.profile_photo_url || ''} 
                       alt={friend.friend_pet.name} 
@@ -170,30 +170,32 @@ const PetFriendsList = ({ petId, petName, isOwner = false, onFriendRemoved }: Pe
                     </AvatarFallback>
                   </Avatar>
                   
-                  <div>
-                    <h4 className="font-semibold text-gray-800 text-sm">
+                  <div className="space-y-1 min-w-0 flex-1">
+                    <h4 className="font-semibold text-gray-800 text-base sm:text-sm truncate">
                       {friend.friend_pet.name}
                     </h4>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-sm sm:text-xs text-gray-600 truncate">
                       {friend.friend_pet.breed}
                     </p>
                   </div>
                 </div>
                 
                 {isOwner && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => removeFriend(friend.friendship_id, friend.friend_pet.name)}
-                    disabled={removingFriends.has(friend.friendship_id)}
-                    className="border-red-500 text-red-600 hover:bg-red-50"
-                  >
-                    {removingFriends.has(friend.friendship_id) ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
-                    ) : (
-                      <UserMinus className="w-4 h-4" />
-                    )}
-                  </Button>
+                  <div className="flex justify-center sm:justify-end">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => removeFriend(friend.friendship_id, friend.friend_pet.name)}
+                      disabled={removingFriends.has(friend.friendship_id)}
+                      className="border-red-500 text-red-600 hover:bg-red-50 w-full sm:w-auto"
+                    >
+                      {removingFriends.has(friend.friendship_id) ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                      ) : (
+                        <UserMinus className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
                 )}
               </div>
             ))}

@@ -29,7 +29,15 @@ import type { Tables } from '@/integrations/supabase/types';
 
 type BusinessProfile = Tables<'business_profiles'>;
 type Deal = Tables<'deals'> & {
-  business_profiles: Tables<'business_profiles'>;
+  business_profiles: {
+    id: string;
+    business_name: string;
+    business_category: string;
+    logo_url: string | null;
+    website: string | null;
+    is_verified: boolean;
+    description: string | null;
+  } | null;
 };
 
 const Business = () => {
@@ -149,7 +157,15 @@ const Business = () => {
           .from('deals')
           .select(`
             *,
-            business_profiles (*)
+            business_profiles (
+              id,
+              business_name,
+              business_category,
+              logo_url,
+              website,
+              is_verified,
+              description
+            )
           `)
           .eq('business_id', profile.id)
           .order('created_at', { ascending: false });
