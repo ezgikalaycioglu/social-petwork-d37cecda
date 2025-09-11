@@ -224,12 +224,12 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto shadow-lg rounded-xl">
-      <CardHeader className="pb-6">
-        <CardTitle className="text-2xl font-medium text-gray-800" style={{ fontFamily: 'DM Sans', letterSpacing: '-1px', lineHeight: '1.4' }}>
+    <Card className="w-full max-w-full mx-auto shadow-lg rounded-xl overflow-hidden">
+      <CardHeader className="pb-4 md:pb-6 px-4 md:px-6">
+        <CardTitle className="text-xl md:text-2xl font-medium text-gray-800" style={{ fontFamily: 'DM Sans', letterSpacing: '-1px', lineHeight: '1.4' }}>
           Manage Your Availability
         </CardTitle>
-        <p className="text-gray-600 mt-2" style={{ fontFamily: 'DM Sans', lineHeight: '1.4' }}>
+        <p className="text-sm md:text-base text-gray-600 mt-2" style={{ fontFamily: 'DM Sans', lineHeight: '1.4' }}>
           Click to select start date, then click end date to create an availability range
         </p>
         {dateRange.start && !dateRange.end && (
@@ -244,7 +244,7 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
         )}
       </CardHeader>
 
-      <CardContent className="space-y-8">
+      <CardContent className="space-y-6 md:space-y-8 px-4 md:px-6 pb-4 md:pb-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
@@ -253,17 +253,19 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
             </span>
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-8 lg:space-y-0">
+          <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-8 lg:space-y-0">
             {/* Calendar */}
-            <div className="flex-1">
-              <Calendar
-                mode="single"
-                onSelect={handleDateSelect}
-                modifiers={modifiers}
-                modifiersStyles={modifiersStyles}
-                className="w-full rounded-xl border border-gray-200 p-4"
-                style={{ fontFamily: 'DM Sans' }}
-              />
+            <div className="flex-1 min-w-0">
+              <div className="overflow-x-auto">
+                <Calendar
+                  mode="single"
+                  onSelect={handleDateSelect}
+                  modifiers={modifiers}
+                  modifiersStyles={modifiersStyles}
+                  className="w-full min-w-[320px] max-w-full rounded-xl border border-gray-200 p-2 md:p-4 mx-auto"
+                  style={{ fontFamily: 'DM Sans' }}
+                />
+              </div>
             </div>
 
             {/* Legend and Actions */}
