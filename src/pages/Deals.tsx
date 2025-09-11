@@ -12,7 +12,15 @@ import ClaimDealModal from '@/components/ClaimDealModal';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Deal = Tables<'deals'> & {
-  business_profiles: Tables<'business_profiles'>;
+  business_profiles: {
+    id: string;
+    business_name: string;
+    business_category: string;
+    logo_url: string | null;
+    website: string | null;
+    is_verified: boolean;
+    description: string | null;
+  } | null;
 };
 
 const Deals = () => {
@@ -63,7 +71,15 @@ const Deals = () => {
         .from('deals')
         .select(`
           *,
-          business_profiles (*)
+          business_profiles (
+            id,
+            business_name,
+            business_category,
+            logo_url,
+            website,
+            is_verified,
+            description
+          )
         `)
         .eq('is_active', true)
         .or(`valid_until.is.null,valid_until.gte.${new Date().toISOString().split('T')[0]}`)
@@ -196,12 +212,11 @@ const Deals = () => {
 
                     {/* Deal Info */}
                     <div className="space-y-2 mb-4 text-sm text-gray-600">
-                      {deal.business_profiles?.address && (
-                        <div className="flex items-center">
-                          <MapPin className="w-4 h-4 mr-2" />
-                          {deal.business_profiles.address}
-                        </div>
-                      )}
+                      {/* Removed business address for privacy - only show business name */}
+                      <div className="flex items-center">
+                        <MapPin className="w-4 h-4 mr-2" />
+                        <span>Available at {deal.business_profiles?.business_name}</span>
+                      </div>
                       {deal.valid_until && (
                         <div className="flex items-center">
                           <Clock className="w-4 h-4 mr-2" />

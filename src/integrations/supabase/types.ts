@@ -1547,6 +1547,10 @@ export type Database = {
         Args: { base_name: string }
         Returns: string
       }
+      get_waitlist_count: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
