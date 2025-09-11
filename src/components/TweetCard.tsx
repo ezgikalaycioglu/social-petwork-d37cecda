@@ -304,36 +304,34 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
       onMouseLeave={() => setShowReactionPopup(false)}
     >
       <CardHeader className="pb-3">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-3">
-          <div className="flex items-center gap-3 flex-1">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={petInfo.profile_photo_url} />
-              <AvatarFallback>{petInfo.name[0]}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-1 sm:mb-0">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={petInfo.profile_photo_url} />
+            <AvatarFallback>{petInfo.name[0]}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 justify-between mb-1">
+              <div className="flex items-center gap-2 min-w-0">
                 <h3 className="font-semibold truncate">{petInfo.name}</h3>
-                <Badge variant="secondary" className="text-xs self-start sm:self-auto">
+                <Badge variant="secondary" className="text-xs flex-shrink-0">
                   {petInfo.breed}
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {formatDistanceToNow(new Date(tweet.created_at), { 
-                  addSuffix: true, 
-                  locale: enUS 
-                })}
-              </p>
+              <ReportAbuseButton
+                contentType="tweet"
+                contentId={tweet.id}
+                petName={petInfo.name}
+                size="sm"
+                variant="ghost"
+                className="text-xs px-2 py-1 h-auto min-h-0 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:mr-0.5 flex-shrink-0"
+              />
             </div>
-          </div>
-          <div className="flex justify-end sm:justify-start mt-2 sm:mt-0">
-            <ReportAbuseButton
-              contentType="tweet"
-              contentId={tweet.id}
-              petName={petInfo.name}
-              size="sm"
-              variant="ghost"
-              className="text-xs px-2 py-1 h-auto min-h-0 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:mr-0.5"
-            />
+            <p className="text-sm text-muted-foreground">
+              {formatDistanceToNow(new Date(tweet.created_at), { 
+                addSuffix: true, 
+                locale: enUS 
+              })}
+            </p>
           </div>
         </div>
       </CardHeader>
