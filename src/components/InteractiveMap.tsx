@@ -462,10 +462,11 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           </Marker>
         )}
 
-        {/* Pet markers - only show pets that have location data and are not user's pets */}
+        {/* Pet markers - only show user's own pets with exact locations for privacy protection */}
         {nearbyPets
           .filter(pet => 
-            !userPets.some(userPet => userPet.id === pet.id) && 
+            // Only show user's own pets with exact coordinates on the map
+            userPets.some(userPet => userPet.id === pet.id) &&
             pet.latitude !== null && 
             pet.longitude !== null
           )

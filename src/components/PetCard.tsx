@@ -90,11 +90,11 @@ const PetCard: React.FC<PetCardProps> = ({
               </p>
             )}
 
-            {/* Location */}
-            {showLocation && pet.latitude && pet.longitude && (
+            {/* Location - Use approximate distance for privacy */}
+            {showLocation && (
               <div className="flex items-center text-xs text-gray-500 mb-2">
                 <MapPin className="w-3 h-3 mr-1" />
-                <span>{formatDistance(pet.latitude, pet.longitude)}</span>
+                <span>Distance information protected for privacy</span>
               </div>
             )}
 
