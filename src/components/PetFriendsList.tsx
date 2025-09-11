@@ -126,7 +126,7 @@ const PetFriendsList = ({ petId, petName, isOwner = false, onFriendRemoved }: Pe
   return (
     <Card className="bg-white shadow-lg">
       <CardHeader className="pb-4 md:pb-6">
-        <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+        <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5 text-green-600" />
             {petName}'s Friends ({friends.length})
