@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/Layout';
 import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 import SitterAvailabilityCalendar from '@/components/SitterAvailabilityCalendar';
+import SitterProfileSettings from '@/components/SitterProfileSettings';
 import { 
   Search, 
   UserCheck, 
@@ -212,6 +213,14 @@ const PetSitters = () => {
     } finally {
       setAvailabilityLoading(false);
     }
+  };
+
+  const getCurrencySymbol = (currency: string) => {
+    const symbols: Record<string, string> = {
+      USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', 
+      JPY: '¥', CHF: 'Fr', SEK: 'kr', NOK: 'kr', DKK: 'kr'
+    };
+    return symbols[currency] || '$';
   };
 
   const filterSitters = () => {
@@ -634,13 +643,21 @@ const PetSitters = () => {
                   {/* Header Section */}
                   <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <CalendarCheck className="w-5 h-5 text-primary" />
-                        Your Availability Calendar
-                      </CardTitle>
-                      <p className="text-muted-foreground">
-                        Set your available dates for pet sitting services
-                      </p>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="flex items-center gap-2">
+                            <CalendarCheck className="w-5 h-5 text-primary" />
+                            Your Availability Calendar
+                          </CardTitle>
+                          <p className="text-muted-foreground">
+                            Set your available dates for pet sitting services
+                          </p>
+                        </div>
+                        <SitterProfileSettings 
+                          sitterProfile={sitterProfile} 
+                          onUpdate={checkSitterProfile}
+                        />
+                      </div>
                     </CardHeader>
                   </Card>
 
@@ -667,7 +684,10 @@ const PetSitters = () => {
                           <div>
                             <p className="text-sm text-muted-foreground">Rate per Day</p>
                             <p className="text-lg font-medium text-foreground">
-                              ${sitterProfile?.rate_per_day || 'Not set'}
+                              {sitterProfile?.rate_per_day 
+                                ? `${getCurrencySymbol(sitterProfile.currency)}${sitterProfile.rate_per_day}` 
+                                : 'Not set'
+                              }
                             </p>
                           </div>
                         </div>

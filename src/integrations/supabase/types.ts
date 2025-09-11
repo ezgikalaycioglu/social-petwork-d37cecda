@@ -1266,6 +1266,7 @@ export type Database = {
         Row: {
           bio: string | null
           created_at: string
+          currency: string
           id: string
           is_active: boolean | null
           location: string | null
@@ -1276,6 +1277,7 @@ export type Database = {
         Insert: {
           bio?: string | null
           created_at?: string
+          currency?: string
           id?: string
           is_active?: boolean | null
           location?: string | null
@@ -1286,6 +1288,7 @@ export type Database = {
         Update: {
           bio?: string | null
           created_at?: string
+          currency?: string
           id?: string
           is_active?: boolean | null
           location?: string | null
