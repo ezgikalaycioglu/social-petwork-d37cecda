@@ -132,9 +132,9 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
         ) : (
           <div className="space-y-4">
             {requests.map((request) => (
-              <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Avatar className="w-12 h-12">
+              <div key={request.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 border rounded-lg space-y-4 sm:space-y-0">
+                <div className="flex items-center space-x-4">
+                  <Avatar className="w-14 h-14 sm:w-12 sm:h-12 flex-shrink-0">
                     <AvatarImage 
                       src={request.requester_pet.profile_photo_url || ''} 
                       alt={request.requester_pet.name} 
@@ -144,11 +144,11 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
                     </AvatarFallback>
                   </Avatar>
                   
-                  <div>
-                    <h4 className="font-semibold text-gray-800">
+                  <div className="space-y-1 min-w-0 flex-1">
+                    <h4 className="font-semibold text-gray-800 text-base sm:text-sm">
                       {request.requester_pet.name}
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm sm:text-xs text-gray-600">
                       {request.requester_pet.breed}
                     </p>
                     <p className="text-xs text-gray-500">
@@ -157,12 +157,12 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
                   </div>
                 </div>
                 
-                <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                <div className="flex flex-row space-x-3 sm:flex-col sm:space-x-0 sm:space-y-2 lg:flex-row lg:space-y-0 lg:space-x-2 w-full sm:w-auto justify-center sm:justify-end">
                   <Button
                     size="sm"
                     onClick={() => handleRequest(request.id, 'accepted')}
                     disabled={processingRequests.has(request.id)}
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-none"
                   >
                     {processingRequests.has(request.id) ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -179,7 +179,7 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
                     variant="outline"
                     onClick={() => handleRequest(request.id, 'rejected')}
                     disabled={processingRequests.has(request.id)}
-                    className="border-red-500 text-red-600 hover:bg-red-50"
+                    className="border-red-500 text-red-600 hover:bg-red-50 flex-1 sm:flex-none"
                   >
                     {processingRequests.has(request.id) ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
