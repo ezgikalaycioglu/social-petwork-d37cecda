@@ -332,6 +332,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet, petInfo, userPets }
               petName={petInfo.name}
               size="sm"
               variant="ghost"
+              className="text-xs px-2 py-1 h-auto min-h-0 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:mr-0.5"
             />
           </div>
         </div>
