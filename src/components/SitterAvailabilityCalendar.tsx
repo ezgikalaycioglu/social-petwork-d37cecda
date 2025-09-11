@@ -256,16 +256,14 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
           <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-8 lg:space-y-0">
             {/* Calendar */}
             <div className="flex-1 min-w-0">
-              <div className="overflow-x-auto">
-                <Calendar
-                  mode="single"
-                  onSelect={handleDateSelect}
-                  modifiers={modifiers}
-                  modifiersStyles={modifiersStyles}
-                  className="w-full min-w-[320px] max-w-full rounded-xl border border-gray-200 p-2 md:p-4 mx-auto"
-                  style={{ fontFamily: 'DM Sans' }}
-                />
-              </div>
+              <Calendar
+                mode="single"
+                onSelect={handleDateSelect}
+                modifiers={modifiers}
+                modifiersStyles={modifiersStyles}
+                className="w-full rounded-xl border border-gray-200 p-1 md:p-4 mx-auto scale-75 md:scale-100 origin-top"
+                style={{ fontFamily: 'DM Sans' }}
+              />
             </div>
 
             {/* Legend and Actions */}
