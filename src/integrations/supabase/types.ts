@@ -296,13 +296,6 @@ export type Database = {
             foreignKeyName: "deals_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
-            referencedRelation: "business_listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "deals_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
             referencedRelation: "business_profiles"
             referencedColumns: ["id"]
           },
@@ -1523,42 +1516,7 @@ export type Database = {
       }
     }
     Views: {
-      business_listings: {
-        Row: {
-          business_category: string | null
-          business_name: string | null
-          created_at: string | null
-          description: string | null
-          id: string | null
-          is_verified: boolean | null
-          logo_url: string | null
-          updated_at: string | null
-          website: string | null
-        }
-        Insert: {
-          business_category?: string | null
-          business_name?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          is_verified?: boolean | null
-          logo_url?: string | null
-          updated_at?: string | null
-          website?: string | null
-        }
-        Update: {
-          business_category?: string | null
-          business_name?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          is_verified?: boolean | null
-          logo_url?: string | null
-          updated_at?: string | null
-          website?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       can_view_user_content: {
@@ -1588,20 +1546,6 @@ export type Database = {
       generate_unique_pet_username: {
         Args: { base_name: string }
         Returns: string
-      }
-      get_business_directory: {
-        Args: { category_filter?: string }
-        Returns: {
-          business_category: string
-          business_name: string
-          created_at: string
-          description: string
-          id: string
-          is_verified: boolean
-          logo_url: string
-          updated_at: string
-          website: string
-        }[]
       }
       get_waitlist_count: {
         Args: Record<PropertyKey, never>
