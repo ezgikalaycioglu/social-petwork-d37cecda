@@ -120,7 +120,15 @@ const Footer = () => {
         
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm mb-4 md:mb-0">
-            © 2025 PawCult. All rights reserved.
+            © 2025 PawCult. All rights reserved. Made by{' '}
+            <a 
+              href="https://tortoise-calm-crafts.lovable.app/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-gray-300 hover:text-white transition-colors underline"
+            >
+              Tortoise & Co.
+            </a>
           </p>
           <div className="flex items-center text-gray-400 text-sm">
             Made with <Heart className="h-4 w-4 text-red-500 mx-1" /> for pets and their families
