@@ -76,7 +76,6 @@ const PWAInstallInstructions = () => {
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-foreground">🤖 Android</h3>
-                <p className="text-sm text-muted-foreground">(Beta version now available on Google Play)</p>
               </div>
             </div>
 
@@ -93,7 +92,7 @@ const PWAInstallInstructions = () => {
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 underline"
                     >
-                      Join the Beta Test on Google Play
+                      Click to download app
                     </a>
                   </p>
                 </div>
