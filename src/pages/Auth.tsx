@@ -201,7 +201,7 @@ const Auth = () => {
       {/* Back Button */}
       <Button
         variant="ghost"
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/', { state: { fromAuth: true } })}
         className="absolute top-6 left-6 z-10 flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors duration-200"
       >
         <ArrowLeft className="h-4 w-4" />
