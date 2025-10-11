@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 import Hero from '../components/landing/Hero';
 import AppShowcase from '../components/landing/AppShowcase';
 import PWAInstallInstructions from '../components/landing/PWAInstallInstructions';
@@ -16,10 +17,16 @@ import Footer from '../components/landing/Footer';
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const isMobile = useIsMobile();
 
   // Redirect to dashboard if user is already logged in
   if (!loading && user) {
     return <Navigate to="/dashboard" replace />;
+  }
+
+  // Redirect mobile users to auth page if not logged in
+  if (!loading && !user && isMobile) {
+    return <Navigate to="/auth" replace />;
   }
 
   // Show loading state while checking auth
