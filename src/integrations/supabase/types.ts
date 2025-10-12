@@ -131,6 +131,33 @@ export type Database = {
         }
         Relationships: []
       }
+      app_configurations: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          value: boolean
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          value?: boolean
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          value?: boolean
+        }
+        Relationships: []
+      }
       beta_testers: {
         Row: {
           created_at: string

@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ReadyToPlayProvider } from "@/contexts/ReadyToPlayContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Layout from "@/components/Layout";
+import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -67,8 +68,21 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Layout>
-              <Routes>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+        </ReadyToPlayProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
+
+const AppRoutes = () => {
+  const { data: featureFlags } = useFeatureFlags();
+  
+  return (
+    <Layout>
+      <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -124,22 +138,29 @@ const App = () => {
                     <Events />
                   </ProtectedRoute>
                 } />
-                <Route path="/business" element={
-                  <ProtectedRoute>
-                    <Business />
-                  </ProtectedRoute>
-                } />
-                <Route path="/business/:businessId" element={<BusinessProfile />} />
-                <Route path="/deals" element={
-                  <ProtectedRoute>
-                    <Deals />
-                  </ProtectedRoute>
-                } />
-                <Route path="/business-dashboard" element={
-                  <ProtectedRoute>
-                    <BusinessDashboard />
-                  </ProtectedRoute>
-                } />
+                
+                {/* Business routes - conditionally rendered based on feature flag */}
+                {featureFlags?.business_section_enabled && (
+                  <>
+                    <Route path="/business" element={
+                      <ProtectedRoute>
+                        <Business />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/business/:businessId" element={<BusinessProfile />} />
+                    <Route path="/deals" element={
+                      <ProtectedRoute>
+                        <Deals />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/business-dashboard" element={
+                      <ProtectedRoute>
+                        <BusinessDashboard />
+                      </ProtectedRoute>
+                    } />
+                  </>
+                )}
+                
                 <Route path="/packs" element={
                   <ProtectedRoute>
                     <Navigate to="/packs/discover" replace />
@@ -223,11 +244,6 @@ const App = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Layout>
-          </BrowserRouter>
-        </TooltipProvider>
-        </ReadyToPlayProvider>
-      </AuthProvider>
-    </QueryClientProvider>
   );
 };
 
