@@ -13,8 +13,8 @@ const MobileBottomNav = () => {
 
   const allNavItems = [
     { name: t('navigation.dashboard'), href: '/dashboard', icon: Home, tourId: 'dashboard' },
-    { name: t('navigation.petSocial'), href: '/social', icon: Search, tourId: 'social' },
-    { name: t('navigation.petSitters'), href: '/find-sitter', icon: Heart, tourId: 'sitters' },
+    { name: 'Social', href: '/social', icon: Search, tourId: 'social' },
+    { name: 'Sitters', href: '/find-sitter', icon: Heart, tourId: 'sitters' },
     { name: t('navigation.business'), href: '/business', icon: Building2, tourId: 'business', requiresBusiness: true },
     { name: t('navigation.packs'), href: '/packs/discover', icon: Users, tourId: 'packs' },
     { name: t('navigation.profile'), href: '/profile', icon: User, tourId: 'profile' },
