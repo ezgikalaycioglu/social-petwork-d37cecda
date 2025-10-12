@@ -185,7 +185,7 @@ const MyPets = () => {
       <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 py-4">
           {/* Actions Bar */}
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-center mb-4">
             <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
               <DialogTrigger asChild>
                 <Button 
