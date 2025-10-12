@@ -95,29 +95,27 @@ const PastEvents = ({ events, currentUserId, onEventClick }: PastEventsProps) =>
   }
 
   return (
-    <div className="space-y-3">
+    <div className="relative z-0 space-y-3 mt-3">
       <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
         {/* Section Header */}
-        <div className="flex items-center justify-between px-1">
+        <div className="relative isolate z-0 flex items-center justify-between px-2 mt-3 mb-2">
           <CollapsibleTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-auto p-0 hover:bg-transparent focus:ring-2 focus:ring-primary/40"
+            <button
+              className="relative z-10 inline-flex items-center gap-2 h-9 px-3 rounded-full bg-white text-gray-900 hover:bg-gray-50 hover:ring-1 hover:ring-gray-200 cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-primary/30"
               aria-expanded={isExpanded}
               aria-label={isExpanded ? 'Collapse past events' : 'Expand past events'}
+              role="button"
+              tabIndex={0}
             >
-              <div className="flex items-center gap-2">
-                <h2 className="text-base font-semibold">Past Events</h2>
-                <ChevronDown 
-                  className={`w-4 h-4 text-muted-foreground transition-transform ${
-                    isExpanded ? 'rotate-0' : '-rotate-90'
-                  }`}
-                />
-              </div>
-            </Button>
+              <span className="text-sm font-medium text-gray-900">Past Events</span>
+              <ChevronDown 
+                className={`w-4 h-4 text-gray-500 transition-transform ${
+                  isExpanded ? 'rotate-0' : 'rotate-180'
+                }`}
+              />
+            </button>
           </CollapsibleTrigger>
-          <span className="text-xs text-muted-foreground">{pastEvents.length} total</span>
+          <span className="text-xs text-muted-foreground shrink-0">{pastEvents.length} total</span>
         </div>
 
         <CollapsibleContent className="space-y-3">
