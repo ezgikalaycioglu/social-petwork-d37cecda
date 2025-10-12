@@ -4,9 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Camera, Upload, Users, Lock } from 'lucide-react';
+import { Camera, Upload, Users, Lock, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -19,6 +19,7 @@ const CreatePackForm = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [isCreating, setIsCreating] = useState(false);
+  const [errors, setErrors] = useState<{ packName?: string }>({});
   
   const { user } = useAuth();
   const { toast } = useToast();
@@ -57,9 +58,22 @@ const CreatePackForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !packName.trim()) return;
-
+    
+    // Validate
+    const newErrors: { packName?: string } = {};
+    if (!packName.trim()) {
+      newErrors.packName = 'Pack name is required';
+    }
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    
+    if (!user) return;
+    setErrors({});
     setIsCreating(true);
+    
     try {
       // Create the pack first
       const { data: pack, error: packError } = await supabase
@@ -121,142 +135,210 @@ const CreatePackForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light to-background p-4">
+    <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-3 tracking-tight">
-            Create Your Pack
+        {/* Compact Header */}
+        <div className="flex items-center justify-between pt-2 pb-2 px-4">
+          <h1 className="text-base font-semibold text-foreground">
+            Create your pack
           </h1>
-          <p className="text-muted-foreground text-lg leading-relaxed">
-            Start a community for pet owners to connect and share adventures
-          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Cancel
+          </Button>
         </div>
 
-        <Card className="border-0 shadow-2xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground p-8">
-            <CardTitle className="text-2xl font-semibold tracking-tight">
-              Pack Details
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent className="p-8">
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Pack Avatar */}
-              <div className="space-y-3">
-                <Label className="text-lg font-medium">Pack Avatar</Label>
-                <div className="flex items-center space-x-6">
-                  <Avatar className="h-24 w-24 border-4 border-primary/20">
-                    <AvatarImage src={avatarPreview} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-xl">
-                      <Camera className="h-8 w-8" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <label htmlFor="avatar-upload" className="cursor-pointer">
-                      <Button type="button" variant="outline" className="rounded-xl" asChild>
-                        <span>
-                          <Upload className="h-4 w-4 mr-2" />
-                          Choose Image
-                        </span>
-                      </Button>
-                    </label>
-                    <input
-                      id="avatar-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarUpload}
-                      className="hidden"
-                    />
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Upload a group photo or logo
-                    </p>
-                  </div>
+        <form onSubmit={handleSubmit} className="px-4 space-y-4 pb-24">
+          {/* Pack Avatar Section */}
+          <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4 space-y-3">
+            <div>
+              <h2 className="text-sm font-semibold text-gray-900 mb-1">Pack Avatar</h2>
+              <div className="flex items-center gap-4">
+                <Avatar className="size-28 rounded-full border border-gray-200 bg-gray-50">
+                  <AvatarImage src={avatarPreview} />
+                  <AvatarFallback className="bg-gray-50 text-gray-400">
+                    <Camera className="h-8 w-8" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <label htmlFor="avatar-upload">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      className="h-9 rounded-full px-3 text-sm"
+                      asChild
+                    >
+                      <span className="cursor-pointer">
+                        <Upload className="h-4 w-4 mr-2" />
+                        Choose image
+                      </span>
+                    </Button>
+                  </label>
+                  <input
+                    id="avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                    aria-label="Upload pack avatar"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Upload a group photo or logo
+                  </p>
                 </div>
               </div>
+            </div>
+          </Card>
 
-              {/* Pack Name */}
-              <div className="space-y-3">
-                <Label htmlFor="pack-name" className="text-lg font-medium">
-                  Pack Name *
-                </Label>
-                <Input
-                  id="pack-name"
-                  value={packName}
-                  onChange={(e) => setPackName(e.target.value)}
-                  placeholder="e.g., Downtown Dog Walkers"
-                  className="h-12 text-lg rounded-xl border-2 focus:border-primary"
-                  required
-                />
-              </div>
-
-              {/* Description */}
-              <div className="space-y-3">
-                <Label htmlFor="description" className="text-lg font-medium">
-                  Description
-                </Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Tell others what your pack is about - activities, location, type of pets welcome..."
-                  rows={4}
-                  className="text-lg rounded-xl border-2 focus:border-primary resize-none"
-                />
-              </div>
-
-              {/* Privacy Settings */}
-              <div className="space-y-4">
-                <Label className="text-lg font-medium">Pack Privacy</Label>
-                <RadioGroup
-                  value={privacy}
-                  onValueChange={(value) => setPrivacy(value as 'public' | 'private')}
-                  className="space-y-4"
+          {/* Pack Name Section */}
+          <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4 space-y-3">
+            <div>
+              <Label htmlFor="pack-name" className="text-sm font-semibold text-gray-900 mb-1">
+                Pack Name <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="pack-name"
+                value={packName}
+                onChange={(e) => {
+                  setPackName(e.target.value);
+                  if (errors.packName) setErrors({ ...errors, packName: undefined });
+                }}
+                placeholder="e.g., Downtown Dog Walkers"
+                className={`h-11 text-sm rounded-xl mt-2 focus:ring-2 focus:ring-primary/30 ${
+                  errors.packName ? 'border-red-300' : ''
+                }`}
+                required
+                aria-invalid={!!errors.packName}
+                aria-describedby={errors.packName ? 'pack-name-error' : undefined}
+              />
+              {errors.packName && (
+                <p 
+                  id="pack-name-error" 
+                  className="text-xs text-red-600 mt-1"
+                  role="alert"
+                  aria-live="polite"
                 >
-                  <div className="flex items-start space-x-4 p-4 rounded-xl border-2 border-border hover:border-primary/50 transition-colors">
-                    <RadioGroupItem value="public" id="public" className="mt-1" />
-                    <div className="space-y-2 flex-1">
-                      <div className="flex items-center space-x-2">
-                        <Users className="h-5 w-5 text-primary" />
-                        <Label htmlFor="public" className="text-lg font-medium cursor-pointer">
+                  {errors.packName}
+                </p>
+              )}
+            </div>
+          </Card>
+
+          {/* Description Section */}
+          <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4 space-y-3">
+            <div>
+              <Label htmlFor="description" className="text-sm font-semibold text-gray-900 mb-1">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Tell others what your pack is about - activities, location, type of pets welcome..."
+                rows={4}
+                className="text-sm rounded-xl mt-2 resize-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+          </Card>
+
+          {/* Privacy Section */}
+          <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4 space-y-3">
+            <div>
+              <h2 className="text-sm font-semibold text-gray-900 mb-3">Pack Privacy</h2>
+              <RadioGroup
+                value={privacy}
+                onValueChange={(value) => setPrivacy(value as 'public' | 'private')}
+                className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+              >
+                <div 
+                  className={`rounded-xl border p-3 hover:border-gray-300 transition-colors cursor-pointer ${
+                    privacy === 'public' 
+                      ? 'border-primary ring-1 ring-primary/20 bg-primary/5' 
+                      : 'border-gray-200'
+                  }`}
+                  onClick={() => setPrivacy('public')}
+                >
+                  <div className="flex items-start gap-3">
+                    <RadioGroupItem 
+                      value="public" 
+                      id="public" 
+                      className="mt-0.5" 
+                      aria-checked={privacy === 'public'}
+                    />
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-primary" />
+                        <Label htmlFor="public" className="text-sm font-semibold cursor-pointer">
                           Public Pack
                         </Label>
                       </div>
-                      <p className="text-muted-foreground">
-                        Anyone can find this pack and request to join. Great for growing your community!
+                      <p className="text-xs text-muted-foreground">
+                        Anyone can find and join
                       </p>
                     </div>
                   </div>
-                  
-                  <div className="flex items-start space-x-4 p-4 rounded-xl border-2 border-border hover:border-primary/50 transition-colors">
-                    <RadioGroupItem value="private" id="private" className="mt-1" />
-                    <div className="space-y-2 flex-1">
-                      <div className="flex items-center space-x-2">
-                        <Lock className="h-5 w-5 text-primary" />
-                        <Label htmlFor="private" className="text-lg font-medium cursor-pointer">
+                </div>
+                
+                <div 
+                  className={`rounded-xl border p-3 hover:border-gray-300 transition-colors cursor-pointer ${
+                    privacy === 'private' 
+                      ? 'border-primary ring-1 ring-primary/20 bg-primary/5' 
+                      : 'border-gray-200'
+                  }`}
+                  onClick={() => setPrivacy('private')}
+                >
+                  <div className="flex items-start gap-3">
+                    <RadioGroupItem 
+                      value="private" 
+                      id="private" 
+                      className="mt-0.5"
+                      aria-checked={privacy === 'private'}
+                    />
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Lock className="h-4 w-4 text-primary" />
+                        <Label htmlFor="private" className="text-sm font-semibold cursor-pointer">
                           Private Pack
                         </Label>
                       </div>
-                      <p className="text-muted-foreground">
-                        This pack is invite-only and cannot be found by searching. Perfect for close friends.
+                      <p className="text-xs text-muted-foreground">
+                        Invite-only
                       </p>
                     </div>
                   </div>
-                </RadioGroup>
-              </div>
+                </div>
+              </RadioGroup>
+            </div>
+          </Card>
+        </form>
 
-              {/* Submit Button */}
-              <div className="pt-6">
-                <Button
-                  type="submit"
-                  disabled={isCreating || !packName.trim()}
-                  className="w-full h-14 text-lg font-semibold rounded-xl bg-primary hover:bg-primary-hover text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
-                >
-                  {isCreating ? 'Creating Pack...' : 'Create Pack & Invite Friends'}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+        {/* Sticky Footer */}
+        <div className="sticky bottom-0 inset-x-0 bg-white/90 backdrop-blur px-4 py-3 border-t border-gray-100 z-10">
+          <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => navigate(-1)}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isCreating || !packName.trim()}
+              onClick={handleSubmit}
+              className="h-11 rounded-full px-5 text-sm font-medium bg-primary text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              {isCreating ? 'Creating...' : 'Create Pack & Invite Friends'}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
