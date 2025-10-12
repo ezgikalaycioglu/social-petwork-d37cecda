@@ -1,7 +1,7 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
 import { useLocation as useLocationHook } from '@/hooks/useLocation';
-import { SocialPetworkLogo } from './SocialPetworkLogo';
+import SocialPetworkLogo from './SocialPetworkLogo';
 import MobileMoreMenu from './MobileMoreMenu';
 import {
   Tooltip,
@@ -11,22 +11,22 @@ import {
 } from '@/components/ui/tooltip';
 
 const CompactMobileAppBar = () => {
-  const { city, hasPermission, loading } = useLocationHook();
+  const { coordinates, loading, error } = useLocationHook();
 
   const getLocationText = () => {
     if (loading) return 'Loading...';
-    if (!hasPermission) return 'Location off';
-    return city || 'Unknown';
+    if (error || !coordinates) return 'Location off';
+    return 'Location on';
   };
 
   const getLocationTooltip = () => {
-    if (!hasPermission) {
+    if (error) {
       return 'Location access is currently disabled. Enable it in your browser settings to see nearby pets.';
     }
-    if (city) {
-      return `You are in ${city}`;
+    if (coordinates) {
+      return `Location detected`;
     }
-    return 'Location detected';
+    return 'Detecting location...';
   };
 
   return (

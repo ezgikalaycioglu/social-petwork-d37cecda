@@ -412,6 +412,8 @@ const Social = () => {
       <GroupWalkModal
         isOpen={showGroupWalkModal}
         onClose={() => setShowGroupWalkModal(false)}
+        onSuccess={handleRefresh}
+        userId={user?.id || ''}
         userPets={pets}
       />
     </div>

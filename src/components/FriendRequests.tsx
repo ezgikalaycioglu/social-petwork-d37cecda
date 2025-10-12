@@ -3,8 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
-import { Check, X, Heart, Mail } from 'lucide-react';
+import { Check, X, Heart, Mail, ChevronDown } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetFriendship = Tables<'pet_friendships'>;
