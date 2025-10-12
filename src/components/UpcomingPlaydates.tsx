@@ -136,21 +136,21 @@ const UpcomingPlaydates: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="mb-3">
-        <div className="flex items-center justify-between mt-2 mb-3 px-4">
+      <div className="mb-2">
+        <div className="flex items-center justify-between mt-2 mb-2 px-4">
           <h2 className="text-base font-semibold text-gray-900">Upcoming Playdates</h2>
           <Button
             onClick={() => setIsGroupWalkModalOpen(true)}
             size="sm"
-            className="h-9 rounded-full px-4 text-sm"
+            className="h-9 rounded-full px-4 text-sm font-medium shadow-sm"
           >
             <Plus className="w-4 h-4 mr-1" />
-            Create Group Walk
+            Create
           </Button>
         </div>
-        <div className="px-4 space-y-3">
-          {Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className="rounded-2xl h-24 w-full bg-gray-200 animate-pulse" />
+        <div className="px-4 space-y-2">
+          {Array.from({ length: 1 }).map((_, i) => (
+            <div key={i} className="rounded-2xl h-20 w-full bg-gray-200 animate-pulse" />
           ))}
         </div>
       </div>
@@ -159,22 +159,22 @@ const UpcomingPlaydates: React.FC = () => {
 
   if (playdates.length === 0) {
     return (
-      <div className="mb-3">
-        <div className="flex items-center justify-between mt-2 mb-3 px-4">
+      <div className="mb-2">
+        <div className="flex items-center justify-between mt-2 mb-2 px-4">
           <h2 className="text-base font-semibold text-gray-900">Upcoming Playdates</h2>
           <Button
             onClick={() => setIsGroupWalkModalOpen(true)}
             size="sm"
-            className="h-9 rounded-full px-4 text-sm"
+            className="h-9 rounded-full px-4 text-sm font-medium shadow-sm"
           >
             <Plus className="w-4 h-4 mr-1" />
-            Create Group Walk
+            Create
           </Button>
         </div>
         <div className="px-4">
           <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl mb-2">📅</div>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">📅</div>
               <h3 className="text-base font-semibold mb-1">No upcoming playdates</h3>
               <p className="text-sm text-muted-foreground">Create one or check back later.</p>
             </CardContent>
@@ -193,19 +193,19 @@ const UpcomingPlaydates: React.FC = () => {
   }
 
   return (
-    <div className="mb-3">
-      <div className="flex items-center justify-between mt-2 mb-3 px-4">
+    <div className="mb-2">
+      <div className="flex items-center justify-between mt-2 mb-2 px-4">
         <h2 className="text-base font-semibold text-gray-900">Upcoming Playdates</h2>
         <Button
           onClick={() => setIsGroupWalkModalOpen(true)}
           size="sm"
-          className="h-9 rounded-full px-4 text-sm"
+          className="h-9 rounded-full px-4 text-sm font-medium shadow-sm"
         >
           <Plus className="w-4 h-4 mr-1" />
-          Create Group Walk
+          Create
         </Button>
       </div>
-      <div className="px-4 space-y-3">
+      <div className="px-4 space-y-2">
         {playdates.map((playdate) => {
           const timeInfo = formatEventTime(playdate.scheduled_time);
           const isGroupWalk = playdate.event_type === 'group_walk';
@@ -229,35 +229,35 @@ const UpcomingPlaydates: React.FC = () => {
           return (
             <Card 
               key={playdate.id} 
-              className={`rounded-2xl bg-white border border-gray-100 shadow-sm p-4 cursor-pointer border-l-4 ${getAccentColor()}`}
+              className={`rounded-2xl bg-white border border-gray-100 shadow-sm p-3 cursor-pointer border-l-4 ${getAccentColor()} hover:shadow-md transition-shadow`}
               onClick={() => handleEventClick(playdate)}
             >
               <CardContent className="p-0">
-                {/* Top row: Title + Status */}
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className="font-semibold text-gray-900 text-sm">
+                {/* Top row: Title + Time + Arrow */}
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <h3 className="font-semibold text-gray-900 text-sm min-w-0 truncate">
                     {playdate.title || (isGroupWalk ? '🚶‍♂️ Group Walk' : '🐕 Playdate')}
                   </h3>
-                  <div className="text-right flex-shrink-0">
-                    <div className="text-xs text-muted-foreground mb-1">
-                      {timeInfo.timeAgo.replace('in ', '')}
-                    </div>
-                    <div className={`rounded-full px-2 py-0.5 text-xs ${getStatusPillClasses()}`}>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStatusPillClasses()}`}>
                       {status.charAt(0).toUpperCase() + status.slice(1)}
                     </div>
+                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </div>
                 </div>
                 
                 {/* Meta row: Date, time, location, participants */}
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground flex-wrap">
-                  <Clock className="w-4 h-4 flex-shrink-0" />
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap">
+                  <Clock className="w-3.5 h-3.5 flex-shrink-0" />
                   <span className="whitespace-nowrap">{timeInfo.date}, {timeInfo.time}</span>
                   <span>•</span>
-                  <MapPin className="w-4 h-4 flex-shrink-0" />
+                  <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
                   <span className="min-w-0 truncate">{playdate.location_name}</span>
                   <span>•</span>
-                  <Users className="w-4 h-4 flex-shrink-0" />
-                  <span className="whitespace-nowrap">{playdate.participants.length} participants</span>
+                  <Users className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span className="whitespace-nowrap">{playdate.participants.length}</span>
                 </div>
               </CardContent>
             </Card>

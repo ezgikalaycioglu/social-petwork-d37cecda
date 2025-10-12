@@ -200,33 +200,30 @@ const Dashboard = () => {
         />
       )}
       <div className="min-h-screen bg-background">
-        {/* Upcoming Playdates Horizontal Scroller */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-6xl mx-auto">
-            <UpcomingPlaydates />
-          </div>
+        {/* Upcoming Playdates */}
+        <div className="bg-white border-b border-gray-100">
+          <UpcomingPlaydates />
         </div>
 
         {/* Main Content */}
-        <div className="max-w-6xl mx-auto px-4 py-6">
+        <div className="px-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Feed - Takes up 2/3 on large screens */}
             <div className="lg:col-span-2">
-              <div className="mb-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-2">Community Feed</h2>
-                <p className="text-gray-600">See what's happening in your pet network</p>
+              <div className="mt-4 mb-2">
+                <h2 className="text-lg font-semibold text-gray-900">Community Feed</h2>
               </div>
               
               <Tabs defaultValue="tweets" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger value="tweets">Pet Tweets</TabsTrigger>
-                  <TabsTrigger value="feed">Activities</TabsTrigger>
+                <TabsList className="h-9 grid w-full grid-cols-2 mb-3 rounded-full gap-2 bg-gray-100 p-1">
+                  <TabsTrigger value="tweets" className="h-8 text-sm rounded-full data-[state=active]:bg-white data-[state=active]:shadow-sm">Pet Tweets</TabsTrigger>
+                  <TabsTrigger value="feed" className="h-8 text-sm rounded-full data-[state=active]:bg-white data-[state=active]:shadow-sm">Activities</TabsTrigger>
                 </TabsList>
                 
                 {pets.length > 0 && (
                   <Button
                     onClick={() => setIsCreateTweetModalOpen(true)}
-                    className="w-full mb-6 bg-primary hover:bg-primary/90"
+                    className="w-full h-11 mb-4 rounded-full px-4 bg-primary hover:bg-primary/90 shadow-sm"
                   >
                     <Send className="w-4 h-4 mr-2" />
                     Create New Tweet
