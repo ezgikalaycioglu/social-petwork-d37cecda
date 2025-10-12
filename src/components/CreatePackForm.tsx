@@ -135,10 +135,10 @@ const CreatePackForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-20 xl:pt-0">
       <div className="max-w-2xl mx-auto">
         {/* Compact Header - Sticky & Safe-Area Aware */}
-        <div className="sticky top-[var(--app-topbar-height,0px)] inset-x-0 z-40 bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-2 pt-[max(8px,env(safe-area-inset-top))]">
+        <div className="sticky top-20 xl:top-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-2 pt-2">
           <div className="flex items-center justify-between gap-2">
             <h1 className="text-base font-semibold text-gray-900 truncate">
               Create your pack
