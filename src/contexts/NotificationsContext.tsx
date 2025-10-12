@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -12,6 +12,23 @@ interface NotificationState {
     totalCount: number;
   };
 }
+
+interface NotificationsContextType {
+  friendRequests: {
+    unreadIds: Set<string>;
+    totalCount: number;
+  };
+  eventRequests: {
+    unreadIds: Set<string>;
+    totalCount: number;
+  };
+  markFriendRequestAsRead: (requestId: string) => void;
+  markEventRequestAsRead: (eventId: string) => void;
+  markAllAsRead: () => void;
+  getUnreadCount: () => number;
+}
+
+const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'notificationUnreadIds';
 const STALE_DAYS = 7;
@@ -49,7 +66,7 @@ const saveUnreadIds = (friendIds: string[], eventIds: string[]) => {
   }
 };
 
-export const useNotifications = () => {
+export const NotificationsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [state, setState] = useState<NotificationState>({
     friendRequests: { unreadIds: new Set(), totalCount: 0 },
@@ -144,9 +161,9 @@ export const useNotifications = () => {
 
     fetchCounts();
 
-    // Set up real-time subscriptions
+    // Set up real-time subscriptions with unique channel names
     const friendsChannel = supabase
-      .channel('friend_requests_notifications')
+      .channel('friend_requests_notifications_global')
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'pet_friendships' },
         () => fetchCounts()
@@ -154,7 +171,7 @@ export const useNotifications = () => {
       .subscribe();
 
     const eventsChannel = supabase
-      .channel('events_notifications')
+      .channel('events_notifications_global')
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'events' },
         () => fetchCounts()
@@ -162,8 +179,8 @@ export const useNotifications = () => {
       .subscribe();
 
     return () => {
-      friendsChannel.unsubscribe();
-      eventsChannel.unsubscribe();
+      supabase.removeChannel(friendsChannel);
+      supabase.removeChannel(eventsChannel);
     };
   }, [user]);
 
@@ -233,12 +250,26 @@ export const useNotifications = () => {
     return state.friendRequests.unreadIds.size + state.eventRequests.unreadIds.size;
   };
 
-  return {
-    friendRequests: state.friendRequests,
-    eventRequests: state.eventRequests,
-    markFriendRequestAsRead,
-    markEventRequestAsRead,
-    markAllAsRead,
-    getUnreadCount
-  };
+  return (
+    <NotificationsContext.Provider
+      value={{
+        friendRequests: state.friendRequests,
+        eventRequests: state.eventRequests,
+        markFriendRequestAsRead,
+        markEventRequestAsRead,
+        markAllAsRead,
+        getUnreadCount
+      }}
+    >
+      {children}
+    </NotificationsContext.Provider>
+  );
+};
+
+export const useNotificationsContext = () => {
+  const context = useContext(NotificationsContext);
+  if (context === undefined) {
+    throw new Error('useNotificationsContext must be used within a NotificationsProvider');
+  }
+  return context;
 };

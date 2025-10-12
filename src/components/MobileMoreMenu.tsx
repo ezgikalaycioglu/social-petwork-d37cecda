@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Settings, MessageSquare, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useNotificationsContext } from '@/contexts/NotificationsContext';
 import { toast } from 'sonner';
 import {
   DropdownMenu,
@@ -26,7 +26,7 @@ const MobileMoreMenu = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
   const { signOut } = useAuth();
   const navigate = useNavigate();
-  const { getUnreadCount } = useNotifications();
+  const { getUnreadCount } = useNotificationsContext();
   const unreadCount = getUnreadCount();
 
   const handleSignOut = async () => {

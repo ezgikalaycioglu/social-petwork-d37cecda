@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useNotificationsContext } from '@/contexts/NotificationsContext';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -45,7 +45,7 @@ const NotificationsPanel = ({ isOpen, onClose }: NotificationsPanelProps) => {
     markEventRequestAsRead,
     markAllAsRead,
     getUnreadCount
-  } = useNotifications();
+  } = useNotificationsContext();
 
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [eventRequests, setEventRequests] = useState<EventRequest[]>([]);
