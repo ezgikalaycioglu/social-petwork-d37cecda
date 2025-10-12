@@ -94,9 +94,9 @@ const PackDiscovery = () => {
     <Layout>
       <div className="min-h-screen bg-background px-4">
         <div className="max-w-6xl mx-auto">
-          {/* Top Row: Search + Create Pack */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-2 mb-2">
-            <div className="relative w-full sm:flex-1">
+          {/* Search Row */}
+          <div className="mt-2 mb-2">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
@@ -106,13 +106,6 @@ const PackDiscovery = () => {
                 className="pl-9 h-10 rounded-xl text-sm w-full"
               />
             </div>
-            <Button
-              onClick={() => navigate('/packs/create')}
-              className="h-10 px-4 rounded-full inline-flex items-center gap-2 text-sm font-medium bg-primary text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30 self-end sm:self-auto"
-            >
-              <Plus className="h-4 w-4" />
-              Create Pack
-            </Button>
           </div>
 
           {/* Packs Near You */}
