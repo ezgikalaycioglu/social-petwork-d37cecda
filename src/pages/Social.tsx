@@ -29,6 +29,7 @@ import GroupWalkModal from '@/components/GroupWalkModal';
 import UpcomingPlaydates from '@/components/UpcomingPlaydates';
 import InteractiveMap from '@/components/InteractiveMap';
 import EventDetailsModal from '@/components/EventDetailsModal';
+import PastEvents from '@/components/PastEvents';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Event = Tables<'events'>;
@@ -227,13 +228,18 @@ const Social = () => {
   };
 
   const userPetIds = pets.map(pet => pet.id);
-  const incomingRequests = events.filter(
+  
+  // Filter events by status and time
+  const now = new Date();
+  const futureEvents = events.filter(event => new Date(event.scheduled_time) > now);
+  
+  const incomingRequests = futureEvents.filter(
     event => event.creator_id !== user?.id && event.status === 'pending'
   );
-  const upcomingEvents = events.filter(
-    event => event.status === 'confirmed' && new Date(event.scheduled_time) > new Date()
+  const upcomingEvents = futureEvents.filter(
+    event => event.status === 'confirmed'
   );
-  const pendingEvents = events.filter(
+  const pendingEvents = futureEvents.filter(
     event => event.creator_id === user?.id && event.status === 'pending'
   );
 
@@ -390,6 +396,13 @@ const Social = () => {
                     <p className="text-xs text-muted-foreground">Pending</p>
                   </button>
                 </div>
+
+                {/* Past Events Section */}
+                <PastEvents 
+                  events={events}
+                  currentUserId={user?.id || ''}
+                  onEventClick={handleEventClick}
+                />
               </>
             )}
           </div>
