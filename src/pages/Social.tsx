@@ -398,28 +398,24 @@ const Social = () => {
         <Drawer 
           open={openSheet !== null} 
           onOpenChange={(open) => !open && setOpenSheet(null)}
-          snapPoints={
-            openSheet === 'requests' ? (incomingRequests.length > 0 ? [0.3, 0.6, 0.92] : [0.4, 0.92]) :
-            openSheet === 'upcoming' ? (upcomingEvents.length > 0 ? [0.3, 0.6, 0.92] : [0.4, 0.92]) :
-            openSheet === 'pending' ? (pendingEvents.length > 0 ? [0.3, 0.6, 0.92] : [0.4, 0.92]) :
-            [0.6, 0.92]
-          }
-          activeSnapPoint={
-            openSheet === 'requests' ? (incomingRequests.length > 0 ? 0.6 : 0.4) :
-            openSheet === 'upcoming' ? (upcomingEvents.length > 0 ? 0.6 : 0.4) :
-            openSheet === 'pending' ? (pendingEvents.length > 0 ? 0.6 : 0.4) :
-            0.6
-          }
+          modal={true}
         >
           <DrawerContent 
-            className="z-[999] mb-16 rounded-t-2xl shadow-xl border-t border-gray-200 pb-[env(safe-area-inset-bottom)]"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="drawer-title"
+            className="fixed bottom-0 left-0 right-0 z-[100] mb-16 rounded-t-2xl shadow-xl border-t border-gray-200 pb-[env(safe-area-inset-bottom)] bg-white"
+            style={{
+              maxHeight: openSheet && 
+                ((openSheet === 'requests' && incomingRequests.length === 0) ||
+                 (openSheet === 'upcoming' && upcomingEvents.length === 0) ||
+                 (openSheet === 'pending' && pendingEvents.length === 0))
+                ? '40vh'
+                : '75vh'
+            }}
           >
-            <div className="sticky top-0 bg-white/95 backdrop-blur-sm px-4 py-3 border-b border-gray-100 flex items-center justify-between z-10">
+            <div className="mx-auto mt-2 h-1.5 w-12 rounded-full bg-gray-300" />
+            
+            <div className="sticky top-0 bg-white px-4 py-3 border-b border-gray-100 flex items-center justify-between z-10">
               <div className="flex items-center gap-2">
-                <h3 id="drawer-title" className="text-lg font-semibold">
+                <h3 className="text-lg font-semibold">
                   {openSheet === 'requests' && 'Requests'}
                   {openSheet === 'upcoming' && 'Upcoming'}
                   {openSheet === 'pending' && 'Pending'}
@@ -443,8 +439,7 @@ const Social = () => {
 
             <div 
               className="overflow-y-auto p-4 space-y-2"
-              style={{ maxHeight: 'calc(60vh - 60px)' }}
-              role="list"
+              style={{ maxHeight: 'calc(60vh - 100px)' }}
             >
               {openSheet === 'requests' && (
                 incomingRequests.length === 0 ? (
