@@ -251,320 +251,313 @@ const PetSitters = () => {
     }
   };
 
-  const SitterCard = ({ sitter }: { sitter: SitterData }) => {
-    const primaryPhoto = sitter.sitter_photos.find(p => p.is_primary)?.photo_url;
-    const services = sitter.sitter_services.map(s => s.service_type);
-
-    return (
-      <Card className="hover:shadow-lg transition-all duration-300 border-0 bg-white">
-        <CardContent className="p-6">
-          <div className="flex items-start space-x-4">
-            <Avatar className="w-16 h-16 border-2 border-primary/20">
-              <AvatarImage src={primaryPhoto} alt={sitter.user_profiles?.display_name} />
-              <AvatarFallback className="bg-primary/10 text-primary">
-                {sitter.user_profiles?.display_name?.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            
-            <div className="flex-1 space-y-3">
-              <div>
-                <h3 className="font-semibold text-lg text-foreground">
-                  {sitter.user_profiles?.display_name || 'Unknown Sitter'}
-                </h3>
-                <div className="flex items-center text-muted-foreground text-sm">
-                  <MapPin className="w-4 h-4 mr-1" />
-                  {sitter.location}
-                </div>
-              </div>
-
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {sitter.bio}
-              </p>
-
-              <div className="flex flex-wrap gap-2">
-                {services.slice(0, 3).map((service) => (
-                  <Badge key={service} variant="secondary" className="text-xs">
-                    {service}
-                  </Badge>
-                ))}
-                {services.length > 3 && (
-                  <Badge variant="outline" className="text-xs">
-                    +{services.length - 3} more
-                  </Badge>
-                )}
-              </div>
-
-              <div className="flex flex-col space-y-3 sm:space-y-0">
-                {/* Price and Rating Row */}
-                <div className="flex items-center space-x-4 text-sm">
-                  <div className="flex items-center text-muted-foreground">
-                    <DollarSign className="w-4 h-4 mr-1" />
-                    ${sitter.rate_per_day}/day
-                  </div>
-                  <div className="flex items-center text-muted-foreground">
-                    <Star className="w-4 h-4 mr-1 fill-yellow-400 text-yellow-400" />
-                    5.0
-                  </div>
-                </div>
-                
-                {/* View Profile Button Row - separate on mobile, inline on desktop */}
-                <div className="flex sm:hidden">
-                  <Button 
-                    size="sm"
-                    onClick={() => navigate(`/sitter/${sitter.id}`)}
-                    className="bg-primary hover:bg-primary/90 w-full"
-                  >
-                    View Profile
-                  </Button>
-                </div>
-              </div>
-              
-              {/* View Profile Button - hidden on mobile, shown on desktop */}
-              <div className="hidden sm:block">
-                <Button 
-                  size="sm"
-                  onClick={() => navigate(`/sitter/${sitter.id}`)}
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  View Profile
-                </Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
-
   return (
     <Layout>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <div className="bg-white/80 backdrop-blur-sm border-b border-border/50">
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="text-center">
-              <h1 className="page-title mb-2 flex items-center justify-center gap-2"><UserCheck className="w-7 h-7 text-primary" aria-hidden="true" /> Pet Sitters</h1>
-              <p className="page-subtitle">Trusted care for your furry family members</p>
+      <div className="min-h-screen bg-background px-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Compact Role Selector (Segmented Control) */}
+          <div className="sticky top-16 z-20 bg-background/95 backdrop-blur-sm py-3 -mx-4 px-4 border-b border-gray-100">
+            <div 
+              className="inline-flex items-center h-10 rounded-full bg-gray-100 p-1 max-w-md mx-auto"
+              role="tablist"
+              aria-label="User role selection"
+            >
+              <button
+                role="tab"
+                aria-selected={userType === 'owner'}
+                onClick={() => {
+                  setUserType('owner');
+                  setActiveTab('find');
+                }}
+                className={`h-8 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
+                  userType === 'owner'
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'text-gray-700 hover:text-gray-900'
+                }`}
+              >
+                <Heart className="w-4 h-4" />
+                Find a sitter
+              </button>
+              <button
+                role="tab"
+                aria-selected={userType === 'sitter'}
+                onClick={() => {
+                  setUserType('sitter');
+                  setActiveTab(userIsSitter ? 'availability' : 'become');
+                }}
+                className={`h-8 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
+                  userType === 'sitter'
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'text-gray-700 hover:text-gray-900'
+                }`}
+              >
+                <PawPrint className="w-4 h-4" />
+                Offer services
+              </button>
             </div>
           </div>
-        </div>
 
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          {/* User Type Selection */}
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm mb-8">
-            <CardContent className="p-6">
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-semibold mb-2">What are you looking for?</h2>
-                <p className="text-muted-foreground">Choose your role to see relevant options</p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                <Button
-                  variant={userType === 'owner' ? 'default' : 'outline'}
-                  onClick={() => {
-                    setUserType('owner');
-                    setActiveTab('find');
-                  }}
-                  className="h-20 flex flex-col items-center justify-center space-y-2"
-                >
-                  <Heart className="w-6 h-6" />
-                  <div>
-                    <div className="font-medium">I need a pet sitter</div>
-                    <div className="text-xs opacity-80">Find trusted care for my pet</div>
-                  </div>
-                </Button>
-                <Button
-                  variant={userType === 'sitter' ? 'default' : 'outline'}
-                  onClick={() => {
-                    setUserType('sitter');
-                    setActiveTab(userIsSitter ? 'availability' : 'become');
-                  }}
-                  className="h-20 flex flex-col items-center justify-center space-y-2"
-                >
-                  <PawPrint className="w-6 h-6" />
-                  <div>
-                    <div className="font-medium">I want to be a sitter</div>
-                    <div className="text-xs opacity-80">Earn money caring for pets</div>
-                  </div>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            {/* Pet Owner Tabs */}
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4 space-y-4">
+            {/* Owner Sub-Navigation */}
             {userType === 'owner' && (
-              <TabsList className="w-full grid grid-cols-1 md:grid-cols-2 gap-2 bg-white rounded-2xl p-2 shadow-sm h-auto">
-                <TabsTrigger
-                  value="find"
-                  className="h-16 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              <div className="flex gap-2 px-4">
+                <button
+                  onClick={() => setActiveTab('find')}
+                  className={`h-10 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
+                    activeTab === 'find'
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
                 >
-                  <Search className="w-4 h-4 mr-2" />
-                  <div className="text-left">
-                    <div className="font-medium">Find Sitters</div>
-                    <div className="text-xs opacity-80">Browse available pet sitters</div>
-                  </div>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="bookings"
-                  className="h-16 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  <Search className="w-4 h-4" />
+                  Find Sitters
+                </button>
+                <button
+                  onClick={() => setActiveTab('bookings')}
+                  className={`h-10 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
+                    activeTab === 'bookings'
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
                 >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  <div className="text-left">
-                    <div className="font-medium">My Bookings</div>
-                    <div className="text-xs opacity-80">Track your sitter bookings</div>
-                  </div>
-                </TabsTrigger>
-              </TabsList>
+                  <Calendar className="w-4 h-4" />
+                  My Bookings
+                </button>
+              </div>
             )}
 
-            {/* Pet Sitter Tabs */}
+            {/* Sitter Sub-Navigation */}
             {userType === 'sitter' && (
-              <TabsList className="w-full grid grid-cols-1 md:grid-cols-2 gap-2 bg-white rounded-2xl p-2 shadow-sm h-auto">
-                {userIsSitter ? (
-                  <TabsTrigger 
-                    value="availability"
-                    className="h-16 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              <div className="flex gap-2 px-4">
+                {!userIsSitter && (
+                  <button
+                    onClick={() => setActiveTab('become')}
+                    className={`h-10 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
+                      activeTab === 'become'
+                        ? 'bg-primary text-white shadow-sm'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
                   >
-                    <CalendarCheck className="w-4 h-4 mr-2" />
-                    <div className="text-left">
-                      <div className="font-medium">Manage Availability</div>
-                      <div className="text-xs opacity-80">Update your calendar</div>
-                    </div>
-                  </TabsTrigger>
-                ) : (
-                  <TabsTrigger 
-                    value="become"
-                    className="h-16 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                  >
-                    <UserCheck className="w-4 h-4 mr-2" />
-                    <div className="text-left">
-                      <div className="font-medium">Become a Sitter</div>
-                      <div className="text-xs opacity-80">Start your sitter journey</div>
-                    </div>
-                  </TabsTrigger>
+                    <UserCheck className="w-4 h-4" />
+                    Become a Sitter
+                  </button>
                 )}
-                <TabsTrigger 
-                  value="sitter-bookings"
-                  className="h-16 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  <div className="text-left">
-                    <div className="font-medium">My Clients</div>
-                    <div className="text-xs opacity-80">Manage sitter bookings</div>
-                  </div>
-                </TabsTrigger>
-              </TabsList>
+                {userIsSitter && (
+                  <>
+                    <button
+                      onClick={() => setActiveTab('availability')}
+                      className={`h-10 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
+                        activeTab === 'availability'
+                          ? 'bg-primary text-white shadow-sm'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      <CalendarCheck className="w-4 h-4" />
+                      Availability
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('sitter-bookings')}
+                      className={`h-10 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
+                        activeTab === 'sitter-bookings'
+                          ? 'bg-primary text-white shadow-sm'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      My Clients
+                    </button>
+                  </>
+                )}
+              </div>
             )}
 
             {/* Find Sitters Tab (Pet Owners) */}
             {userType === 'owner' && (
-              <TabsContent value="find" className="space-y-6">
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Search className="w-5 h-5 text-primary" />
-                    Find the Perfect Sitter
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="location">Location</Label>
-                      <LocationAutocomplete
-                        value={searchLocation}
-                        onChange={setSearchLocation}
-                        placeholder="Enter city, area, or address"
-                        className="bg-white"
-                        onLocationSelect={(location) => {
-                          // Optionally store coordinates for future use
-                          console.log('Selected location:', location);
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="service">Service Type</Label>
-                      <Select value={selectedService} onValueChange={setSelectedService}>
-                        <SelectTrigger className="bg-white">
-                          <SelectValue placeholder="Select service" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Services</SelectItem>
-                          <SelectItem value="House Sitting">House Sitting</SelectItem>
-                          <SelectItem value="Dog Walking">Dog Walking</SelectItem>
-                          <SelectItem value="Pet Boarding">Pet Boarding</SelectItem>
-                          <SelectItem value="Day Care">Day Care</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <div className="space-y-4">
-                {loading ? (
-                  <div className="text-center py-12">
-                    <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-                    <p className="text-muted-foreground">Finding amazing sitters...</p>
-                  </div>
-                ) : filteredSitters.length === 0 ? (
-                  <Card className="bg-white/80 backdrop-blur-sm border-0">
-                    <CardContent className="text-center py-12">
-                      <Search className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-                      <h3 className="text-xl font-semibold text-foreground mb-2">
-                        No sitters found
-                      </h3>
-                      <p className="text-muted-foreground">
-                        Try adjusting your search criteria
-                      </p>
+              <TabsContent value="find" className="space-y-4">
+                <div>
+                  <h2 className="text-base font-semibold mb-2 px-4">
+                    Find the perfect sitter
+                  </h2>
+                  
+                  {/* Compact Search Form */}
+                  <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="flex-1">
+                          <LocationAutocomplete
+                            value={searchLocation}
+                            onChange={setSearchLocation}
+                            placeholder="Location..."
+                            className="h-10 rounded-xl text-sm"
+                            onLocationSelect={(location) => {
+                              console.log('Selected location:', location);
+                            }}
+                          />
+                        </div>
+                        <div className="w-full sm:w-48">
+                          <Select value={selectedService} onValueChange={setSelectedService}>
+                            <SelectTrigger className="h-10 rounded-xl text-sm">
+                              <SelectValue placeholder="Service type" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white z-50">
+                              <SelectItem value="all">All Services</SelectItem>
+                              <SelectItem value="House Sitting">House Sitting</SelectItem>
+                              <SelectItem value="Dog Walking">Dog Walking</SelectItem>
+                              <SelectItem value="Pet Boarding">Pet Boarding</SelectItem>
+                              <SelectItem value="Day Care">Day Care</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <Button 
+                          onClick={filterSitters}
+                          className="h-10 px-4 rounded-full text-sm font-medium bg-primary text-white shadow-sm hover:bg-primary/90 self-end"
+                        >
+                          Search
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {filteredSitters.map((sitter) => (
-                      <SitterCard key={sitter.id} sitter={sitter} />
-                    ))}
-                  </div>
-                )}
-              </div>
+                </div>
+
+                {/* Results */}
+                <div className="space-y-3">
+                  {loading ? (
+                    <div className="text-center py-12">
+                      <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+                      <p className="text-sm text-muted-foreground">Finding sitters...</p>
+                    </div>
+                  ) : filteredSitters.length === 0 ? (
+                    <Card className="rounded-2xl border border-gray-100 bg-white shadow-sm max-w-md mx-auto my-4">
+                      <CardContent className="p-4 text-center space-y-3">
+                        <Search className="w-8 h-8 mx-auto text-muted-foreground" />
+                        <h3 className="text-base font-semibold text-foreground">
+                          No sitters found
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          Try adjusting your search criteria
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    filteredSitters.map((sitter) => {
+                      const primaryPhoto = sitter.sitter_photos.find(p => p.is_primary)?.photo_url;
+                      const services = sitter.sitter_services.map(s => s.service_type);
+                      
+                      return (
+                        <Card 
+                          key={sitter.id}
+                          className="rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                          onClick={() => navigate(`/sitter/${sitter.id}`)}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-3 min-w-0">
+                              <div className="flex items-start gap-3 min-w-0 flex-1">
+                                <Avatar className="h-12 w-12 border border-gray-100 shrink-0">
+                                  <AvatarImage src={primaryPhoto} alt={sitter.user_profiles?.display_name} />
+                                  <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+                                    {sitter.user_profiles?.display_name?.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                
+                                <div className="min-w-0 flex-1">
+                                  <h3 className="font-semibold text-foreground truncate">
+                                    {sitter.user_profiles?.display_name || 'Unknown Sitter'}
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">
+                                    {sitter.bio || 'Professional pet sitter'}
+                                  </p>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1 flex-wrap">
+                                    <span className="flex items-center gap-1">
+                                      <MapPin className="h-3.5 w-3.5" />
+                                      <span className="truncate">{sitter.location}</span>
+                                    </span>
+                                    <span>•</span>
+                                    <span className="flex items-center gap-1">
+                                      <DollarSign className="h-3.5 w-3.5" />
+                                      ${sitter.rate_per_day}/day
+                                    </span>
+                                  </div>
+                                  {services.length > 0 && (
+                                    <div className="flex flex-wrap gap-1 mt-2">
+                                      {services.slice(0, 2).map((service) => (
+                                        <Badge key={service} variant="secondary" className="text-xs px-2 py-0.5">
+                                          {service}
+                                        </Badge>
+                                      ))}
+                                      {services.length > 2 && (
+                                        <Badge variant="outline" className="text-xs px-2 py-0.5">
+                                          +{services.length - 2}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-9 rounded-full px-3 text-sm shrink-0"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/sitter/${sitter.id}`);
+                                }}
+                              >
+                                View
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })
+                  )}
+                </div>
               </TabsContent>
             )}
 
+
             {/* My Bookings Tab (Pet Owners) */}
             {userType === 'owner' && (
-              <TabsContent value="bookings" className="space-y-6">
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-primary" />
-                    Your Booking History
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {loading ? (
-                    <div className="text-center py-8">
-                      <Clock className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-                      <p className="text-muted-foreground">Loading bookings...</p>
-                    </div>
-                  ) : bookings.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-                      <h3 className="text-xl font-semibold text-foreground mb-2">
+              <TabsContent value="bookings" className="space-y-4">
+                <h2 className="text-base font-semibold mb-2 px-4">
+                  Your booking history
+                </h2>
+                
+                {loading ? (
+                  <div className="text-center py-12">
+                    <Clock className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+                    <p className="text-sm text-muted-foreground">Loading bookings...</p>
+                  </div>
+                ) : bookings.length === 0 ? (
+                  <Card className="rounded-2xl border border-gray-100 bg-white shadow-sm max-w-md mx-auto my-4">
+                    <CardContent className="p-4 text-center space-y-3">
+                      <Calendar className="w-8 h-8 mx-auto text-muted-foreground" />
+                      <h3 className="text-base font-semibold text-foreground">
                         No bookings yet
                       </h3>
-                      <p className="text-muted-foreground mb-4">
+                      <p className="text-sm text-muted-foreground">
                         Book your first pet sitter to get started
                       </p>
-                      <Button onClick={() => setActiveTab('find')}>
+                      <Button 
+                        onClick={() => setActiveTab('find')}
+                        className="h-10 px-4 rounded-full text-sm font-medium bg-primary text-white shadow-sm hover:bg-primary/90"
+                      >
                         Find Sitters
                       </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {bookings.map((booking) => (
-                        <div key={booking.id} className="p-4 border border-border rounded-lg bg-background">
-                          <div className="flex items-center justify-between">
-                            <div className="space-y-2">
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-3">
+                    {bookings.map((booking) => (
+                      <Card 
+                        key={booking.id}
+                        className="rounded-2xl bg-white border border-gray-100 shadow-sm"
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 space-y-1">
                               <div className="flex items-center gap-2">
                                 <h4 className="font-semibold text-foreground">
                                   {booking.pet_profiles.name}
@@ -574,10 +567,7 @@ const PetSitters = () => {
                                 </Badge>
                               </div>
                               <p className="text-sm text-muted-foreground">
-                                Sitter: {booking.sitter_profiles?.user_profiles?.display_name || 'Unknown Sitter'}
-                              </p>
-                              <p className="text-sm text-muted-foreground">
-                                {booking.sitter_profiles?.location || 'Unknown Location'}
+                                {booking.sitter_profiles?.user_profiles?.display_name || 'Unknown Sitter'}
                               </p>
                               <p className="text-sm text-muted-foreground">
                                 {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
@@ -589,261 +579,213 @@ const PetSitters = () => {
                               </p>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </TabsContent>
             )}
 
+
             {/* Sitter Availability Tab */}
             {userType === 'sitter' && (
-              <TabsContent value="availability" className="space-y-6">
-              {availabilityLoading ? (
-                <div className="text-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-                  <p className="text-muted-foreground">Loading your sitter profile...</p>
-                </div>
-              ) : !sitterProfile ? (
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-                  <CardHeader className="text-center pb-8">
-                    <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                      <CalendarCheck className="w-8 h-8 text-purple-600" />
-                    </div>
-                    <CardTitle className="text-2xl font-medium text-gray-800">
-                      Become a Pet Sitter
-                    </CardTitle>
-                    <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
-                      To manage your availability calendar, you'll need to create a pet sitter profile first.
-                    </p>
-                  </CardHeader>
-                  <CardContent className="text-center pb-8">
-                    <div className="bg-blue-50 rounded-xl p-6 mb-6 border border-blue-200">
-                      <AlertCircle className="w-6 h-6 text-blue-600 mx-auto mb-3" />
-                      <h3 className="text-lg font-medium text-blue-800 mb-2">
-                        Ready to Start Pet Sitting?
+              <TabsContent value="availability" className="space-y-4">
+                {availabilityLoading ? (
+                  <div className="text-center py-12">
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+                    <p className="text-sm text-muted-foreground">Loading your sitter profile...</p>
+                  </div>
+                ) : !sitterProfile ? (
+                  <Card className="rounded-2xl border border-gray-100 bg-white shadow-sm max-w-md mx-auto my-4">
+                    <CardContent className="p-4 text-center space-y-3">
+                      <CalendarCheck className="w-8 h-8 mx-auto text-primary" />
+                      <h3 className="text-base font-semibold text-foreground">
+                        Create your sitter profile
                       </h3>
-                      <p className="text-blue-700 text-sm">
-                        Create your sitter profile to access the availability calendar and start accepting bookings.
+                      <p className="text-sm text-muted-foreground">
+                        Set up your profile to manage availability and accept bookings
                       </p>
-                    </div>
-                    <Button
-                      onClick={() => setActiveTab('become')}
-                      className="h-12 px-8 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 bg-primary hover:bg-primary/90"
-                    >
-                      Create Sitter Profile
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="space-y-6">
-                  {/* Header Section */}
-                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-                    <CardHeader>
+                      <Button
+                        onClick={() => setActiveTab('become')}
+                        className="h-10 px-4 rounded-full text-sm font-medium bg-primary text-white shadow-sm hover:bg-primary/90"
+                      >
+                        Get Started
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Status Banner */}
+                    <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4">
                       <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle className="flex items-center gap-2">
-                            <CalendarCheck className="w-5 h-5 text-primary" />
-                            Your Availability Calendar
-                          </CardTitle>
-                          <p className="text-muted-foreground">
-                            Set your available dates for pet sitting services
-                          </p>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 rounded-full ${sitterProfile.is_active ? 'bg-green-500' : 'bg-gray-400'}`} />
+                          <span className="text-sm font-medium text-foreground">
+                            Sitter profile: {sitterProfile.is_active ? 'Active' : 'Inactive'}
+                          </span>
                         </div>
                         <SitterProfileSettings 
                           sitterProfile={sitterProfile} 
                           onUpdate={checkSitterProfile}
                         />
                       </div>
-                    </CardHeader>
-                  </Card>
+                    </div>
 
-                  {/* Quick Stats */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card className="bg-white/80 backdrop-blur-sm border-0">
-                      <CardContent className="p-4">
-                        <div className="flex items-center">
-                          <Clock className="w-8 h-8 text-green-500 mr-3" />
-                          <div>
-                            <p className="text-sm text-muted-foreground">Profile Status</p>
-                            <p className="text-lg font-medium text-foreground">
-                              {sitterProfile?.is_active ? 'Active' : 'Inactive'}
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    {/* Quick Actions Grid */}
+                    <div>
+                      <h3 className="text-base font-semibold mb-2 px-4">Quick actions</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                          <CardContent className="p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                <DollarSign className="w-5 h-5 text-primary" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-foreground text-sm">Rate per Day</h4>
+                                <p className="text-xs text-muted-foreground mt-0.5">
+                                  {sitterProfile?.rate_per_day 
+                                    ? `${getCurrencySymbol(sitterProfile.currency)}${sitterProfile.rate_per_day}` 
+                                    : 'Not set'
+                                  }
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
 
-                    <Card className="bg-white/80 backdrop-blur-sm border-0">
-                      <CardContent className="p-4">
-                        <div className="flex items-center">
-                          <DollarSign className="w-8 h-8 text-purple-500 mr-3" />
-                          <div>
-                            <p className="text-sm text-muted-foreground">Rate per Day</p>
-                            <p className="text-lg font-medium text-foreground">
-                              {sitterProfile?.rate_per_day 
-                                ? `${getCurrencySymbol(sitterProfile.currency)}${sitterProfile.rate_per_day}` 
-                                : 'Not set'
-                              }
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                        <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                          <CardContent className="p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                <MapPin className="w-5 h-5 text-primary" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-foreground text-sm">Location</h4>
+                                <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                                  {sitterProfile?.location || 'Not set'}
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
 
-                    <Card className="bg-white/80 backdrop-blur-sm border-0">
+                        <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                          <CardContent className="p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                <CheckCircle className="w-5 h-5 text-primary" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-foreground text-sm">My Clients</h4>
+                                <p className="text-xs text-muted-foreground mt-0.5">View bookings</p>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setActiveTab('sitter-bookings')}
+                                  className="h-8 mt-2 rounded-full px-3 text-xs"
+                                >
+                                  View
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                          <CardContent className="p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                <CalendarCheck className="w-5 h-5 text-primary" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-foreground text-sm">Availability</h4>
+                                <p className="text-xs text-muted-foreground mt-0.5">Manage calendar</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
+
+                    {/* Calendar */}
+                    <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
                       <CardContent className="p-4">
-                        <div className="flex items-center">
-                          <MapPin className="w-8 h-8 text-blue-500 mr-3" />
-                          <div>
-                            <p className="text-sm text-muted-foreground">Location</p>
-                            <p className="text-lg font-medium text-foreground">
-                              {sitterProfile?.location || 'Not set'}
-                            </p>
-                          </div>
-                        </div>
+                        <SitterAvailabilityCalendar sitterId={sitterProfile.id} />
                       </CardContent>
                     </Card>
                   </div>
-
-                  {/* Calendar Component */}
-                  <Card className="bg-white/80 backdrop-blur-sm border-0">
-                    <CardContent className="p-6">
-                      <SitterAvailabilityCalendar sitterId={sitterProfile.id} />
-                    </CardContent>
-                  </Card>
-
-                  {/* Tips Section */}
-                  <Card className="bg-white/80 backdrop-blur-sm border-0">
-                    <CardContent className="p-6">
-                      <h3 className="text-lg font-medium text-foreground mb-4">
-                        💡 Tips for Managing Your Availability
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium text-foreground">
-                            Keep it updated
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Regularly update your calendar to ensure pet owners see accurate availability
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium text-foreground">
-                            Plan ahead
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Set your availability for several weeks in advance to get more booking requests
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                 </div>
-               )}
-             </TabsContent>
+                )}
+              </TabsContent>
             )}
 
+
             {/* Become a Sitter Tab */}
-            {userType === 'sitter' && (
-              <TabsContent value="become" className="space-y-6">
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <UserCheck className="w-5 h-5 text-primary" />
-                    Join Our Sitter Community
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {userIsSitter ? (
-                    <div className="text-center py-12">
-                      <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500" />
+            {userType === 'sitter' && !userIsSitter && (
+              <TabsContent value="become" className="space-y-4">
+                {/* Compact Join Card */}
+                <Card className="rounded-2xl border border-gray-100 bg-white shadow-sm max-w-2xl mx-auto">
+                  <CardContent className="p-6 text-center space-y-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                      <Heart className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
                       <h3 className="text-xl font-semibold text-foreground mb-2">
-                        You're already a sitter!
+                        Join our sitter community
                       </h3>
-                      <p className="text-muted-foreground mb-4">
-                        Thank you for being part of our trusted sitter community
+                      <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                        Turn your love for pets into income. Provide loving care while earning extra money in your spare time.
                       </p>
-                      <Button onClick={() => navigate('/dashboard')}>
-                        Go to Dashboard
-                      </Button>
                     </div>
-                  ) : (
-                    <div className="space-y-8">
-                      <div className="text-center">
-                        <Heart className="w-16 h-16 mx-auto mb-4 text-primary" />
-                        <h3 className="text-2xl font-semibold text-foreground mb-4">
-                          Turn Your Love for Pets into Income
-                        </h3>
-                        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                          Join thousands of trusted pet sitters who provide loving care 
-                          while earning extra income in their spare time.
-                        </p>
-                      </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="text-center p-6 bg-background rounded-xl">
-                          <Shield className="w-12 h-12 mx-auto mb-4 text-primary" />
-                          <h4 className="font-semibold text-foreground mb-2">Trusted Platform</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Background checks and verified profiles for peace of mind
-                          </p>
-                        </div>
-                        <div className="text-center p-6 bg-background rounded-xl">
-                          <DollarSign className="w-12 h-12 mx-auto mb-4 text-primary" />
-                          <h4 className="font-semibold text-foreground mb-2">Flexible Earnings</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Set your own rates and work when it suits your schedule
-                          </p>
-                        </div>
-                        <div className="text-center p-6 bg-background rounded-xl">
-                          <Heart className="w-12 h-12 mx-auto mb-4 text-primary" />
-                          <h4 className="font-semibold text-foreground mb-2">Pet Community</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Connect with fellow pet lovers and make new furry friends
-                          </p>
-                        </div>
-                      </div>
-
+                    {/* Benefits Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
                       <div className="text-center">
-                        <Button 
-                          size="lg"
-                          onClick={() => navigate('/become-sitter')}
-                          className="bg-primary hover:bg-primary/90 text-lg px-8 py-3"
-                        >
-                          Start Your Sitter Journey
-                        </Button>
+                        <Shield className="w-8 h-8 mx-auto mb-2 text-primary" />
+                        <h4 className="text-sm font-semibold text-foreground">Trusted</h4>
+                        <p className="text-xs text-muted-foreground">Verified profiles</p>
+                      </div>
+                      <div className="text-center">
+                        <DollarSign className="w-8 h-8 mx-auto mb-2 text-primary" />
+                        <h4 className="text-sm font-semibold text-foreground">Flexible</h4>
+                        <p className="text-xs text-muted-foreground">Set your rates</p>
+                      </div>
+                      <div className="text-center">
+                        <Heart className="w-8 h-8 mx-auto mb-2 text-primary" />
+                        <h4 className="text-sm font-semibold text-foreground">Community</h4>
+                        <p className="text-xs text-muted-foreground">Connect with pets</p>
                       </div>
                     </div>
-                  )}
-                 </CardContent>
-               </Card>
-               </TabsContent>
-             )}
+
+                    <Button 
+                      onClick={() => navigate('/become-sitter')}
+                      className="h-10 px-6 rounded-full text-sm font-medium bg-primary text-white shadow-sm hover:bg-primary/90"
+                    >
+                      Become a sitter
+                    </Button>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
+
 
              {/* Sitter Bookings Tab (New) */}
              {userType === 'sitter' && userIsSitter && (
-               <TabsContent value="sitter-bookings" className="space-y-6">
-                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-                   <CardHeader>
-                     <CardTitle className="flex items-center gap-2">
-                       <CheckCircle className="w-5 h-5 text-primary" />
-                       Client Bookings
-                     </CardTitle>
-                   </CardHeader>
-                   <CardContent>
-                     <div className="text-center py-12">
-                       <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-                       <h3 className="text-xl font-semibold text-foreground mb-2">
-                         No client bookings yet
-                       </h3>
-                       <p className="text-muted-foreground">
-                         When clients book your services, they'll appear here
-                       </p>
-                     </div>
+               <TabsContent value="sitter-bookings" className="space-y-4">
+                 <h2 className="text-base font-semibold mb-2 px-4">
+                   Client bookings
+                 </h2>
+                 
+                 <Card className="rounded-2xl border border-gray-100 bg-white shadow-sm max-w-md mx-auto my-4">
+                   <CardContent className="p-4 text-center space-y-3">
+                     <Calendar className="w-8 h-8 mx-auto text-muted-foreground" />
+                     <h3 className="text-base font-semibold text-foreground">
+                       No client bookings yet
+                     </h3>
+                     <p className="text-sm text-muted-foreground">
+                       When clients book your services, they'll appear here
+                     </p>
                    </CardContent>
                  </Card>
                </TabsContent>
