@@ -1543,6 +1543,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_pet_profile: {
+        Args: { _pet_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_view_user_content: {
         Args: { content_owner_id: string; viewer_id: string }
         Returns: boolean
