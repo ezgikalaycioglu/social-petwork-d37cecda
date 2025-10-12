@@ -54,14 +54,22 @@ const PetFriendsList = ({ petId, petName, isOwner = false, onFriendRemoved }: Pe
       if (error) throw error;
 
       // Transform the data to get the friend pet (the one that's not the current pet)
-      const friendsList: Friend[] = (data || []).map((friendship: any) => {
-        const isRequester = friendship.requester_pet_id === petId;
-        return {
-          id: isRequester ? friendship.recipient_pet_id : friendship.requester_pet_id,
-          friend_pet: isRequester ? friendship.recipient_pet : friendship.requester_pet,
-          friendship_id: friendship.id
-        };
-      });
+      // Filter out friendships where the friend's pet profile has been deleted
+      const friendsList: Friend[] = (data || [])
+        .map((friendship: any) => {
+          const isRequester = friendship.requester_pet_id === petId;
+          const friendPet = isRequester ? friendship.recipient_pet : friendship.requester_pet;
+          
+          // Skip if friend pet is null (deleted profile)
+          if (!friendPet) return null;
+          
+          return {
+            id: isRequester ? friendship.recipient_pet_id : friendship.requester_pet_id,
+            friend_pet: friendPet,
+            friendship_id: friendship.id
+          };
+        })
+        .filter((friend): friend is Friend => friend !== null);
 
       setFriends(friendsList);
     } catch (error) {
