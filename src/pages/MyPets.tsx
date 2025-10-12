@@ -10,15 +10,11 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Plus, 
-  Search, 
   Edit, 
   Trash2, 
   Eye, 
   Heart, 
   Users, 
-  MapPin,
-  Calendar,
-  Star,
   PawPrint
 } from 'lucide-react';
 import {
@@ -61,23 +57,13 @@ const MyPets = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [pets, setPets] = useState<PetProfile[]>([]);
-  const [filteredPets, setFilteredPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuthAndFetchPets();
   }, []);
-
-  useEffect(() => {
-    const filtered = pets.filter(pet =>
-      pet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pet.breed.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredPets(filtered);
-  }, [pets, searchTerm]);
 
   const checkAuthAndFetchPets = async () => {
     try {
@@ -198,19 +184,8 @@ const MyPets = () => {
     <Layout>
       <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          {/* Search & Actions Bar */}
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center mb-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                type="text"
-                placeholder="Search your pets..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-10 text-sm rounded-xl bg-white shadow-sm"
-              />
-            </div>
-
+          {/* Actions Bar */}
+          <div className="flex justify-end mb-4">
             <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
               <DialogTrigger asChild>
                 <Button 
@@ -236,7 +211,7 @@ const MyPets = () => {
           </div>
 
           {/* Pet Grid */}
-          {filteredPets.length === 0 && !loading ? (
+          {pets.length === 0 && !loading ? (
             <div className="text-center py-16">
               <div className="max-w-md mx-auto space-y-4">
                 <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
@@ -245,23 +220,21 @@ const MyPets = () => {
                 <div className="space-y-2">
                   <h3 className="text-base font-semibold">No pets yet</h3>
                   <p className="text-sm text-muted-foreground">
-                    {searchTerm ? 'No pets match your search.' : 'Create your first pet profile to get started.'}
+                    Create your first pet profile to get started.
                   </p>
                 </div>
-                {!searchTerm && (
-                  <Button 
-                    onClick={() => setShowCreateModal(true)}
-                    className="h-10 rounded-full px-4"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Pet Profile
-                  </Button>
-                )}
+                <Button 
+                  onClick={() => setShowCreateModal(true)}
+                  className="h-10 rounded-full px-4"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Pet Profile
+                </Button>
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredPets.map((pet) => (
+              {pets.map((pet) => (
                 <Card 
                   key={pet.id} 
                   className="rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
