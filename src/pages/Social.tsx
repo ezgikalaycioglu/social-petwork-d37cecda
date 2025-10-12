@@ -14,9 +14,13 @@ import {
   Plus,
   Users,
   Clock,
-  ChevronDown
+  ChevronDown,
+  ChevronRight,
+  X
 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer';
+import { Badge } from '@/components/ui/badge';
 import SegmentedControl from '@/components/SegmentedControl';
 import DiscoverPets from '@/components/DiscoverPets';
 import FriendRequests from '@/components/FriendRequests';
@@ -46,6 +50,7 @@ const Social = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [showPlaydateModal, setShowPlaydateModal] = useState(false);
   const [showGroupWalkModal, setShowGroupWalkModal] = useState(false);
+  const [openSheet, setOpenSheet] = useState<'requests' | 'upcoming' | 'pending' | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -135,6 +140,9 @@ const Social = () => {
   );
   const upcomingEvents = events.filter(
     event => event.status === 'confirmed' && new Date(event.scheduled_time) > new Date()
+  );
+  const pendingEvents = events.filter(
+    event => event.creator_id === user?.id && event.status === 'pending'
   );
 
   const segmentedItems = [
@@ -243,41 +251,50 @@ const Social = () => {
 
                 {/* Event Summary Stats */}
                 <div className="grid grid-cols-3 gap-2 my-2">
-                  <Card className="rounded-xl bg-white border border-gray-100 shadow-sm">
-                    <CardContent className="p-3 text-center">
-                      <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-1.5">
-                        <Heart className="w-4 h-4 text-red-500" />
-                      </div>
-                      <h3 className="text-lg font-semibold mb-0.5">
-                        {incomingRequests.length}
-                      </h3>
-                      <p className="text-xs text-muted-foreground">Requests</p>
-                    </CardContent>
-                  </Card>
+                  <button
+                    onClick={() => setOpenSheet('requests')}
+                    className="rounded-xl bg-white border border-gray-100 shadow-sm p-3 text-center hover:shadow-md active:scale-[0.98] transition focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    aria-label={`View ${incomingRequests.length} playdate requests`}
+                    tabIndex={0}
+                  >
+                    <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-1.5">
+                      <Heart className="w-4 h-4 text-red-500" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-0.5">
+                      {incomingRequests.length}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">Requests</p>
+                  </button>
 
-                  <Card className="rounded-xl bg-white border border-gray-100 shadow-sm">
-                    <CardContent className="p-3 text-center">
-                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-1.5">
-                        <Calendar className="w-4 h-4 text-green-500" />
-                      </div>
-                      <h3 className="text-lg font-semibold mb-0.5">
-                        {upcomingEvents.length}
-                      </h3>
-                      <p className="text-xs text-muted-foreground">Upcoming</p>
-                    </CardContent>
-                  </Card>
+                  <button
+                    onClick={() => setOpenSheet('upcoming')}
+                    className="rounded-xl bg-white border border-gray-100 shadow-sm p-3 text-center hover:shadow-md active:scale-[0.98] transition focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    aria-label={`View ${upcomingEvents.length} upcoming events`}
+                    tabIndex={0}
+                  >
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-1.5">
+                      <Calendar className="w-4 h-4 text-green-500" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-0.5">
+                      {upcomingEvents.length}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">Upcoming</p>
+                  </button>
 
-                  <Card className="rounded-xl bg-white border border-gray-100 shadow-sm">
-                    <CardContent className="p-3 text-center">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-1.5">
-                        <Clock className="w-4 h-4 text-blue-500" />
-                      </div>
-                      <h3 className="text-lg font-semibold mb-0.5">
-                        {events.filter(e => e.creator_id === user?.id && e.status === 'pending').length}
-                      </h3>
-                      <p className="text-xs text-muted-foreground">Pending</p>
-                    </CardContent>
-                  </Card>
+                  <button
+                    onClick={() => setOpenSheet('pending')}
+                    className="rounded-xl bg-white border border-gray-100 shadow-sm p-3 text-center hover:shadow-md active:scale-[0.98] transition focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    aria-label={`View ${pendingEvents.length} pending events`}
+                    tabIndex={0}
+                  >
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-1.5">
+                      <Clock className="w-4 h-4 text-blue-500" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-0.5">
+                      {pendingEvents.length}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">Pending</p>
+                  </button>
                 </div>
 
                 {/* Manage All Events */}
@@ -376,6 +393,196 @@ const Social = () => {
           userId={user?.id || ''}
           userPets={pets}
         />
+
+        {/* Event Lists Drawer */}
+        <Drawer open={openSheet !== null} onOpenChange={(open) => !open && setOpenSheet(null)}>
+          <DrawerContent className="max-h-[85vh]">
+            <DrawerHeader className="border-b sticky top-0 bg-background z-10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <DrawerTitle className="text-lg font-semibold">
+                    {openSheet === 'requests' && 'Requests'}
+                    {openSheet === 'upcoming' && 'Upcoming'}
+                    {openSheet === 'pending' && 'Pending'}
+                  </DrawerTitle>
+                  <Badge variant="secondary" className="rounded-full">
+                    {openSheet === 'requests' && incomingRequests.length}
+                    {openSheet === 'upcoming' && upcomingEvents.length}
+                    {openSheet === 'pending' && pendingEvents.length}
+                  </Badge>
+                </div>
+                <DrawerClose asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <X className="h-4 w-4" />
+                  </Button>
+                </DrawerClose>
+              </div>
+            </DrawerHeader>
+
+            <div className="overflow-y-auto p-4 space-y-2">
+              {openSheet === 'requests' && (
+                incomingRequests.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="text-3xl mb-2">💌</div>
+                    <h3 className="text-sm font-semibold mb-1">No requests</h3>
+                    <p className="text-xs text-muted-foreground">Check back later.</p>
+                  </div>
+                ) : (
+                  incomingRequests.map((event) => (
+                    <button
+                      key={event.id}
+                      onClick={() => {
+                        setOpenSheet(null);
+                        navigate(`/events?eventId=${event.id}`);
+                      }}
+                      className="w-full rounded-xl bg-white border border-gray-100 shadow-sm p-3 text-left hover:shadow-md transition"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-sm mb-1 truncate">{event.title}</h4>
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5" />
+                              {formatTime(event.scheduled_time)}
+                            </span>
+                            {event.location_name && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-3.5 h-3.5" />
+                                <span className="truncate max-w-[120px]">{event.location_name}</span>
+                              </span>
+                            )}
+                            {event.participants && (
+                              <span className="flex items-center gap-1">
+                                <Users className="w-3.5 h-3.5" />
+                                {event.participants.length}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1" />
+                      </div>
+                    </button>
+                  ))
+                )
+              )}
+
+              {openSheet === 'upcoming' && (
+                upcomingEvents.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="text-3xl mb-2">📅</div>
+                    <h3 className="text-sm font-semibold mb-1">No upcoming events</h3>
+                    <p className="text-xs text-muted-foreground">Check back later.</p>
+                  </div>
+                ) : (
+                  upcomingEvents.map((event) => (
+                    <button
+                      key={event.id}
+                      onClick={() => {
+                        setOpenSheet(null);
+                        navigate(`/events?eventId=${event.id}`);
+                      }}
+                      className="w-full rounded-xl bg-white border border-gray-100 shadow-sm p-3 text-left hover:shadow-md transition"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-sm mb-1 truncate">{event.title}</h4>
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5" />
+                              {formatTime(event.scheduled_time)}
+                            </span>
+                            {event.location_name && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-3.5 h-3.5" />
+                                <span className="truncate max-w-[120px]">{event.location_name}</span>
+                              </span>
+                            )}
+                            {event.participants && (
+                              <span className="flex items-center gap-1">
+                                <Users className="w-3.5 h-3.5" />
+                                {event.participants.length}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1" />
+                      </div>
+                    </button>
+                  ))
+                )
+              )}
+
+              {openSheet === 'pending' && (
+                pendingEvents.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="text-3xl mb-2">⏳</div>
+                    <h3 className="text-sm font-semibold mb-1">No pending events</h3>
+                    <p className="text-xs text-muted-foreground">Check back later.</p>
+                  </div>
+                ) : (
+                  pendingEvents.map((event) => (
+                    <button
+                      key={event.id}
+                      onClick={() => {
+                        setOpenSheet(null);
+                        navigate(`/events?eventId=${event.id}`);
+                      }}
+                      className="w-full rounded-xl bg-white border border-gray-100 shadow-sm p-3 text-left hover:shadow-md transition"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="font-semibold text-sm truncate">{event.title}</h4>
+                            <Badge variant="outline" className="text-xs">Pending</Badge>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5" />
+                              {formatTime(event.scheduled_time)}
+                            </span>
+                            {event.location_name && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-3.5 h-3.5" />
+                                <span className="truncate max-w-[120px]">{event.location_name}</span>
+                              </span>
+                            )}
+                            {event.participants && (
+                              <span className="flex items-center gap-1">
+                                <Users className="w-3.5 h-3.5" />
+                                {event.participants.length}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1" />
+                      </div>
+                    </button>
+                  ))
+                )
+              )}
+            </div>
+
+            {(
+              (openSheet === 'requests' && incomingRequests.length > 0) ||
+              (openSheet === 'upcoming' && upcomingEvents.length > 0) ||
+              (openSheet === 'pending' && pendingEvents.length > 0)
+            ) && (
+              <div className="border-t p-4">
+                <Button
+                  onClick={() => {
+                    setOpenSheet(null);
+                    navigate('/events');
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-9 rounded-full"
+                >
+                  View All Events
+                </Button>
+              </div>
+            )}
+          </DrawerContent>
+        </Drawer>
       </div>
     </Layout>
   );
