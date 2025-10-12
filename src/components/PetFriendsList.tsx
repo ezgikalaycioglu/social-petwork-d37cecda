@@ -124,78 +124,73 @@ const PetFriendsList = ({ petId, petName, isOwner = false, onFriendRemoved }: Pe
   }
 
   return (
-    <Card className="bg-white shadow-lg">
-      <CardHeader className="pb-4 md:pb-6">
-        <div className="flex flex-col items-center space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0 md:space-x-4">
-          <CardTitle className="flex items-center gap-2 text-center md:text-left">
-            <Users className="h-5 w-5 text-green-600" />
-            {petName}'s Friends ({friends.length})
-          </CardTitle>
+    <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-semibold">{petName}'s Friends</h3>
+            <span className="text-xs text-muted-foreground">({friends.length})</span>
+          </div>
           {isOwner && (
             <Button 
               onClick={() => navigate(`/find-friends?petId=${petId}`)}
               size="sm"
-              className="bg-green-600 hover:bg-green-700 flex-shrink-0"
+              variant="ghost"
+              className="h-8 px-2 text-xs"
             >
-              <Search className="w-4 h-4 mr-2" />
-              Find Friends
+              <Search className="w-3.5 h-3.5 mr-1" />
+              Find
             </Button>
           )}
         </div>
-      </CardHeader>
-      <CardContent>
+        
         {friends.length === 0 ? (
-          <div className="text-center py-8">
-            <Heart className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">No friends yet!</h3>
-            <p className="text-gray-600">
-              {isOwner 
-                ? `${petName} hasn't made any friends yet. Use the search above to discover new pet friends!`
-                : `${petName} hasn't made any friends yet.`
-              }
+          <div className="text-center py-6">
+            <Heart className="w-10 h-10 mx-auto mb-2 text-gray-400" />
+            <p className="text-xs text-muted-foreground">
+              {isOwner ? 'No friends yet. Use search to find pet friends!' : 'No friends yet'}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="space-y-2">
             {friends.map((friend) => (
-              <div key={friend.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 border rounded-lg space-y-4 sm:space-y-0">
-                <div className="flex items-center space-x-4 flex-1 min-w-0">
-                  <Avatar className="w-14 h-14 sm:w-10 sm:h-10 flex-shrink-0">
+              <div key={friend.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-xl bg-white">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <Avatar className="w-10 h-10 flex-shrink-0">
                     <AvatarImage 
                       src={friend.friend_pet.profile_photo_url || ''} 
                       alt={friend.friend_pet.name} 
                     />
-                    <AvatarFallback className="bg-green-100 text-green-600">
+                    <AvatarFallback className="bg-green-100 text-green-600 text-xs">
                       {friend.friend_pet.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   
-                  <div className="space-y-1 min-w-0 flex-1">
-                    <h4 className="font-semibold text-gray-800 text-base sm:text-sm truncate">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-semibold text-sm truncate">
                       {friend.friend_pet.name}
                     </h4>
-                    <p className="text-sm sm:text-xs text-gray-600 truncate">
+                    <p className="text-xs text-muted-foreground truncate">
                       {friend.friend_pet.breed}
                     </p>
                   </div>
                 </div>
                 
                 {isOwner && (
-                  <div className="flex justify-center sm:justify-end">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => removeFriend(friend.friendship_id, friend.friend_pet.name)}
-                      disabled={removingFriends.has(friend.friendship_id)}
-                      className="border-red-500 text-red-600 hover:bg-red-50 w-full sm:w-auto"
-                    >
-                      {removingFriends.has(friend.friendship_id) ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
-                      ) : (
-                        <UserMinus className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => removeFriend(friend.friendship_id, friend.friend_pet.name)}
+                    disabled={removingFriends.has(friend.friendship_id)}
+                    className="h-8 w-8 p-0 flex-shrink-0"
+                  >
+                    {removingFriends.has(friend.friendship_id) ? (
+                      <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-gray-400"></div>
+                    ) : (
+                      <UserMinus className="w-4 h-4 text-gray-400 hover:text-red-500" />
+                    )}
+                  </Button>
                 )}
               </div>
             ))}

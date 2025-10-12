@@ -29,11 +29,9 @@ const DiscoverPets = ({ userPetIds, onFriendRequestSent }: DiscoverPetsProps) =>
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">
-          Discover Pets
-        </h2>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between px-1">
+        <h2 className="text-base font-semibold">Discover Pets</h2>
       </div>
 
       {loading ? (

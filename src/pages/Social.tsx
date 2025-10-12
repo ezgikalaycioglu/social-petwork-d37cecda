@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import Layout from '@/components/Layout';
 import { 
   Heart, 
   Calendar, 
@@ -15,16 +13,14 @@ import {
   Plus,
   Users,
   Clock,
-  Loader2,
   ChevronDown
 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-
-// Import components from the individual pages
+import CompactMobileAppBar from '@/components/CompactMobileAppBar';
+import SegmentedControl from '@/components/SegmentedControl';
 import DiscoverPets from '@/components/DiscoverPets';
 import FriendRequests from '@/components/FriendRequests';
 import PetFriendsList from '@/components/PetFriendsList';
-import PlaydateRequestModal from '@/components/PlaydateRequestModal';
 import GroupWalkModal from '@/components/GroupWalkModal';
 import UpcomingPlaydates from '@/components/UpcomingPlaydates';
 import InteractiveMap from '@/components/InteractiveMap';
@@ -140,322 +136,285 @@ const Social = () => {
     event => event.status === 'confirmed' && new Date(event.scheduled_time) > new Date()
   );
 
+  const segmentedItems = [
+    { value: 'pet-social', label: 'Social', icon: Heart },
+    { value: 'events', label: 'Events', icon: Calendar },
+    { value: 'pet-map', label: 'Pet Map', icon: MapPin },
+  ];
+
   return (
-    <Layout>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <div className="bg-white/80 backdrop-blur-sm border-b border-border/50">
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="text-center">
-              <h1 className="page-title mb-2">
-                🐾 Social
-              </h1>
-              <p className="page-subtitle">
-                Connect, discover, and share with the pet community
-              </p>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-background pb-20">
+      {/* Compact App Bar */}
+      <CompactMobileAppBar />
 
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="-mx-4 w-[calc(100%+2rem)] min-h-[240px] grid grid-cols-1 grid-rows-3 gap-x-4 gap-y-6 bg-white rounded-2xl p-6 shadow-sm md:mx-0 md:w-full md:grid-cols-3 md:grid-rows-1 md:gap-x-2 md:gap-y-0 md:min-h-[96px] md:p-4">{/* Increased mobile height and spacing */}
-              <TabsTrigger
-                value="pet-social"
-                className="h-12 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-base"
-              >
-                <Heart className="w-5 h-5 mr-2" />
-                Pet Social
-              </TabsTrigger>
-              <TabsTrigger 
-                value="events"
-                className="h-12 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-base"
-              >
-                <Calendar className="w-5 h-5 mr-2" />
-                Events
-              </TabsTrigger>
-              <TabsTrigger 
-                value="pet-map"
-                className="h-12 flex items-center justify-center rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-base"
-              >
-                <MapPin className="w-5 h-5 mr-2" />
-                Pet Map
-              </TabsTrigger>
-            </TabsList>
+      {/* Segmented Control */}
+      <SegmentedControl
+        items={segmentedItems}
+        value={activeTab}
+        onChange={setActiveTab}
+      />
 
-            {/* Pet Social Tab */}
-            <TabsContent value="pet-social" className="space-y-6">
-              {loading ? (
-                <div className="text-center py-12">
-                  <PawPrint className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-                  <p className="text-muted-foreground">Loading pet social features...</p>
-                </div>
-              ) : pets.length === 0 ? (
-                <Card className="bg-white/80 backdrop-blur-sm border-0">
-                  <CardContent className="text-center py-12">
-                    <PawPrint className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      No pets yet!
-                    </h3>
-                    <p className="text-muted-foreground mb-6">
-                      Create a pet profile first to start making friends.
-                    </p>
-                    <Button
-                      onClick={() => navigate('/create-pet-profile')}
-                      className="bg-primary hover:bg-primary/90"
-                    >
-                      Create Pet Profile
-                    </Button>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="space-y-8">
-                  {/* Discover Pets Section */}
-                  <DiscoverPets 
+      {/* Main Content */}
+      <div className="px-4">
+        {/* Pet Social Tab */}
+        {activeTab === 'pet-social' && (
+          <div className="space-y-4 mt-4">
+            {loading ? (
+              <div className="text-center py-12">
+                <PawPrint className="w-6 h-6 animate-spin mx-auto mb-3 text-primary" />
+                <p className="text-sm text-muted-foreground">Loading...</p>
+              </div>
+            ) : pets.length === 0 ? (
+              <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm mt-4">
+                <CardContent className="text-center py-10 p-4">
+                  <div className="text-4xl mb-3">🐾</div>
+                  <h3 className="text-base font-semibold mb-2">No pets yet</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Create a pet profile to start making friends
+                  </p>
+                  <Button
+                    onClick={() => navigate('/create-pet-profile')}
+                    size="sm"
+                    className="h-9"
+                  >
+                    Create Pet Profile
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                {/* Discover Pets Section */}
+                <DiscoverPets 
+                  userPetIds={userPetIds} 
+                  onFriendRequestSent={handleRefresh}
+                />
+
+                {/* Friends Section */}
+                <div className="space-y-3 mt-4">
+                  <h2 className="text-base font-semibold px-1">Your Pets' Friends</h2>
+                  
+                  {/* Friend Requests - Collapsible */}
+                  <FriendRequests 
+                    key={`requests-${refreshKey}`}
                     userPetIds={userPetIds} 
-                    onFriendRequestSent={handleRefresh}
+                    onRequestHandled={handleRefresh}
                   />
 
-                  {/* Friends Lists for Each Pet */}
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-foreground">Your Pets' Friends</h2>
-                    
-                    {/* Friend Requests Section */}
-                    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-                      <CardContent className="p-4">
-                        <FriendRequests 
-                          key={`requests-${refreshKey}`}
-                          userPetIds={userPetIds} 
-                          onRequestHandled={handleRefresh}
-                        />
-                      </CardContent>
-                    </Card>
-
-                    {pets.map((pet) => (
-                      <PetFriendsList
-                        key={`${pet.id}-${refreshKey}`}
-                        petId={pet.id}
-                        petName={pet.name}
-                        isOwner={true}
-                        onFriendRemoved={handleRefresh}
-                      />
-                    ))}
-                  </div>
+                  {pets.map((pet) => (
+                    <PetFriendsList
+                      key={`${pet.id}-${refreshKey}`}
+                      petId={pet.id}
+                      petName={pet.name}
+                      isOwner={true}
+                      onFriendRemoved={handleRefresh}
+                    />
+                  ))}
                 </div>
-              )}
-            </TabsContent>
+              </>
+            )}
+          </div>
+        )}
 
-            {/* Events Tab */}
-            <TabsContent value="events" className="space-y-6">
-              {pets.length === 0 ? (
-                <Card className="bg-white/80 backdrop-blur-sm border-0">
-                  <CardContent className="text-center py-12">
-                    <PawPrint className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      No pets found!
-                    </h3>
-                    <p className="text-muted-foreground mb-6">
-                      You need to create a pet profile before you can schedule playdates or group walks.
-                    </p>
-                    <Button
-                      onClick={() => navigate('/create-pet-profile')}
-                      className="bg-primary hover:bg-primary/90"
-                    >
-                      Create Pet Profile
-                    </Button>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="space-y-6">
-                  {/* Upcoming Playdates */}
-                  <UpcomingPlaydates />
+        {/* Events Tab */}
+        {activeTab === 'events' && (
+          <div className="space-y-4 mt-4">
+            {pets.length === 0 ? (
+              <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                <CardContent className="text-center py-10 p-4">
+                  <div className="text-4xl mb-3">🐾</div>
+                  <h3 className="text-base font-semibold mb-2">No pets found</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Create a pet profile to schedule events
+                  </p>
+                  <Button
+                    onClick={() => navigate('/create-pet-profile')}
+                    size="sm"
+                    className="h-9"
+                  >
+                    Create Pet Profile
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                {/* Upcoming Playdates */}
+                <UpcomingPlaydates />
 
-                  {/* Quick Actions */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Button
-                      onClick={() => setShowGroupWalkModal(true)}
-                      className="bg-primary hover:bg-primary/90 h-16 text-lg"
-                    >
-                      <Plus className="w-6 h-6 mr-2" />
-                      Create Group Walk
-                    </Button>
-                    <Button
-                      onClick={() => setActiveTab('pet-social')}
-                      variant="outline"
-                      className="h-16 text-lg border-primary text-primary hover:bg-primary/5"
-                    >
-                      <Users className="w-6 h-6 mr-2" />
-                      Find Pets for Playdates
-                    </Button>
-                  </div>
+                {/* Quick Actions */}
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    onClick={() => setShowGroupWalkModal(true)}
+                    size="sm"
+                    className="h-11"
+                  >
+                    <Plus className="w-4 h-4 mr-1.5" />
+                    Group Walk
+                  </Button>
+                  <Button
+                    onClick={() => setActiveTab('pet-social')}
+                    variant="outline"
+                    size="sm"
+                    className="h-11"
+                  >
+                    <Users className="w-4 h-4 mr-1.5" />
+                    Find Pets
+                  </Button>
+                </div>
 
-                  {/* Event Summary Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-                      <CardContent className="p-6 text-center">
-                        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <Heart className="w-6 h-6 text-red-500" />
-                        </div>
-                        <h3 className="font-semibold text-foreground mb-1">
-                          {incomingRequests.length}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">Incoming Requests</p>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-                      <CardContent className="p-6 text-center">
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <Calendar className="w-6 h-6 text-green-500" />
-                        </div>
-                        <h3 className="font-semibold text-foreground mb-1">
-                          {upcomingEvents.length}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">Upcoming Events</p>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-                      <CardContent className="p-6 text-center">
-                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <Clock className="w-6 h-6 text-blue-500" />
-                        </div>
-                        <h3 className="font-semibold text-foreground mb-1">
-                          {events.filter(e => e.creator_id === user?.id && e.status === 'pending').length}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">Pending Sent</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* View Full Events */}
-                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm">
-                    <CardContent className="p-6">
-                      <div className="text-center">
-                        <h3 className="text-lg font-semibold text-foreground mb-2">
-                          Manage All Events
-                        </h3>
-                        <p className="text-muted-foreground mb-4">
-                          View detailed event history, manage requests, and track upcoming playdates
-                        </p>
-                        <Button
-                          onClick={() => navigate('/events')}
-                          variant="outline"
-                          className="border-primary text-primary hover:bg-primary/5"
-                        >
-                          View Full Events Page
-                        </Button>
+                {/* Event Summary Cards */}
+                <div className="grid grid-cols-3 gap-3">
+                  <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                    <CardContent className="p-4 text-center">
+                      <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Heart className="w-5 h-5 text-red-500" />
                       </div>
+                      <h3 className="text-lg font-semibold mb-0.5">
+                        {incomingRequests.length}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">Requests</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                    <CardContent className="p-4 text-center">
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Calendar className="w-5 h-5 text-green-500" />
+                      </div>
+                      <h3 className="text-lg font-semibold mb-0.5">
+                        {upcomingEvents.length}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">Upcoming</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                    <CardContent className="p-4 text-center">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Clock className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <h3 className="text-lg font-semibold mb-0.5">
+                        {events.filter(e => e.creator_id === user?.id && e.status === 'pending').length}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">Pending</p>
                     </CardContent>
                   </Card>
                 </div>
-              )}
-            </TabsContent>
 
-            {/* Pet Map Tab */}
-            <TabsContent value="pet-map" className="space-y-6">
-              {pets.length === 0 ? (
-                <Card className="bg-white/80 backdrop-blur-sm border-0">
-                  <CardContent className="text-center py-12">
-                    <PawPrint className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      No pets yet!
+                {/* View Full Events */}
+                <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                  <CardContent className="p-4 text-center">
+                    <h3 className="text-sm font-semibold mb-1">
+                      Manage All Events
                     </h3>
-                    <p className="text-muted-foreground mb-6">
-                      Create a pet profile first to use the pet map.
+                    <p className="text-xs text-muted-foreground mb-3">
+                      View history, manage requests, track playdates
                     </p>
                     <Button
-                      onClick={() => navigate('/create-pet-profile')}
-                      className="bg-primary hover:bg-primary/90"
+                      onClick={() => navigate('/events')}
+                      variant="outline"
+                      size="sm"
+                      className="h-9"
                     >
-                      Create Pet Profile
+                      View Full Events
                     </Button>
                   </CardContent>
                 </Card>
-              ) : (
-                <div className="space-y-6">
-                  {/* Privacy Notice */}
-                  <Card className="bg-blue-50/80 border-blue-200 backdrop-blur-sm">
-                    <CardContent className="p-4">
-                      <Collapsible>
-                        <CollapsibleTrigger asChild>
-                          <Button variant="outline" className="w-full justify-between bg-white/50 border-blue-300 text-blue-900 hover:bg-white/70">
-                            <div className="flex items-center gap-2">
-                              <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                <span className="text-white text-xs font-bold">i</span>
-                              </div>
-                              Privacy Notice
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Pet Map Tab */}
+        {activeTab === 'pet-map' && (
+          <div className="space-y-4 mt-4">
+            {pets.length === 0 ? (
+              <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                <CardContent className="text-center py-10 p-4">
+                  <div className="text-4xl mb-3">🐾</div>
+                  <h3 className="text-base font-semibold mb-2">No pets yet</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Create a pet profile to use the map
+                  </p>
+                  <Button
+                    onClick={() => navigate('/create-pet-profile')}
+                    size="sm"
+                    className="h-9"
+                  >
+                    Create Pet Profile
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                {/* Privacy Notice */}
+                <Card className="rounded-2xl bg-blue-50 border border-blue-200">
+                  <CardContent className="p-3">
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <Button variant="ghost" size="sm" className="w-full justify-between h-9 px-3 text-blue-900 hover:bg-blue-100/50">
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">i</span>
                             </div>
-                            <ChevronDown className="h-4 w-4" />
-                          </Button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="pt-4">
-                          <p className="text-sm text-blue-800">
-                            Your location will only be shared with others when you toggle "Ready to Play" ON. You can turn it off anytime to stop sharing your location.
-                            <br /><br />
-                            <strong>Important Note:</strong> When you switch "Ready to Play" OFF, our application will stop actively receiving and storing your location information in our database. 
-                            However, the location access permission you previously granted to our application (through your browser or device settings) will remain active until you manually revoke it.
-                          </p>
-                        </CollapsibleContent>
-                      </Collapsible>
+                            <span className="text-sm font-medium">Privacy Notice</span>
+                          </div>
+                          <ChevronDown className="h-3.5 w-3.5" />
+                        </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-3">
+                        <p className="text-xs text-blue-800 leading-relaxed">
+                          Your location is only shared when "Ready to Play" is ON. You can turn it off anytime.
+                        </p>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </CardContent>
+                </Card>
+
+                {/* Interactive Map */}
+                <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden">
+                  <CardContent className="p-0">
+                    <InteractiveMap 
+                      userPets={pets}
+                      onLocationPermissionChange={handleLocationPermissionChange}
+                      showLocationToasts={true}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Instructions */}
+                <div className="grid grid-cols-2 gap-3">
+                  <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                    <CardContent className="p-4 text-center">
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <PawPrint className="w-5 h-5 text-green-500" />
+                      </div>
+                      <h3 className="text-sm font-semibold mb-1">Ready to Play</h3>
+                      <p className="text-xs text-muted-foreground">Toggle to show location</p>
                     </CardContent>
                   </Card>
-
-                  {/* Interactive Map */}
-                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm overflow-hidden">
-                    <CardContent className="p-0">
-                      <InteractiveMap 
-                        userPets={pets}
-                        onLocationPermissionChange={handleLocationPermissionChange}
-                        showLocationToasts={true}
-                      />
+                  <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+                    <CardContent className="p-4 text-center">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Users className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <h3 className="text-sm font-semibold mb-1">Find Friends</h3>
+                      <p className="text-xs text-muted-foreground">Search nearby pets</p>
                     </CardContent>
                   </Card>
-
-                  {/* Instructions */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card className="bg-green-50/80 border-green-200 backdrop-blur-sm">
-                      <CardContent className="p-4">
-                        <h3 className="font-medium text-green-900 mb-2">🟢 Ready to Play</h3>
-                        <p className="text-sm text-green-800">
-                          Toggle this ON to share your location and appear on the map for other pet owners to see.
-                        </p>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card className="bg-orange-50/80 border-orange-200 backdrop-blur-sm">
-                      <CardContent className="p-4">
-                        <h3 className="font-medium text-orange-900 mb-2">🐾 Find Friends</h3>
-                        <p className="text-sm text-orange-800">
-                          Click on pet markers to see their profiles and connect with nearby pet owners.
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </div>
                 </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Modals */}
-      <PlaydateRequestModal
-        isOpen={showPlaydateModal}
-        onClose={() => setShowPlaydateModal(false)}
-        onSuccess={handleRefresh}
-        userPets={pets}
-      />
-
       <GroupWalkModal
         isOpen={showGroupWalkModal}
         onClose={() => setShowGroupWalkModal(false)}
-        onSuccess={handleRefresh}
-        userId={user?.id || ''}
         userPets={pets}
       />
-    </Layout>
+    </div>
   );
 };
 

@@ -110,92 +110,94 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
     );
   }
 
+  if (requests.length === 0) {
+    return null;
+  }
+
   return (
-    <Card className="bg-white shadow-lg">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Mail className="h-5 w-5 text-green-600" />
-          Friend Requests
-          {requests.length > 0 && (
-            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-              {requests.length}
-            </span>
-          )}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {requests.length === 0 ? (
-          <div className="text-center py-8">
-            <Heart className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <p className="text-gray-600">No pending friend requests</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {requests.map((request) => (
-              <div key={request.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 border rounded-lg space-y-4 sm:space-y-0">
-                <div className="flex items-center space-x-4">
-                  <Avatar className="w-14 h-14 sm:w-12 sm:h-12 flex-shrink-0">
-                    <AvatarImage 
-                      src={request.requester_pet.profile_photo_url || ''} 
-                      alt={request.requester_pet.name} 
-                    />
-                    <AvatarFallback className="bg-green-100 text-green-600">
-                      {request.requester_pet.name.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <div className="space-y-1 min-w-0 flex-1">
-                    <h4 className="font-semibold text-gray-800 text-base sm:text-sm">
-                      {request.requester_pet.name}
-                    </h4>
-                    <p className="text-sm sm:text-xs text-gray-600">
-                      {request.requester_pet.breed}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Wants to be friends with your pet
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex flex-row space-x-3 sm:flex-col sm:space-x-0 sm:space-y-2 lg:flex-row lg:space-y-0 lg:space-x-2 w-full sm:w-auto justify-center sm:justify-end">
-                  <Button
-                    size="sm"
-                    onClick={() => handleRequest(request.id, 'accepted')}
-                    disabled={processingRequests.has(request.id)}
-                    className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-none"
-                  >
-                    {processingRequests.has(request.id) ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    ) : (
-                      <>
-                        <Check className="w-4 h-4 mr-1" />
-                        Accept
-                      </>
-                    )}
-                  </Button>
-                  
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleRequest(request.id, 'rejected')}
-                    disabled={processingRequests.has(request.id)}
-                    className="border-red-500 text-red-600 hover:bg-red-50 flex-1 sm:flex-none"
-                  >
-                    {processingRequests.has(request.id) ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
-                    ) : (
-                      <>
-                        <X className="w-4 h-4 mr-1" />
-                        Reject
-                      </>
-                    )}
-                  </Button>
-                </div>
+    <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+      <Collapsible defaultOpen={requests.length > 0}>
+        <CardContent className="p-4">
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="w-full justify-between h-10 px-3 hover:bg-gray-50 mb-3">
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-primary" />
+                <span className="text-sm font-semibold">Friend Requests</span>
+                {requests.length > 0 && (
+                  <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                    {requests.length}
+                  </span>
+                )}
               </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            {requests.length === 0 ? (
+              <div className="text-center py-6">
+                <Heart className="w-10 h-10 mx-auto mb-2 text-gray-400" />
+                <p className="text-sm text-gray-600">No pending requests</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {requests.map((request) => (
+                  <div key={request.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-xl bg-white">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <Avatar className="w-12 h-12 flex-shrink-0">
+                        <AvatarImage 
+                          src={request.requester_pet.profile_photo_url || ''} 
+                          alt={request.requester_pet.name} 
+                        />
+                        <AvatarFallback className="bg-green-100 text-green-600 text-sm">
+                          {request.requester_pet.name.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-semibold text-sm truncate">
+                          {request.requester_pet.name}
+                        </h4>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {request.requester_pet.breed}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2 flex-shrink-0">
+                      <Button
+                        size="sm"
+                        onClick={() => handleRequest(request.id, 'accepted')}
+                        disabled={processingRequests.has(request.id)}
+                        className="h-9 w-9 p-0"
+                      >
+                        {processingRequests.has(request.id) ? (
+                          <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white"></div>
+                        ) : (
+                          <Check className="w-4 h-4" />
+                        )}
+                      </Button>
+                      
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleRequest(request.id, 'rejected')}
+                        disabled={processingRequests.has(request.id)}
+                        className="h-9 w-9 p-0 border-gray-200"
+                      >
+                        {processingRequests.has(request.id) ? (
+                          <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-gray-400"></div>
+                        ) : (
+                          <X className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CollapsibleContent>
+        </CardContent>
+      </Collapsible>
     </Card>
   );
 };
