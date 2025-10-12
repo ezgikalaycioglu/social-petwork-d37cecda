@@ -395,47 +395,82 @@ const Social = () => {
         />
 
         {/* Event Lists Drawer */}
-        <Drawer open={openSheet !== null} onOpenChange={(open) => !open && setOpenSheet(null)}>
-          <DrawerContent className="max-h-[85vh]">
-            <DrawerHeader className="border-b sticky top-0 bg-background z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <DrawerTitle className="text-lg font-semibold">
-                    {openSheet === 'requests' && 'Requests'}
-                    {openSheet === 'upcoming' && 'Upcoming'}
-                    {openSheet === 'pending' && 'Pending'}
-                  </DrawerTitle>
-                  <Badge variant="secondary" className="rounded-full">
-                    {openSheet === 'requests' && incomingRequests.length}
-                    {openSheet === 'upcoming' && upcomingEvents.length}
-                    {openSheet === 'pending' && pendingEvents.length}
-                  </Badge>
-                </div>
-                <DrawerClose asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <X className="h-4 w-4" />
-                  </Button>
-                </DrawerClose>
+        <Drawer 
+          open={openSheet !== null} 
+          onOpenChange={(open) => !open && setOpenSheet(null)}
+          snapPoints={
+            openSheet === 'requests' ? (incomingRequests.length > 0 ? [0.3, 0.6, 0.92] : [0.4, 0.92]) :
+            openSheet === 'upcoming' ? (upcomingEvents.length > 0 ? [0.3, 0.6, 0.92] : [0.4, 0.92]) :
+            openSheet === 'pending' ? (pendingEvents.length > 0 ? [0.3, 0.6, 0.92] : [0.4, 0.92]) :
+            [0.6, 0.92]
+          }
+          activeSnapPoint={
+            openSheet === 'requests' ? (incomingRequests.length > 0 ? 0.6 : 0.4) :
+            openSheet === 'upcoming' ? (upcomingEvents.length > 0 ? 0.6 : 0.4) :
+            openSheet === 'pending' ? (pendingEvents.length > 0 ? 0.6 : 0.4) :
+            0.6
+          }
+        >
+          <DrawerContent 
+            className="z-[999] mb-16 rounded-t-2xl shadow-xl border-t border-gray-200 pb-[env(safe-area-inset-bottom)]"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="drawer-title"
+          >
+            <div className="sticky top-0 bg-white/95 backdrop-blur-sm px-4 py-3 border-b border-gray-100 flex items-center justify-between z-10">
+              <div className="flex items-center gap-2">
+                <h3 id="drawer-title" className="text-lg font-semibold">
+                  {openSheet === 'requests' && 'Requests'}
+                  {openSheet === 'upcoming' && 'Upcoming'}
+                  {openSheet === 'pending' && 'Pending'}
+                </h3>
+                <Badge variant="secondary" className="rounded-full">
+                  {openSheet === 'requests' && incomingRequests.length}
+                  {openSheet === 'upcoming' && upcomingEvents.length}
+                  {openSheet === 'pending' && pendingEvents.length}
+                </Badge>
               </div>
-            </DrawerHeader>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 focus:ring-2 focus:ring-primary/40"
+                onClick={() => setOpenSheet(null)}
+                aria-label="Close drawer"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
 
-            <div className="overflow-y-auto p-4 space-y-2">
+            <div 
+              className="overflow-y-auto p-4 space-y-2"
+              style={{ maxHeight: 'calc(60vh - 60px)' }}
+              role="list"
+            >
               {openSheet === 'requests' && (
                 incomingRequests.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="text-3xl mb-2">💌</div>
-                    <h3 className="text-sm font-semibold mb-1">No requests</h3>
-                    <p className="text-xs text-muted-foreground">Check back later.</p>
+                  <div className="flex flex-col items-center justify-center py-12 min-h-[200px]">
+                    <div className="text-4xl mb-3">📬</div>
+                    <h4 className="font-semibold text-base mb-1">No requests</h4>
+                    <p className="text-sm text-muted-foreground">Check back later.</p>
                   </div>
                 ) : (
                   incomingRequests.map((event) => (
                     <button
                       key={event.id}
+                      role="listitem"
                       onClick={() => {
                         setOpenSheet(null);
                         navigate(`/events?eventId=${event.id}`);
                       }}
-                      className="w-full rounded-xl bg-white border border-gray-100 shadow-sm p-3 text-left hover:shadow-md transition"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setOpenSheet(null);
+                          navigate(`/events?eventId=${event.id}`);
+                        }
+                      }}
+                      tabIndex={0}
+                      className="w-full rounded-xl bg-white border border-gray-100 shadow-sm p-3 text-left hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-primary/40"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
@@ -468,20 +503,29 @@ const Social = () => {
 
               {openSheet === 'upcoming' && (
                 upcomingEvents.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="text-3xl mb-2">📅</div>
-                    <h3 className="text-sm font-semibold mb-1">No upcoming events</h3>
-                    <p className="text-xs text-muted-foreground">Check back later.</p>
+                  <div className="flex flex-col items-center justify-center py-12 min-h-[200px]">
+                    <div className="text-4xl mb-3">📅</div>
+                    <h4 className="font-semibold text-base mb-1">No upcoming events</h4>
+                    <p className="text-sm text-muted-foreground">Check back later.</p>
                   </div>
                 ) : (
                   upcomingEvents.map((event) => (
                     <button
                       key={event.id}
+                      role="listitem"
                       onClick={() => {
                         setOpenSheet(null);
                         navigate(`/events?eventId=${event.id}`);
                       }}
-                      className="w-full rounded-xl bg-white border border-gray-100 shadow-sm p-3 text-left hover:shadow-md transition"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setOpenSheet(null);
+                          navigate(`/events?eventId=${event.id}`);
+                        }
+                      }}
+                      tabIndex={0}
+                      className="w-full rounded-xl bg-white border border-gray-100 shadow-sm p-3 text-left hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-primary/40"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
@@ -514,20 +558,29 @@ const Social = () => {
 
               {openSheet === 'pending' && (
                 pendingEvents.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="text-3xl mb-2">⏳</div>
-                    <h3 className="text-sm font-semibold mb-1">No pending events</h3>
-                    <p className="text-xs text-muted-foreground">Check back later.</p>
+                  <div className="flex flex-col items-center justify-center py-12 min-h-[200px]">
+                    <div className="text-4xl mb-3">⏳</div>
+                    <h4 className="font-semibold text-base mb-1">No pending events</h4>
+                    <p className="text-sm text-muted-foreground">Check back later.</p>
                   </div>
                 ) : (
                   pendingEvents.map((event) => (
                     <button
                       key={event.id}
+                      role="listitem"
                       onClick={() => {
                         setOpenSheet(null);
                         navigate(`/events?eventId=${event.id}`);
                       }}
-                      className="w-full rounded-xl bg-white border border-gray-100 shadow-sm p-3 text-left hover:shadow-md transition"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setOpenSheet(null);
+                          navigate(`/events?eventId=${event.id}`);
+                        }
+                      }}
+                      tabIndex={0}
+                      className="w-full rounded-xl bg-white border border-gray-100 shadow-sm p-3 text-left hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-primary/40"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
@@ -567,15 +620,15 @@ const Social = () => {
               (openSheet === 'upcoming' && upcomingEvents.length > 0) ||
               (openSheet === 'pending' && pendingEvents.length > 0)
             ) && (
-              <div className="border-t p-4">
+              <div className="border-t border-gray-100 p-4 bg-white">
                 <Button
                   onClick={() => {
                     setOpenSheet(null);
                     navigate('/events');
                   }}
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
-                  className="w-full h-9 rounded-full"
+                  className="w-full text-sm"
                 >
                   View All Events
                 </Button>
