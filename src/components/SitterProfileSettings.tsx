@@ -245,7 +245,7 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
         </div>
 
         {/* Sticky Footer */}
-        <div className="sticky bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t px-4 py-3 z-[100] pb-[env(safe-area-inset-bottom)]">
+        <div className="sticky bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t px-4 py-3 pb-[calc(80px+env(safe-area-inset-bottom))] z-[100]">
           <div className="flex justify-between sm:justify-end gap-2">
             <Button 
               variant="ghost" 
