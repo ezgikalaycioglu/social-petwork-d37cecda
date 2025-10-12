@@ -141,7 +141,7 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
               </div>
             ) : (
               <div className="space-y-3">
-                {requests.map((request) => (
+                {requests.filter(request => request.requester_pet).map((request) => (
                   <div key={request.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-xl bg-white">
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <Avatar className="w-12 h-12 flex-shrink-0">
