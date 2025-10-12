@@ -137,23 +137,25 @@ const CreatePackForm = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto">
-        {/* Compact Header */}
-        <div className="flex items-center justify-between pt-2 pb-2 px-4">
-          <h1 className="text-base font-semibold text-foreground">
-            Create your pack
-          </h1>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Cancel
-          </Button>
+        {/* Compact Header - Sticky & Safe-Area Aware */}
+        <div className="sticky top-[var(--app-topbar-height,0px)] inset-x-0 z-40 bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-2 pt-[max(8px,env(safe-area-inset-top))]">
+          <div className="flex items-center justify-between gap-2">
+            <h1 className="text-base font-semibold text-gray-900 truncate">
+              Create your pack
+            </h1>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(-1)}
+              className="text-sm px-2 h-9 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              Cancel
+            </Button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-4 space-y-4 pb-24">
+        <form onSubmit={handleSubmit} className="px-4 space-y-4 pt-4 pb-24">
           {/* Pack Avatar Section */}
           <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4 space-y-3">
             <div>
@@ -319,7 +321,7 @@ const CreatePackForm = () => {
         </form>
 
         {/* Sticky Footer */}
-        <div className="sticky bottom-0 inset-x-0 bg-white/90 backdrop-blur px-4 py-3 border-t border-gray-100 z-10">
+        <div className="sticky bottom-0 inset-x-0 bg-white/90 backdrop-blur px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))] border-t border-gray-100 z-40">
           <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
             <Button
               type="button"
