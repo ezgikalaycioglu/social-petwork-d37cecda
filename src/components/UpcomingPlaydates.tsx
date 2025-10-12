@@ -60,6 +60,7 @@ const UpcomingPlaydates: React.FC = () => {
         .from('events')
         .select('*')
         .or(`creator_id.eq.${user.id},invited_participants.cs.{${user.id}}`)
+        .neq('status', 'cancelled')
         .gte('scheduled_time', new Date().toISOString())
         .order('scheduled_time', { ascending: true });
 

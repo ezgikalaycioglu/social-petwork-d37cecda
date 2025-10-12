@@ -126,10 +126,10 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
     
     setIsUpdating(true);
     try {
-      // Delete the event (this will cascade to event_responses)
+      // Update event status to cancelled instead of deleting
       const { error } = await supabase
         .from('events')
-        .delete()
+        .update({ status: 'cancelled' })
         .eq('id', event.id);
 
       if (error) throw error;

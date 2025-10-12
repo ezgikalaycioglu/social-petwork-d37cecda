@@ -89,6 +89,7 @@ const Social = () => {
         .from('events')
         .select('*')
         .or(`creator_id.eq.${user.id},participants.cs.{${user.id}}`)
+        .neq('status', 'cancelled')
         .order('scheduled_time', { ascending: true });
 
       if (error) throw error;
