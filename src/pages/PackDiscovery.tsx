@@ -150,11 +150,6 @@ const PackDiscovery = () => {
                                 <Users className="h-3.5 w-3.5" />
                                 {pack.pack_members.length}
                               </span>
-                              <span>•</span>
-                              <span className="flex items-center gap-1">
-                                <Star className="h-3.5 w-3.5 fill-current" />
-                                4.8
-                              </span>
                             </div>
                           </div>
                         </div>
