@@ -125,7 +125,7 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
           Edit Profile
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="w-5 h-5" />
@@ -133,7 +133,7 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 py-4 overflow-y-auto flex-1 pb-24">
           {/* Rate and Currency */}
           <Card>
             <CardHeader>
@@ -244,20 +244,32 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
           </Card>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t">
-          <Button variant="outline" onClick={() => setIsOpen(false)} disabled={loading}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} disabled={loading}>
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              'Save Changes'
-            )}
-          </Button>
+        {/* Sticky Footer */}
+        <div className="sticky bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t px-4 py-3 z-[100] pb-[env(safe-area-inset-bottom)]">
+          <div className="flex justify-between sm:justify-end gap-2">
+            <Button 
+              variant="ghost" 
+              onClick={() => setIsOpen(false)} 
+              disabled={loading}
+              className="h-11 rounded-full px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSave} 
+              disabled={loading}
+              className="h-11 rounded-full px-5 text-sm font-medium bg-primary text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save Changes'
+              )}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

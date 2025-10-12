@@ -84,6 +84,11 @@ const PetSitters = () => {
   const [sitterProfile, setSitterProfile] = useState<any>(null);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
+  // Check sitter status on mount
+  useEffect(() => {
+    checkSitterStatus();
+  }, [user]);
+
   useEffect(() => {
     if (activeTab === 'find') {
       fetchSitters();
@@ -253,7 +258,7 @@ const PetSitters = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-background px-4">
+      <div className="min-h-screen bg-background px-4 pb-24 pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-7xl mx-auto">
           {/* Compact Role Selector (Segmented Control) */}
           <div className="sticky top-16 z-20 bg-background/95 backdrop-blur-sm py-3 -mx-4 px-4 border-b border-gray-100">
@@ -283,7 +288,8 @@ const PetSitters = () => {
                 aria-selected={userType === 'sitter'}
                 onClick={() => {
                   setUserType('sitter');
-                  setActiveTab(userIsSitter ? 'availability' : 'become');
+                  // Default to availability for sitters
+                  setActiveTab('availability');
                 }}
                 className={`h-8 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
                   userType === 'sitter'
@@ -302,10 +308,12 @@ const PetSitters = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4 space-y-4">
             {/* Owner Sub-Navigation */}
             {userType === 'owner' && (
-              <div className="flex gap-2 px-4">
+              <div className="flex flex-wrap items-center gap-2 px-4 mt-2 mb-2">
                 <button
+                  role="tab"
+                  aria-selected={activeTab === 'find'}
                   onClick={() => setActiveTab('find')}
-                  className={`h-10 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
+                  className={`h-9 px-3 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
                     activeTab === 'find'
                       ? 'bg-primary text-white shadow-sm'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -315,8 +323,10 @@ const PetSitters = () => {
                   Find Sitters
                 </button>
                 <button
+                  role="tab"
+                  aria-selected={activeTab === 'bookings'}
                   onClick={() => setActiveTab('bookings')}
-                  className={`h-10 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
+                  className={`h-9 px-3 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
                     activeTab === 'bookings'
                       ? 'bg-primary text-white shadow-sm'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -330,11 +340,13 @@ const PetSitters = () => {
 
             {/* Sitter Sub-Navigation */}
             {userType === 'sitter' && (
-              <div className="flex gap-2 px-4">
+              <div className="flex flex-wrap items-center gap-2 px-4 mt-2 mb-2">
                 {!userIsSitter && (
                   <button
+                    role="tab"
+                    aria-selected={activeTab === 'become'}
                     onClick={() => setActiveTab('become')}
-                    className={`h-10 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
+                    className={`h-9 px-3 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
                       activeTab === 'become'
                         ? 'bg-primary text-white shadow-sm'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -347,8 +359,10 @@ const PetSitters = () => {
                 {userIsSitter && (
                   <>
                     <button
+                      role="tab"
+                      aria-selected={activeTab === 'availability'}
                       onClick={() => setActiveTab('availability')}
-                      className={`h-10 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
+                      className={`h-9 px-3 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
                         activeTab === 'availability'
                           ? 'bg-primary text-white shadow-sm'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -358,8 +372,10 @@ const PetSitters = () => {
                       Availability
                     </button>
                     <button
+                      role="tab"
+                      aria-selected={activeTab === 'sitter-bookings'}
                       onClick={() => setActiveTab('sitter-bookings')}
-                      className={`h-10 px-4 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
+                      className={`h-9 px-3 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-all ${
                         activeTab === 'sitter-bookings'
                           ? 'bg-primary text-white shadow-sm'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
