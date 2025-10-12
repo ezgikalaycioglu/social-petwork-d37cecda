@@ -37,10 +37,13 @@ const Social = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab');
+  const highlightParam = searchParams.get('highlight');
   const [activeTab, setActiveTab] = useState(tabFromUrl || 'pet-social');
   const [loading, setLoading] = useState(false);
+  const [friendRequestHighlight, setFriendRequestHighlight] = useState<string | undefined>(undefined);
+  const [friendRequestsForceOpen, setFriendRequestsForceOpen] = useState(false);
   
   // Shared state
   const [pets, setPets] = useState<PetProfile[]>([]);
@@ -60,6 +63,39 @@ const Social = () => {
       }
     }
   }, [activeTab, user]);
+
+  // Handle deep linking from notifications
+  useEffect(() => {
+    if (highlightParam?.startsWith('friend-')) {
+      const requestId = highlightParam.replace('friend-', '');
+      
+      // Ensure we're on the pet-social tab
+      if (activeTab !== 'pet-social') {
+        setActiveTab('pet-social');
+      }
+      
+      // Force open and highlight the friend request
+      setFriendRequestsForceOpen(true);
+      setFriendRequestHighlight(requestId);
+      
+      // Scroll to the friend requests card after a brief delay
+      setTimeout(() => {
+        const element = document.getElementById('friend-requests-card');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+      
+      // Clear highlight after animation
+      setTimeout(() => {
+        setFriendRequestHighlight(undefined);
+        // Clean up URL
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('highlight');
+        setSearchParams(newParams, { replace: true });
+      }, 1500);
+    }
+  }, [highlightParam, activeTab, searchParams, setSearchParams]);
 
   const fetchUserPets = async () => {
     if (!user) return;
@@ -207,6 +243,8 @@ const Social = () => {
                     key={`requests-${refreshKey}`}
                     userPetIds={userPetIds} 
                     onRequestHandled={handleRefresh}
+                    forceOpen={friendRequestsForceOpen}
+                    highlightRequestId={friendRequestHighlight}
                   />
 
                   {pets.map((pet) => (

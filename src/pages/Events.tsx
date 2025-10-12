@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,6 +25,8 @@ type PetProfile = Tables<'pet_profiles'>;
 const Events = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const highlightParam = searchParams.get('highlight');
   const [events, setEvents] = useState<Event[]>([]);
   const [userPets, setUserPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +36,7 @@ const Events = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [highlightEventId, setHighlightEventId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -48,6 +51,33 @@ const Events = () => {
   useEffect(() => {
     checkAuthAndFetchData();
   }, []);
+
+  // Handle deep linking from notifications
+  useEffect(() => {
+    if (highlightParam?.startsWith('event-')) {
+      const eventId = highlightParam.replace('event-', '');
+      
+      // Set highlight state
+      setHighlightEventId(eventId);
+      
+      // Scroll to the event card after a brief delay
+      setTimeout(() => {
+        const element = document.querySelector(`[data-event-id="${eventId}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+      
+      // Clear highlight after animation
+      setTimeout(() => {
+        setHighlightEventId(undefined);
+        // Clean up URL
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('highlight');
+        setSearchParams(newParams, { replace: true });
+      }, 1500);
+    }
+  }, [highlightParam, searchParams, setSearchParams]);
 
   const checkAuthAndFetchData = async () => {
     try {
@@ -270,8 +300,11 @@ const Events = () => {
       // Desktop card layout (existing)
       return (
         <Card 
-          className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-95"
+          className={`bg-white shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-95 ${
+            highlightEventId === event.id ? 'notification-highlight' : ''
+          }`}
           onClick={() => handleEventClick(event)}
+          data-event-id={event.id}
         >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -365,8 +398,11 @@ const Events = () => {
     // Mobile card layout (similar to pet sitters)
     return (
       <Card 
-        className="hover:shadow-lg transition-all duration-300 border-0 bg-white cursor-pointer active:scale-95"
+        className={`hover:shadow-lg transition-all duration-300 border-0 bg-white cursor-pointer active:scale-95 ${
+          highlightEventId === event.id ? 'notification-highlight' : ''
+        }`}
         onClick={() => handleEventClick(event)}
+        data-event-id={event.id}
       >
         <CardContent className="p-4">
           <div className="flex items-start space-x-3">

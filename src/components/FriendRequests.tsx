@@ -17,14 +17,29 @@ interface FriendRequest extends PetFriendship {
 interface FriendRequestsProps {
   userPetIds: string[];
   onRequestHandled: () => void;
+  forceOpen?: boolean;
+  highlightRequestId?: string;
 }
 
-const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) => {
+const FriendRequests = ({ 
+  userPetIds, 
+  onRequestHandled, 
+  forceOpen = false,
+  highlightRequestId 
+}: FriendRequestsProps) => {
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingRequests, setProcessingRequests] = useState<Set<string>>(new Set());
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(forceOpen);
   const { toast } = useToast();
+  const cardRef = React.useRef<HTMLDivElement>(null);
+
+  // Handle force open from deep linking
+  React.useEffect(() => {
+    if (forceOpen) {
+      setIsOpen(true);
+    }
+  }, [forceOpen]);
 
   useEffect(() => {
     fetchPendingRequests();
@@ -115,7 +130,11 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
   }
 
   return (
-    <div className="rounded-2xl bg-white border border-gray-100 shadow-sm mb-4">
+    <div 
+      className="rounded-2xl bg-white border border-gray-100 shadow-sm mb-4"
+      id="friend-requests-card"
+      ref={cardRef}
+    >
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <button
@@ -160,7 +179,10 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
                 {requests.filter(request => request.requester_pet).map((request) => (
                   <div 
                     key={request.id} 
-                    className="rounded-xl border border-gray-100 bg-white p-3 flex items-center justify-between gap-3"
+                    data-request-id={request.id}
+                    className={`rounded-xl border border-gray-100 bg-white p-3 flex items-center justify-between gap-3 ${
+                      highlightRequestId === request.id ? 'notification-highlight' : ''
+                    }`}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <Avatar className="w-11 h-11 flex-shrink-0">
