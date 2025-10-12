@@ -183,15 +183,15 @@ const MyPets = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-background">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          {/* Actions Bar */}
-          <div className="flex justify-center mb-4">
+        <div className="max-w-7xl mx-auto px-4 py-2">
+          {/* Header with Add Button */}
+          <div className="flex items-center justify-end gap-2 mt-2 mb-2">
             <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
               <DialogTrigger asChild>
                 <Button 
-                  className="h-10 rounded-full px-4 whitespace-nowrap"
+                  className="h-10 px-4 rounded-full inline-flex items-center gap-2 bg-primary text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm font-medium"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="w-4 h-4" />
                   Add New Pet
                 </Button>
               </DialogTrigger>
@@ -225,9 +225,9 @@ const MyPets = () => {
                 </div>
                 <Button 
                   onClick={() => setShowCreateModal(true)}
-                  className="h-10 rounded-full px-4"
+                  className="h-10 px-4 rounded-full inline-flex items-center gap-2 bg-primary text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm font-medium"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="w-4 h-4" />
                   Create Pet Profile
                 </Button>
               </div>
