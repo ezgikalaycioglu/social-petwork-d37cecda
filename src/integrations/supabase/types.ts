@@ -131,6 +131,33 @@ export type Database = {
         }
         Relationships: []
       }
+      app_configurations: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          value: boolean
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          value?: boolean
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          value?: boolean
+        }
+        Relationships: []
+      }
       beta_testers: {
         Row: {
           created_at: string
@@ -924,7 +951,6 @@ export type Database = {
           created_at: string
           gender: string | null
           id: string
-          is_available: boolean | null
           latitude: number | null
           longitude: number | null
           name: string
@@ -946,7 +972,6 @@ export type Database = {
           created_at?: string
           gender?: string | null
           id?: string
-          is_available?: boolean | null
           latitude?: number | null
           longitude?: number | null
           name: string
@@ -968,7 +993,6 @@ export type Database = {
           created_at?: string
           gender?: string | null
           id?: string
-          is_available?: boolean | null
           latitude?: number | null
           longitude?: number | null
           name?: string
@@ -1519,6 +1543,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_pet_profile: {
+        Args: { _pet_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_view_user_content: {
         Args: { content_owner_id: string; viewer_id: string }
         Returns: boolean

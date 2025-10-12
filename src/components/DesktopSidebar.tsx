@@ -15,24 +15,34 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import SocialPetworkLogo from './SocialPetworkLogo';
 import AuthButton from './AuthButton';
+import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 
 const DesktopSidebar = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useTranslation();
   const [isContactOpen, setIsContactOpen] = React.useState(false);
+  const { data: featureFlags } = useFeatureFlags();
 
-  const navItems = [
+  const allNavItems = [
     { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
     { name: t('navigation.myPets'), href: '/my-pets', icon: PawPrint },
     { name: t('navigation.petSocial'), href: '/pet-social', icon: Users },
     { name: t('navigation.petMap'), href: '/pet-map', icon: MapPin },
     { name: t('navigation.events'), href: '/events', icon: Calendar },
-    { name: t('navigation.deals'), href: '/deals', icon: Gift },
+    { name: t('navigation.deals'), href: '/deals', icon: Gift, requiresBusiness: true },
     { name: t('navigation.packs'), href: '/packs/discover', icon: Users },
     { name: 'Pet Sitters', href: '/pet-sitters', icon: Search },
-    { name: 'Business', href: '/business-dashboard', icon: Building },
+    { name: 'Business', href: '/business-dashboard', icon: Building, requiresBusiness: true },
   ];
+
+  // Filter nav items based on feature flags
+  const navItems = allNavItems.filter(item => {
+    if (item.requiresBusiness && !featureFlags?.business_section_enabled) {
+      return false;
+    }
+    return true;
+  });
 
   const isActive = (href: string) => {
     if (href === '/pet-sitters') {

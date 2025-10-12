@@ -3,20 +3,30 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Home, Search, Users, User, Heart, Building2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 
 const MobileBottomNav = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { data: featureFlags } = useFeatureFlags();
 
-  const navItems = [
+  const allNavItems = [
     { name: t('navigation.dashboard'), href: '/dashboard', icon: Home, tourId: 'dashboard' },
-    { name: t('navigation.petSocial'), href: '/social', icon: Search, tourId: 'social' },
-    { name: t('navigation.petSitters'), href: '/find-sitter', icon: Heart, tourId: 'sitters' },
-    { name: t('navigation.business'), href: '/business', icon: Building2, tourId: 'business' },
+    { name: 'Social', href: '/social', icon: Search, tourId: 'social' },
+    { name: 'Sitters', href: '/find-sitter', icon: Heart, tourId: 'sitters' },
+    { name: t('navigation.business'), href: '/business', icon: Building2, tourId: 'business', requiresBusiness: true },
     { name: t('navigation.packs'), href: '/packs/discover', icon: Users, tourId: 'packs' },
     { name: t('navigation.profile'), href: '/profile', icon: User, tourId: 'profile' },
   ];
+
+  // Filter nav items based on feature flags
+  const navItems = allNavItems.filter(item => {
+    if (item.requiresBusiness && !featureFlags?.business_section_enabled) {
+      return false;
+    }
+    return true;
+  });
 
   const isActive = (href: string) => {
     if (href === '/dashboard') {

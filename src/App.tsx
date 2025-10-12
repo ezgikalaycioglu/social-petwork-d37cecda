@@ -5,9 +5,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import { ReadyToPlayProvider } from "@/contexts/ReadyToPlayContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Layout from "@/components/Layout";
+import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -19,7 +21,7 @@ import PetSocial from "./pages/PetSocial";
 import UserSettings from "./pages/UserSettings";
 import PetMap from "./pages/PetMap";
 import NotFound from "./pages/NotFound";
-import Events from "./pages/Events";
+
 import PetAdventures from "./pages/PetAdventures";
 import Deals from "./pages/Deals";
 import BusinessDashboard from "./pages/BusinessDashboard";
@@ -62,13 +64,28 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ReadyToPlayProvider>
-          <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Layout>
-              <Routes>
+        <NotificationsProvider>
+          <ReadyToPlayProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+            </TooltipProvider>
+          </ReadyToPlayProvider>
+        </NotificationsProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
+
+const AppRoutes = () => {
+  const { data: featureFlags } = useFeatureFlags();
+  
+  return (
+    <Layout>
+      <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -121,25 +138,32 @@ const App = () => {
                 } />
                 <Route path="/events" element={
                   <ProtectedRoute>
-                    <Events />
+                    <PetMap />
                   </ProtectedRoute>
                 } />
-                <Route path="/business" element={
-                  <ProtectedRoute>
-                    <Business />
-                  </ProtectedRoute>
-                } />
-                <Route path="/business/:businessId" element={<BusinessProfile />} />
-                <Route path="/deals" element={
-                  <ProtectedRoute>
-                    <Deals />
-                  </ProtectedRoute>
-                } />
-                <Route path="/business-dashboard" element={
-                  <ProtectedRoute>
-                    <BusinessDashboard />
-                  </ProtectedRoute>
-                } />
+                
+                {/* Business routes - conditionally rendered based on feature flag */}
+                {featureFlags?.business_section_enabled && (
+                  <>
+                    <Route path="/business" element={
+                      <ProtectedRoute>
+                        <Business />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/business/:businessId" element={<BusinessProfile />} />
+                    <Route path="/deals" element={
+                      <ProtectedRoute>
+                        <Deals />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/business-dashboard" element={
+                      <ProtectedRoute>
+                        <BusinessDashboard />
+                      </ProtectedRoute>
+                    } />
+                  </>
+                )}
+                
                 <Route path="/packs" element={
                   <ProtectedRoute>
                     <Navigate to="/packs/discover" replace />
@@ -223,11 +247,6 @@ const App = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Layout>
-          </BrowserRouter>
-        </TooltipProvider>
-        </ReadyToPlayProvider>
-      </AuthProvider>
-    </QueryClientProvider>
   );
 };
 

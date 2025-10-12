@@ -88,7 +88,7 @@ const SocialLogin: React.FC<SocialLoginProps> = ({ mode }) => {
           variant="outline"
           onClick={handleSocialLogin}
           disabled={googleLoading}
-          className="w-full h-12 border-2 border-border/50 hover:border-border bg-card hover:bg-accent/5 text-foreground rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg font-medium"
+          className="w-full h-12 border-2 border-border/50 hover:border-border bg-card hover:bg-accent hover:text-accent-foreground rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg font-medium"
         >
           {googleLoading ? (
             <div className="flex items-center gap-3">

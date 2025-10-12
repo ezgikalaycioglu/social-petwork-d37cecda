@@ -13,12 +13,23 @@ import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
 
+interface Event {
+  id: string;
+  title: string | null;
+  scheduled_time: string;
+  location_name: string;
+  message: string | null;
+  invited_pet_ids?: string[];
+  invited_participants?: string[];
+}
+
 interface GroupWalkModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   userId: string;
   userPets: PetProfile[];
+  editEvent?: Event | null;
 }
 
 const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
@@ -26,7 +37,8 @@ const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
   onClose,
   onSuccess,
   userId,
-  userPets
+  userPets,
+  editEvent
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -39,6 +51,33 @@ const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
     location: '',
     description: ''
   });
+
+  // Pre-fill form when editing
+  React.useEffect(() => {
+    if (editEvent && isOpen) {
+      const eventDate = new Date(editEvent.scheduled_time);
+      setFormData({
+        title: editEvent.title || '',
+        date: eventDate.toISOString().split('T')[0],
+        time: eventDate.toTimeString().slice(0, 5),
+        location: editEvent.location_name,
+        description: editEvent.message || ''
+      });
+      setInvitedPets(editEvent.invited_pet_ids || []);
+      setInvitedUsers(editEvent.invited_participants || []);
+    } else if (!isOpen) {
+      // Reset when closing
+      setFormData({
+        title: '',
+        date: '',
+        time: '',
+        location: '',
+        description: ''
+      });
+      setInvitedPets([]);
+      setInvitedUsers([]);
+    }
+  }, [editEvent, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,27 +100,51 @@ const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
       // Prepare participants list
       const allParticipants = [userId, ...invitedUsers];
 
-      const { error } = await supabase
-        .from('events')
-        .insert({
-          event_type: 'group_walk',
-          creator_id: userId,
-          participants: allParticipants,
-          invited_pet_ids: invitedPets,
-          invited_participants: invitedUsers,
-          status: 'pending', // Will move to confirmed when participants accept
-          location_name: formData.location,
-          scheduled_time: scheduledDateTime.toISOString(),
-          title: formData.title,
-          message: formData.description || null
+      if (editEvent) {
+        // Update existing event
+        const { error } = await supabase
+          .from('events')
+          .update({
+            participants: allParticipants,
+            invited_pet_ids: invitedPets,
+            invited_participants: invitedUsers,
+            location_name: formData.location,
+            scheduled_time: scheduledDateTime.toISOString(),
+            title: formData.title,
+            message: formData.description || null
+          })
+          .eq('id', editEvent.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Event Updated! 🚶",
+          description: "Your event has been updated successfully.",
         });
+      } else {
+        // Create new event
+        const { error } = await supabase
+          .from('events')
+          .insert({
+            event_type: 'group_walk',
+            creator_id: userId,
+            participants: allParticipants,
+            invited_pet_ids: invitedPets,
+            invited_participants: invitedUsers,
+            status: 'pending',
+            location_name: formData.location,
+            scheduled_time: scheduledDateTime.toISOString(),
+            title: formData.title,
+            message: formData.description || null
+          });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "Group Walk Created! 🚶",
-        description: "Your group walk has been created successfully.",
-      });
+        toast({
+          title: "Group Walk Created! 🚶",
+          description: "Your group walk has been created successfully.",
+        });
+      }
 
       // Reset form and invitations
       setFormData({
@@ -141,10 +204,10 @@ const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" />
-            Create Group Walk
+            {editEvent ? 'Edit Group Walk' : 'Create Group Walk'}
           </DialogTitle>
           <DialogDescription>
-            Organize a group walk for the pet community to join.
+            {editEvent ? 'Update the details of your group walk.' : 'Organize a group walk for the pet community to join.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -239,11 +302,11 @@ const GroupWalkModal: React.FC<GroupWalkModalProps> = ({
               className="bg-green-600 hover:bg-green-700 text-white"
             >
               {loading ? (
-                'Creating...'
+                editEvent ? 'Updating...' : 'Creating...'
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-2" />
-                  Create Event
+                  {editEvent ? 'Update Event' : 'Create Event'}
                 </>
               )}
             </Button>

@@ -33,7 +33,7 @@ export interface EventProperties {
   'Event Created': { event_type: string; location?: string };
   'Deal Claimed': { deal_id: string; business_id: string };
   'Deal Viewed': { deal_id: string; business_name?: string; deal_category?: string; discount_type?: string; discount_value?: number };
-  'Ready to Play Toggled': { pet_id: string; is_available: boolean };
+  'Ready to Play Toggled': { pet_id: string; location_shared: boolean };
   'Feature Accessed': { feature_name: string; source?: string };
   'Page Viewed': { page_name: string; path?: string };
 }

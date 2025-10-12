@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
-import { Check, X, Heart, Mail } from 'lucide-react';
+import { Check, X, Mail, ChevronDown } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetFriendship = Tables<'pet_friendships'>;
@@ -17,13 +17,29 @@ interface FriendRequest extends PetFriendship {
 interface FriendRequestsProps {
   userPetIds: string[];
   onRequestHandled: () => void;
+  forceOpen?: boolean;
+  highlightRequestId?: string;
 }
 
-const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) => {
+const FriendRequests = ({ 
+  userPetIds, 
+  onRequestHandled, 
+  forceOpen = false,
+  highlightRequestId 
+}: FriendRequestsProps) => {
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingRequests, setProcessingRequests] = useState<Set<string>>(new Set());
+  const [isOpen, setIsOpen] = useState(forceOpen);
   const { toast } = useToast();
+  const cardRef = React.useRef<HTMLDivElement>(null);
+
+  // Handle force open from deep linking
+  React.useEffect(() => {
+    if (forceOpen) {
+      setIsOpen(true);
+    }
+  }, [forceOpen]);
 
   useEffect(() => {
     fetchPendingRequests();
@@ -63,6 +79,9 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
   };
 
   const handleRequest = async (requestId: string, action: 'accepted' | 'rejected') => {
+    // Optimistic UI: remove immediately
+    const requestToRemove = requests.find(r => r.id === requestId);
+    setRequests(prev => prev.filter(r => r.id !== requestId));
     setProcessingRequests(prev => new Set([...prev, requestId]));
 
     try {
@@ -83,10 +102,15 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
           : "The friend request has been declined.",
       });
 
-      await fetchPendingRequests();
       onRequestHandled();
     } catch (error) {
       console.error(`Error ${action} friend request:`, error);
+      
+      // Restore on error
+      if (requestToRemove) {
+        setRequests(prev => [requestToRemove, ...prev]);
+      }
+      
       toast({
         title: "Error",
         description: `Failed to ${action === 'accepted' ? 'accept' : 'reject'} friend request.`,
@@ -101,102 +125,125 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
     }
   };
 
-  if (loading) {
-    return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-        <p className="text-gray-600 mt-2">Loading friend requests...</p>
-      </div>
-    );
+  if (requests.length === 0 && !loading) {
+    return null;
   }
 
   return (
-    <Card className="bg-white shadow-lg">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Mail className="h-5 w-5 text-green-600" />
-          Friend Requests
-          {requests.length > 0 && (
-            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-              {requests.length}
-            </span>
-          )}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {requests.length === 0 ? (
-          <div className="text-center py-8">
-            <Heart className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <p className="text-gray-600">No pending friend requests</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {requests.map((request) => (
-              <div key={request.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 border rounded-lg space-y-4 sm:space-y-0">
-                <div className="flex items-center space-x-4">
-                  <Avatar className="w-14 h-14 sm:w-12 sm:h-12 flex-shrink-0">
-                    <AvatarImage 
-                      src={request.requester_pet.profile_photo_url || ''} 
-                      alt={request.requester_pet.name} 
-                    />
-                    <AvatarFallback className="bg-green-100 text-green-600">
-                      {request.requester_pet.name.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <div className="space-y-1 min-w-0 flex-1">
-                    <h4 className="font-semibold text-gray-800 text-base sm:text-sm">
-                      {request.requester_pet.name}
-                    </h4>
-                    <p className="text-sm sm:text-xs text-gray-600">
-                      {request.requester_pet.breed}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Wants to be friends with your pet
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex flex-row space-x-3 sm:flex-col sm:space-x-0 sm:space-y-2 lg:flex-row lg:space-y-0 lg:space-x-2 w-full sm:w-auto justify-center sm:justify-end">
-                  <Button
-                    size="sm"
-                    onClick={() => handleRequest(request.id, 'accepted')}
-                    disabled={processingRequests.has(request.id)}
-                    className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-none"
-                  >
-                    {processingRequests.has(request.id) ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    ) : (
-                      <>
-                        <Check className="w-4 h-4 mr-1" />
-                        Accept
-                      </>
-                    )}
-                  </Button>
-                  
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleRequest(request.id, 'rejected')}
-                    disabled={processingRequests.has(request.id)}
-                    className="border-red-500 text-red-600 hover:bg-red-50 flex-1 sm:flex-none"
-                  >
-                    {processingRequests.has(request.id) ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
-                    ) : (
-                      <>
-                        <X className="w-4 h-4 mr-1" />
-                        Reject
-                      </>
-                    )}
-                  </Button>
-                </div>
+    <div 
+      className="rounded-2xl bg-white border border-gray-100 shadow-sm mb-4"
+      id="friend-requests-card"
+      ref={cardRef}
+    >
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger asChild>
+          <button
+            className="w-full p-4 flex items-center justify-between gap-3 hover:bg-gray-50/50 transition-colors rounded-t-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            role="button"
+            tabIndex={0}
+            aria-expanded={isOpen}
+          >
+            <div className="flex items-center gap-3">
+              <Mail className="h-5 w-5 text-primary flex-shrink-0" />
+              <span className="text-sm font-semibold">Friend Requests</span>
+              {requests.length > 0 && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                  {requests.length}
+                </span>
+              )}
+            </div>
+            <ChevronDown 
+              className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+                isOpen ? 'rotate-180' : ''
+              }`} 
+            />
+          </button>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent className="transition-all duration-200 overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+          <div className="px-4 pb-4">
+            {loading ? (
+              <div className="space-y-2">
+                {[1, 2].map((i) => (
+                  <div key={i} className="h-16 rounded-xl bg-gray-100/80 animate-pulse" />
+                ))}
               </div>
-            ))}
+            ) : requests.length === 0 ? (
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                <Mail className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                <p className="font-medium text-gray-700">No pending friend requests</p>
+                <p className="text-xs mt-1">You'll see new requests here.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {requests.filter(request => request.requester_pet).map((request) => (
+                  <div 
+                    key={request.id} 
+                    data-request-id={request.id}
+                    className={`rounded-xl border border-gray-100 bg-white p-3 flex items-center justify-between gap-3 ${
+                      highlightRequestId === request.id ? 'notification-highlight' : ''
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <Avatar className="w-11 h-11 flex-shrink-0">
+                        <AvatarImage 
+                          src={request.requester_pet.profile_photo_url || ''} 
+                          alt={request.requester_pet.name} 
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                          {request.requester_pet.name.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-semibold text-sm truncate">
+                          {request.requester_pet.name}
+                        </h4>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {request.requester_pet.breed}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2 flex-shrink-0">
+                      <Button
+                        size="sm"
+                        onClick={() => handleRequest(request.id, 'accepted')}
+                        disabled={processingRequests.has(request.id)}
+                        className="h-9 rounded-full px-3 min-w-[70px]"
+                      >
+                        {processingRequests.has(request.id) ? (
+                          <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white"></div>
+                        ) : (
+                          <>
+                            <Check className="w-3.5 h-3.5 mr-1" />
+                            Accept
+                          </>
+                        )}
+                      </Button>
+                      
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleRequest(request.id, 'rejected')}
+                        disabled={processingRequests.has(request.id)}
+                        className="h-9 rounded-full px-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      >
+                        {processingRequests.has(request.id) ? (
+                          <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-current"></div>
+                        ) : (
+                          <X className="w-3.5 h-3.5" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
   );
 };
 

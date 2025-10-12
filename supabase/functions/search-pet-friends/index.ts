@@ -77,13 +77,12 @@ Deno.serve(async (req) => {
       excludedPetIds.add(f.requester_pet_id === petId ? f.recipient_pet_id : f.requester_pet_id);
     });
 
-    // Search for pets by name only
+    // Search for pets by username OR name
     const { data: searchResults, error: searchError } = await supabase
       .from('pet_profiles')
       .select('*')
       .neq('id', petId)
-      .eq('is_available', true)
-      .ilike('name', `%${searchQuery}%`)
+      .or(`pet_username.ilike.%${searchQuery}%,name.ilike.%${searchQuery}%`)
       .limit(20);
 
     if (searchError) {

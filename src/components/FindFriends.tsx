@@ -244,7 +244,7 @@ const FindFriends: React.FC<FindFriendsProps> = ({ userPetId, onMatchFound }) =>
           <div className="relative">
             <Input
               type="text"
-              placeholder="Find by pet username..."
+              placeholder="Search by username or name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pr-12"

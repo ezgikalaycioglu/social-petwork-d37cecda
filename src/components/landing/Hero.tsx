@@ -2,7 +2,6 @@
 
 import { ArrowRight, Menu, X } from 'lucide-react';
 import AuthButton from '../AuthButton';
-import WaitlistForm from '../WaitlistForm';
 import PromotionalPopup from '../PromotionalPopup';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { Button } from '@/components/ui/button';
@@ -143,16 +142,6 @@ const Hero = () => {
             >
               {t('landing.hero.learnMore')} <ArrowRight className="ml-2 h-5 w-5" />
             </button>
-          </div>
-          
-          {/* Waitlist Form */}
-          <div className="max-w-md mx-auto">
-            <div className="text-center mb-4">
-              <p className="text-gray-600 text-sm">
-                {t('landing.hero.waitlistText')}
-              </p>
-            </div>
-            <WaitlistForm />
           </div>
         </div>
       </div>

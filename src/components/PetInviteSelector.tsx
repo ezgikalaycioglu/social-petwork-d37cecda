@@ -56,6 +56,9 @@ const PetInviteSelector: React.FC<PetInviteSelectorProps> = ({
         const isRequester = userPetIds.includes(friendship.requester_pet_id);
         const friendPet = isRequester ? friendship.recipient_pet : friendship.requester_pet;
         
+        // Skip if friendPet is null (deleted pet profile)
+        if (!friendPet) return;
+        
         // Avoid duplicates
         if (!friends.find(f => f.id === friendPet.id)) {
           friends.push(friendPet);

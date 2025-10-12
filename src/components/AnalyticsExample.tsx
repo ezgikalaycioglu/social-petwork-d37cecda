@@ -46,7 +46,7 @@ const AnalyticsExample: React.FC = () => {
   const handleReadyToPlayToggled = () => {
     trackEvent('Ready to Play Toggled', {
       pet_id: 'example-pet-id',
-      is_available: true
+      location_shared: true
     });
   };
 

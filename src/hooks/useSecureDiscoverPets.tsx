@@ -37,7 +37,6 @@ export const useSecureDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseSe
         const { data, error } = await supabase
           .from('pet_profiles')
           .select('*')
-          .eq('is_available', true)
           .limit(12);
 
         if (error) throw error;
@@ -89,8 +88,7 @@ export const useSecureDiscoverPets = ({ userPetIds, onFriendRequestSent }: UseSe
       // Fetch pets with privacy protection
       let query = supabase
         .from('pet_profiles')
-        .select('*')
-        .eq('is_available', true);
+        .select('*');
 
       if (excludedPetIds.length > 0) {
         query = query.not('id', 'in', `(${excludedPetIds.join(',')})`);
