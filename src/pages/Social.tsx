@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import Layout from '@/components/Layout';
 import { 
   Heart, 
   Calendar, 
@@ -16,7 +17,6 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import CompactMobileAppBar from '@/components/CompactMobileAppBar';
 import SegmentedControl from '@/components/SegmentedControl';
 import DiscoverPets from '@/components/DiscoverPets';
 import FriendRequests from '@/components/FriendRequests';
@@ -143,19 +143,19 @@ const Social = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Compact App Bar */}
-      <CompactMobileAppBar />
+    <Layout>
+      <div className="min-h-screen bg-background">
+        {/* Segmented Control - sticky under global app bar */}
+        <div className="mt-2">
+          <SegmentedControl
+            items={segmentedItems}
+            value={activeTab}
+            onChange={setActiveTab}
+          />
+        </div>
 
-      {/* Segmented Control */}
-      <SegmentedControl
-        items={segmentedItems}
-        value={activeTab}
-        onChange={setActiveTab}
-      />
-
-      {/* Main Content */}
-      <div className="px-4">
+        {/* Main Content */}
+        <div className="px-4">
         {/* Pet Social Tab */}
         {activeTab === 'pet-social' && (
           <div className="space-y-4 mt-4">
@@ -408,15 +408,16 @@ const Social = () => {
         )}
       </div>
 
-      {/* Modals */}
-      <GroupWalkModal
-        isOpen={showGroupWalkModal}
-        onClose={() => setShowGroupWalkModal(false)}
-        onSuccess={handleRefresh}
-        userId={user?.id || ''}
-        userPets={pets}
-      />
-    </div>
+        {/* Modals */}
+        <GroupWalkModal
+          isOpen={showGroupWalkModal}
+          onClose={() => setShowGroupWalkModal(false)}
+          onSuccess={handleRefresh}
+          userId={user?.id || ''}
+          userPets={pets}
+        />
+      </div>
+    </Layout>
   );
 };
 

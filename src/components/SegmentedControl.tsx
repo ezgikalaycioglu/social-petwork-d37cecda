@@ -17,7 +17,7 @@ interface SegmentedControlProps {
 
 const SegmentedControl: React.FC<SegmentedControlProps> = ({ items, value, onChange }) => {
   return (
-    <div className="sticky top-14 z-20 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-gray-100 shadow-sm">
+    <div className="sticky top-14 z-20 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-gray-100">
       <div className="px-4 py-2">
         <div className="flex gap-1 bg-gray-100 rounded-full p-1">
           {items.map((item) => {
