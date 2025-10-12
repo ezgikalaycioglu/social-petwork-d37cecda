@@ -127,7 +127,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         supabase
           .from('pet_profiles')
           .update({
-            is_available: available,
             latitude: available ? latitude : null,
             longitude: available ? longitude : null,
             updated_at: new Date().toISOString(),
@@ -208,8 +207,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         {
           event: '*',
           schema: 'public',
-          table: 'pet_profiles',
-          filter: 'is_available=eq.true'
+          table: 'pet_profiles'
         },
         () => {
           fetchNearbyPets();
@@ -225,7 +223,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       const { data, error } = await supabase
         .from('pet_profiles')
         .select('*')
-        .eq('is_available', true)
         .not('latitude', 'is', null)
         .not('longitude', 'is', null);
 

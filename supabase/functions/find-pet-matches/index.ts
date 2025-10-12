@@ -179,7 +179,6 @@ Deno.serve(async (req) => {
       .from('pet_profiles')
       .select('*')
       .neq('id', petId)
-      .eq('is_available', true)
       .not('latitude', 'is', null)
       .not('longitude', 'is', null);
 

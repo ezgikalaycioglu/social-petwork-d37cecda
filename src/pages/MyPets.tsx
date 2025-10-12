@@ -54,7 +54,6 @@ interface PetProfile {
   boop_count: number;
   personality_traits: string[] | null;
   vaccination_status: string | null;
-  is_available: boolean | null;
   friend_count?: number;
 }
 
@@ -299,20 +298,6 @@ const MyPets = () => {
                           <PawPrint className="w-16 h-16 text-primary opacity-50" />
                         </div>
                       )}
-                      
-                      {/* Status Badge */}
-                      <div className="absolute top-4 right-4">
-                        <Badge 
-                          variant={pet.is_available ? "default" : "secondary"}
-                          className={`${
-                            pet.is_available 
-                              ? 'bg-accent text-accent-foreground' 
-                              : 'bg-muted text-muted-foreground'
-                          } rounded-full px-3 py-1 shadow-lg`}
-                        >
-                          {pet.is_available ? 'Available' : 'Busy'}
-                        </Badge>
-                      </div>
 
                       {/* Quick Action Overlay */}
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
@@ -484,9 +469,9 @@ const MyPets = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-foreground">
-                      {pets.filter(pet => pet.is_available).length}
+                      {pets.length}
                     </p>
-                    <p className="text-sm text-muted-foreground">Available for Play</p>
+                    <p className="text-sm text-muted-foreground">Total Pets</p>
                   </div>
                 </div>
               </Card>

@@ -951,7 +951,6 @@ export type Database = {
           created_at: string
           gender: string | null
           id: string
-          is_available: boolean | null
           latitude: number | null
           longitude: number | null
           name: string
@@ -973,7 +972,6 @@ export type Database = {
           created_at?: string
           gender?: string | null
           id?: string
-          is_available?: boolean | null
           latitude?: number | null
           longitude?: number | null
           name: string
@@ -995,7 +993,6 @@ export type Database = {
           created_at?: string
           gender?: string | null
           id?: string
-          is_available?: boolean | null
           latitude?: number | null
           longitude?: number | null
           name?: string
