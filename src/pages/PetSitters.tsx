@@ -261,9 +261,9 @@ const PetSitters = () => {
       <div className="min-h-screen bg-background px-4 pb-24 pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-7xl mx-auto">
           {/* Compact Role Selector (Segmented Control) */}
-          <div className="sticky top-16 z-20 bg-background/95 backdrop-blur-sm py-3 -mx-4 px-4 border-b border-gray-100">
+          <div className="sticky top-16 z-20 bg-background/95 backdrop-blur-sm py-3 -mx-4 px-4 border-b border-gray-100 flex justify-center">
             <div 
-              className="inline-flex items-center h-10 rounded-full bg-gray-100 p-1 max-w-md mx-auto"
+              className="inline-flex items-center h-10 rounded-full bg-gray-100 p-1 max-w-md"
               role="tablist"
               aria-label="User role selection"
             >
@@ -308,7 +308,7 @@ const PetSitters = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4 space-y-4">
             {/* Owner Sub-Navigation */}
             {userType === 'owner' && (
-              <div className="flex flex-wrap items-center gap-2 px-4 mt-2 mb-2">
+              <div className="flex flex-wrap items-center justify-center gap-2 px-4 mt-2 mb-2">
                 <button
                   role="tab"
                   aria-selected={activeTab === 'find'}
@@ -340,7 +340,7 @@ const PetSitters = () => {
 
             {/* Sitter Sub-Navigation */}
             {userType === 'sitter' && (
-              <div className="flex flex-wrap items-center gap-2 px-4 mt-2 mb-2">
+              <div className="flex flex-wrap items-center justify-center gap-2 px-4 mt-2 mb-2">
                 {!userIsSitter && (
                   <button
                     role="tab"
