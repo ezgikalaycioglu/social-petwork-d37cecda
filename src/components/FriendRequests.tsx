@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
-import { Check, X, Heart, Mail, ChevronDown } from 'lucide-react';
+import { Check, X, Mail, ChevronDown } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetFriendship = Tables<'pet_friendships'>;
@@ -24,6 +23,7 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingRequests, setProcessingRequests] = useState<Set<string>>(new Set());
+  const [isOpen, setIsOpen] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -64,6 +64,9 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
   };
 
   const handleRequest = async (requestId: string, action: 'accepted' | 'rejected') => {
+    // Optimistic UI: remove immediately
+    const requestToRemove = requests.find(r => r.id === requestId);
+    setRequests(prev => prev.filter(r => r.id !== requestId));
     setProcessingRequests(prev => new Set([...prev, requestId]));
 
     try {
@@ -84,10 +87,15 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
           : "The friend request has been declined.",
       });
 
-      await fetchPendingRequests();
       onRequestHandled();
     } catch (error) {
       console.error(`Error ${action} friend request:`, error);
+      
+      // Restore on error
+      if (requestToRemove) {
+        setRequests(prev => [requestToRemove, ...prev]);
+      }
+      
       toast({
         title: "Error",
         description: `Failed to ${action === 'accepted' ? 'accept' : 'reject'} friend request.`,
@@ -102,54 +110,65 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
     }
   };
 
-  if (loading) {
-    return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-        <p className="text-gray-600 mt-2">Loading friend requests...</p>
-      </div>
-    );
-  }
-
-  if (requests.length === 0) {
+  if (requests.length === 0 && !loading) {
     return null;
   }
 
   return (
-    <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
-      <Collapsible defaultOpen={requests.length > 0}>
-        <CardContent className="p-4">
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm" className="w-full justify-between h-10 px-3 hover:bg-gray-50 mb-3">
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-primary" />
-                <span className="text-sm font-semibold">Friend Requests</span>
-                {requests.length > 0 && (
-                  <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
-                    {requests.length}
-                  </span>
-                )}
+    <div className="rounded-2xl bg-white border border-gray-100 shadow-sm mb-4">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger asChild>
+          <button
+            className="w-full p-4 flex items-center justify-between gap-3 hover:bg-gray-50/50 transition-colors rounded-t-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            role="button"
+            tabIndex={0}
+            aria-expanded={isOpen}
+          >
+            <div className="flex items-center gap-3">
+              <Mail className="h-5 w-5 text-primary flex-shrink-0" />
+              <span className="text-sm font-semibold">Friend Requests</span>
+              {requests.length > 0 && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                  {requests.length}
+                </span>
+              )}
+            </div>
+            <ChevronDown 
+              className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+                isOpen ? 'rotate-180' : ''
+              }`} 
+            />
+          </button>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent className="transition-all duration-200 overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+          <div className="px-4 pb-4">
+            {loading ? (
+              <div className="space-y-2">
+                {[1, 2].map((i) => (
+                  <div key={i} className="h-16 rounded-xl bg-gray-100/80 animate-pulse" />
+                ))}
               </div>
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            {requests.length === 0 ? (
-              <div className="text-center py-6">
-                <Heart className="w-10 h-10 mx-auto mb-2 text-gray-400" />
-                <p className="text-sm text-gray-600">No pending requests</p>
+            ) : requests.length === 0 ? (
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                <Mail className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                <p className="font-medium text-gray-700">No pending friend requests</p>
+                <p className="text-xs mt-1">You'll see new requests here.</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {requests.filter(request => request.requester_pet).map((request) => (
-                  <div key={request.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-xl bg-white">
+                  <div 
+                    key={request.id} 
+                    className="rounded-xl border border-gray-100 bg-white p-3 flex items-center justify-between gap-3"
+                  >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <Avatar className="w-12 h-12 flex-shrink-0">
+                      <Avatar className="w-11 h-11 flex-shrink-0">
                         <AvatarImage 
                           src={request.requester_pet.profile_photo_url || ''} 
                           alt={request.requester_pet.name} 
                         />
-                        <AvatarFallback className="bg-green-100 text-green-600 text-sm">
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm">
                           {request.requester_pet.name.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -169,26 +188,29 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
                         size="sm"
                         onClick={() => handleRequest(request.id, 'accepted')}
                         disabled={processingRequests.has(request.id)}
-                        className="h-9 w-9 p-0"
+                        className="h-9 rounded-full px-3 min-w-[70px]"
                       >
                         {processingRequests.has(request.id) ? (
                           <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white"></div>
                         ) : (
-                          <Check className="w-4 h-4" />
+                          <>
+                            <Check className="w-3.5 h-3.5 mr-1" />
+                            Accept
+                          </>
                         )}
                       </Button>
                       
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant="ghost"
                         onClick={() => handleRequest(request.id, 'rejected')}
                         disabled={processingRequests.has(request.id)}
-                        className="h-9 w-9 p-0 border-gray-200"
+                        className="h-9 rounded-full px-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                       >
                         {processingRequests.has(request.id) ? (
-                          <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-gray-400"></div>
+                          <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-current"></div>
                         ) : (
-                          <X className="w-4 h-4" />
+                          <X className="w-3.5 h-3.5" />
                         )}
                       </Button>
                     </div>
@@ -196,10 +218,10 @@ const FriendRequests = ({ userPetIds, onRequestHandled }: FriendRequestsProps) =
                 ))}
               </div>
             )}
-          </CollapsibleContent>
-        </CardContent>
+          </div>
+        </CollapsibleContent>
       </Collapsible>
-    </Card>
+    </div>
   );
 };
 
