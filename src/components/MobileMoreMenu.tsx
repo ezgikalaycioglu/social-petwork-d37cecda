@@ -1,6 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Settings, Bell, MessageSquare } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Settings, Bell, MessageSquare, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +22,18 @@ import ContactUs from './ContactUs';
 
 const MobileMoreMenu = () => {
   const [isContactOpen, setIsContactOpen] = React.useState(false);
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success('Signed out successfully');
+      navigate('/');
+    } catch (error) {
+      toast.error('Failed to sign out');
+    }
+  };
 
   return (
     <>
@@ -56,6 +70,11 @@ const MobileMoreMenu = () => {
           <DropdownMenuItem onSelect={() => setIsContactOpen(true)}>
             <MessageSquare className="w-4 h-4 mr-2" />
             Contact Us
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={handleSignOut}>
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
