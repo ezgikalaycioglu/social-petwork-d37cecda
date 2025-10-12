@@ -240,29 +240,8 @@ const Social = () => {
                 {/* Upcoming Playdates */}
                 <UpcomingPlaydates />
 
-                {/* Quick Actions */}
-                <div className="grid grid-cols-2 gap-3 my-3">
-                  <Button
-                    onClick={() => setShowGroupWalkModal(true)}
-                    size="sm"
-                    className="h-10 rounded-full gap-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Group Walk
-                  </Button>
-                  <Button
-                    onClick={() => setActiveTab('pet-social')}
-                    variant="outline"
-                    size="sm"
-                    className="h-10 rounded-full gap-2"
-                  >
-                    <Users className="w-4 h-4" />
-                    Find Pets
-                  </Button>
-                </div>
-
                 {/* Event Summary Stats */}
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-2 my-2">
                   <Card className="rounded-xl bg-white border border-gray-100 shadow-sm">
                     <CardContent className="p-3 text-center">
                       <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-1.5">
