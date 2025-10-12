@@ -87,11 +87,6 @@ const Auth = () => {
         });
 
         if (error) throw error;
-
-        toast({
-          title: "Welcome back!",
-          description: "You have been successfully signed in.",
-        });
         
         // Redirect to dashboard after successful login
         navigate('/dashboard');
