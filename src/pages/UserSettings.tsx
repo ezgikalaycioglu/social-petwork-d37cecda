@@ -708,8 +708,8 @@ const UserSettings = () => {
                 </CardContent>
               </Card>
 
-              {/* Mobile Sign Out Button */}
-              <div className="block md:hidden">
+              {/* Sign Out Button */}
+              <div>
                 <Card>
                   <CardContent className="pt-6">
                     <Button
