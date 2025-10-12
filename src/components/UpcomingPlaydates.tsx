@@ -136,15 +136,22 @@ const UpcomingPlaydates: React.FC = () => {
   if (loading) {
     return (
       <div className="mb-3">
-        <h2 className="text-lg font-semibold text-gray-800 mb-3 px-4">Upcoming Playdates</h2>
-        <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex w-max space-x-4 px-4 pb-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="w-72 h-24 bg-gray-200 rounded-lg animate-pulse" />
-            ))}
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+        <div className="flex items-center justify-between mt-2 mb-3 px-4">
+          <h2 className="text-base font-semibold text-gray-900">Upcoming Playdates</h2>
+          <Button
+            onClick={() => setIsGroupWalkModalOpen(true)}
+            size="sm"
+            className="h-9 rounded-full px-4 text-sm"
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Create Group Walk
+          </Button>
+        </div>
+        <div className="px-4 space-y-3">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="rounded-2xl h-24 w-full bg-gray-200 animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -152,24 +159,23 @@ const UpcomingPlaydates: React.FC = () => {
   if (playdates.length === 0) {
     return (
       <div className="mb-3">
-        <div className="flex items-center justify-between mb-3 px-4">
-          <h2 className="text-lg font-semibold text-gray-800">Upcoming Playdates</h2>
+        <div className="flex items-center justify-between mt-2 mb-3 px-4">
+          <h2 className="text-base font-semibold text-gray-900">Upcoming Playdates</h2>
           <Button
             onClick={() => setIsGroupWalkModalOpen(true)}
             size="sm"
-            className="bg-primary hover:bg-primary/90"
+            className="h-9 rounded-full px-4 text-sm"
           >
-            <Plus className="w-3 h-3 mr-1" />
+            <Plus className="w-4 h-4 mr-1" />
             Create Group Walk
           </Button>
         </div>
         <div className="px-4">
-          <Card className="border-dashed border-2 border-gray-300">
-            <CardContent className="flex items-center justify-center py-8">
-              <div className="text-center">
-                <Users className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600 text-sm">No upcoming playdates scheduled</p>
-              </div>
+          <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl mb-2">📅</div>
+              <h3 className="text-base font-semibold mb-1">No upcoming playdates</h3>
+              <p className="text-sm text-muted-foreground">Create one or check back later.</p>
             </CardContent>
           </Card>
         </div>
@@ -187,68 +193,76 @@ const UpcomingPlaydates: React.FC = () => {
 
   return (
     <div className="mb-3">
-      <div className="flex items-center justify-between mb-3 px-4">
-        <h2 className="text-lg font-semibold text-gray-800">Upcoming Playdates</h2>
+      <div className="flex items-center justify-between mt-2 mb-3 px-4">
+        <h2 className="text-base font-semibold text-gray-900">Upcoming Playdates</h2>
         <Button
           onClick={() => setIsGroupWalkModalOpen(true)}
           size="sm"
-          className="bg-primary hover:bg-primary/90"
+          className="h-9 rounded-full px-4 text-sm"
         >
-          <Plus className="w-3 h-3 mr-1" />
+          <Plus className="w-4 h-4 mr-1" />
           Create Group Walk
         </Button>
       </div>
-      <ScrollArea className="w-full whitespace-nowrap">
-        <div className="flex w-max space-x-4 px-4 pb-4">
-          {playdates.map((playdate) => {
-            const timeInfo = formatEventTime(playdate.scheduled_time);
-            const isGroupWalk = playdate.event_type === 'group_walk';
-            
-            return (
-              <Card 
-                key={playdate.id} 
-                className="w-72 flex-shrink-0 bg-gradient-to-r from-green-50 to-blue-50 border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300 cursor-pointer active:scale-95"
-                onClick={() => handleEventClick(playdate)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-800 text-sm">
-                        {playdate.title || (isGroupWalk ? '🚶‍♂️ Group Walk' : '🐕 Playdate')}
-                      </h3>
-                      <div className="flex items-center text-xs text-gray-600 mt-1">
-                        <Calendar className="w-3 h-3 mr-1" />
-                        <span>{timeInfo.date}</span>
-                        <Clock className="w-3 h-3 ml-2 mr-1" />
-                        <span>{timeInfo.time}</span>
-                      </div>
+      <div className="px-4 space-y-3">
+        {playdates.map((playdate) => {
+          const timeInfo = formatEventTime(playdate.scheduled_time);
+          const isGroupWalk = playdate.event_type === 'group_walk';
+          
+          // Determine status and accent color
+          const status = playdate.status || 'confirmed';
+          const getAccentColor = () => {
+            if (status === 'confirmed') return 'border-l-green-300';
+            if (status === 'pending') return 'border-l-amber-300';
+            if (status === 'cancelled') return 'border-l-rose-300';
+            return 'border-l-blue-300';
+          };
+          
+          const getStatusPillClasses = () => {
+            if (status === 'confirmed') return 'bg-green-100 text-green-700';
+            if (status === 'pending') return 'bg-amber-100 text-amber-700';
+            if (status === 'cancelled') return 'bg-rose-100 text-rose-700';
+            return 'bg-blue-100 text-blue-700';
+          };
+          
+          return (
+            <Card 
+              key={playdate.id} 
+              className={`rounded-2xl bg-white border border-gray-100 shadow-sm p-4 cursor-pointer border-l-4 ${getAccentColor()}`}
+              onClick={() => handleEventClick(playdate)}
+            >
+              <CardContent className="p-0">
+                {/* Top row: Title + Status */}
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <h3 className="font-semibold text-gray-900 text-sm">
+                    {playdate.title || (isGroupWalk ? '🚶‍♂️ Group Walk' : '🐕 Playdate')}
+                  </h3>
+                  <div className="text-right flex-shrink-0">
+                    <div className="text-xs text-muted-foreground mb-1">
+                      {timeInfo.timeAgo.replace('in ', '')}
                     </div>
-                    <div className="text-xs text-green-600 font-medium">
-                      {timeInfo.timeAgo}
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center text-xs text-gray-600">
-                    <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
-                    <span className="truncate">{playdate.location_name}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between mt-2">
-                    <div className="flex items-center text-xs text-gray-500">
-                      <Users className="w-3 h-3 mr-1" />
-                      <span>{playdate.participants.length} participants</span>
-                    </div>
-                    <div className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                      Confirmed
+                    <div className={`rounded-full px-2 py-0.5 text-xs ${getStatusPillClasses()}`}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-        <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+                </div>
+                
+                {/* Meta row: Date, time, location, participants */}
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground flex-wrap">
+                  <Clock className="w-4 h-4 flex-shrink-0" />
+                  <span className="whitespace-nowrap">{timeInfo.date}, {timeInfo.time}</span>
+                  <span>•</span>
+                  <MapPin className="w-4 h-4 flex-shrink-0" />
+                  <span className="min-w-0 truncate">{playdate.location_name}</span>
+                  <span>•</span>
+                  <Users className="w-4 h-4 flex-shrink-0" />
+                  <span className="whitespace-nowrap">{playdate.participants.length} participants</span>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
         
         <EventDetailsModal
           event={selectedEvent}

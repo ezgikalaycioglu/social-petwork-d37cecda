@@ -241,32 +241,32 @@ const Social = () => {
                 <UpcomingPlaydates />
 
                 {/* Quick Actions */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 my-3">
                   <Button
                     onClick={() => setShowGroupWalkModal(true)}
                     size="sm"
-                    className="h-11"
+                    className="h-10 rounded-full gap-2"
                   >
-                    <Plus className="w-4 h-4 mr-1.5" />
+                    <Plus className="w-4 h-4" />
                     Group Walk
                   </Button>
                   <Button
                     onClick={() => setActiveTab('pet-social')}
                     variant="outline"
                     size="sm"
-                    className="h-11"
+                    className="h-10 rounded-full gap-2"
                   >
-                    <Users className="w-4 h-4 mr-1.5" />
+                    <Users className="w-4 h-4" />
                     Find Pets
                   </Button>
                 </div>
 
-                {/* Event Summary Cards */}
-                <div className="grid grid-cols-3 gap-3">
-                  <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
-                    <CardContent className="p-4 text-center">
-                      <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Heart className="w-5 h-5 text-red-500" />
+                {/* Event Summary Stats */}
+                <div className="grid grid-cols-3 gap-2">
+                  <Card className="rounded-xl bg-white border border-gray-100 shadow-sm">
+                    <CardContent className="p-3 text-center">
+                      <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-1.5">
+                        <Heart className="w-4 h-4 text-red-500" />
                       </div>
                       <h3 className="text-lg font-semibold mb-0.5">
                         {incomingRequests.length}
@@ -275,10 +275,10 @@ const Social = () => {
                     </CardContent>
                   </Card>
 
-                  <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
-                    <CardContent className="p-4 text-center">
-                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Calendar className="w-5 h-5 text-green-500" />
+                  <Card className="rounded-xl bg-white border border-gray-100 shadow-sm">
+                    <CardContent className="p-3 text-center">
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-1.5">
+                        <Calendar className="w-4 h-4 text-green-500" />
                       </div>
                       <h3 className="text-lg font-semibold mb-0.5">
                         {upcomingEvents.length}
@@ -287,10 +287,10 @@ const Social = () => {
                     </CardContent>
                   </Card>
 
-                  <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
-                    <CardContent className="p-4 text-center">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Clock className="w-5 h-5 text-blue-500" />
+                  <Card className="rounded-xl bg-white border border-gray-100 shadow-sm">
+                    <CardContent className="p-3 text-center">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-1.5">
+                        <Clock className="w-4 h-4 text-blue-500" />
                       </div>
                       <h3 className="text-lg font-semibold mb-0.5">
                         {events.filter(e => e.creator_id === user?.id && e.status === 'pending').length}
@@ -300,22 +300,24 @@ const Social = () => {
                   </Card>
                 </div>
 
-                {/* View Full Events */}
-                <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
-                  <CardContent className="p-4 text-center">
-                    <h3 className="text-sm font-semibold mb-1">
-                      Manage All Events
-                    </h3>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      View history, manage requests, track playdates
-                    </p>
+                {/* Manage All Events */}
+                <Card className="rounded-xl bg-white border border-gray-100 shadow-sm">
+                  <CardContent className="p-3 flex items-center justify-between">
+                    <div className="text-left">
+                      <h3 className="text-sm font-semibold text-gray-900">
+                        Manage All Events
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        View history & manage requests
+                      </p>
+                    </div>
                     <Button
                       onClick={() => navigate('/events')}
                       variant="outline"
                       size="sm"
-                      className="h-9"
+                      className="h-8 px-3 rounded-full"
                     >
-                      View Full Events
+                      View All
                     </Button>
                   </CardContent>
                 </Card>
