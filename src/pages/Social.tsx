@@ -362,28 +362,6 @@ const Social = () => {
                     />
                   </CardContent>
                 </Card>
-
-                {/* Instructions */}
-                <div className="grid grid-cols-2 gap-3">
-                  <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
-                    <CardContent className="p-4 text-center">
-                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <PawPrint className="w-5 h-5 text-green-500" />
-                      </div>
-                      <h3 className="text-sm font-semibold mb-1">Ready to Play</h3>
-                      <p className="text-xs text-muted-foreground">Toggle to show location</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
-                    <CardContent className="p-4 text-center">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Users className="w-5 h-5 text-blue-500" />
-                      </div>
-                      <h3 className="text-sm font-semibold mb-1">Find Friends</h3>
-                      <p className="text-xs text-muted-foreground">Search nearby pets</p>
-                    </CardContent>
-                  </Card>
-                </div>
               </>
             )}
           </div>
