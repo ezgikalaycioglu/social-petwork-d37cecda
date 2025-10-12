@@ -46,6 +46,8 @@ interface EventDetailsModalProps {
   onClose: () => void;
   currentUserId: string;
   onEventUpdate: () => void;
+  modalType?: 'request' | 'upcoming' | 'pending';
+  onEditEvent?: () => void;
 }
 
 const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
@@ -54,6 +56,8 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
   onClose,
   currentUserId,
   onEventUpdate,
+  modalType,
+  onEditEvent,
 }) => {
   const { toast } = useToast();
   const [isUpdating, setIsUpdating] = useState(false);
@@ -246,8 +250,62 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 This event has already passed.
               </div>
             )}
-            {isCreator ? (
-              // Creator actions
+            
+            {modalType === 'pending' && isCreator ? (
+              // Pending: Edit or Cancel
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={onEditEvent}
+                  disabled={isUpdating}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Edit Event
+                </Button>
+                <Button
+                  onClick={handleCancelEvent}
+                  disabled={isUpdating}
+                  variant="destructive"
+                  className="w-full"
+                >
+                  <AlertTriangle className="w-4 h-4 mr-2" />
+                  {isUpdating ? 'Cancelling...' : 'Cancel Event'}
+                </Button>
+              </div>
+            ) : modalType === 'request' && !isCreator ? (
+              // Request: Accept or Decline
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={() => handleRSVPChange('declined')}
+                  disabled={isUpdating}
+                  variant="outline"
+                  className="border-red-500 text-red-600 hover:bg-red-50"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  {isUpdating ? 'Updating...' : 'Decline'}
+                </Button>
+                <Button
+                  onClick={() => handleRSVPChange('accepted')}
+                  disabled={isUpdating || isPast}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Check className="w-4 h-4 mr-2" />
+                  {isUpdating ? 'Updating...' : isPast ? 'Event Passed' : 'Accept'}
+                </Button>
+              </div>
+            ) : modalType === 'upcoming' && !isCreator ? (
+              // Upcoming: Can't Attend
+              <Button
+                onClick={() => handleRSVPChange('declined')}
+                disabled={isUpdating}
+                variant="outline"
+                className="w-full border-red-500 text-red-600 hover:bg-red-50"
+              >
+                <X className="w-4 h-4 mr-2" />
+                {isUpdating ? 'Updating...' : "Can't Attend"}
+              </Button>
+            ) : isCreator ? (
+              // Creator actions (fallback)
               <Button
                 onClick={handleCancelEvent}
                 disabled={isUpdating}
@@ -258,7 +316,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 {isUpdating ? 'Cancelling...' : 'Cancel Event'}
               </Button>
             ) : (
-              // Attendee actions
+              // Attendee actions (fallback)
               <div className="grid grid-cols-2 gap-3">
                 {currentUserResponse === 'accepted' ? (
                   <>

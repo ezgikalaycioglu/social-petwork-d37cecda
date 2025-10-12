@@ -111,7 +111,7 @@ const NotificationsPanel = ({ isOpen, onClose }: NotificationsPanelProps) => {
 
   const handleEventRequestClick = (eventId: string) => {
     markEventRequestAsRead(eventId);
-    navigate('/events?highlight=event-' + eventId);
+    navigate('/social?tab=events&highlight=event-' + eventId);
     onClose();
   };
 

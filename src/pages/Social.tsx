@@ -28,6 +28,7 @@ import PetFriendsList from '@/components/PetFriendsList';
 import GroupWalkModal from '@/components/GroupWalkModal';
 import UpcomingPlaydates from '@/components/UpcomingPlaydates';
 import InteractiveMap from '@/components/InteractiveMap';
+import EventDetailsModal from '@/components/EventDetailsModal';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Event = Tables<'events'>;
@@ -54,6 +55,9 @@ const Social = () => {
   const [showPlaydateModal, setShowPlaydateModal] = useState(false);
   const [showGroupWalkModal, setShowGroupWalkModal] = useState(false);
   const [openSheet, setOpenSheet] = useState<'requests' | 'upcoming' | 'pending' | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [eventModalType, setEventModalType] = useState<'request' | 'upcoming' | 'pending'>('request');
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -94,8 +98,38 @@ const Social = () => {
         newParams.delete('highlight');
         setSearchParams(newParams, { replace: true });
       }, 1500);
+    } else if (highlightParam?.startsWith('event-')) {
+      const eventId = highlightParam.replace('event-', '');
+      
+      // Ensure we're on the events tab
+      if (activeTab !== 'events') {
+        setActiveTab('events');
+      }
+      
+      // Find the event and determine its category
+      setTimeout(() => {
+        const event = events.find(e => e.id === eventId);
+        if (event) {
+          const isRequest = event.creator_id !== user?.id && event.status === 'pending';
+          const isUpcoming = event.status === 'confirmed' && new Date(event.scheduled_time) > new Date();
+          const isPending = event.creator_id === user?.id && event.status === 'pending';
+          
+          if (isRequest) {
+            handleEventClick(event, 'request');
+          } else if (isUpcoming) {
+            handleEventClick(event, 'upcoming');
+          } else if (isPending) {
+            handleEventClick(event, 'pending');
+          }
+        }
+        
+        // Clean up URL
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('highlight');
+        setSearchParams(newParams, { replace: true });
+      }, 500);
     }
-  }, [highlightParam, activeTab, searchParams, setSearchParams]);
+  }, [highlightParam, activeTab, searchParams, setSearchParams, events, user]);
 
   const fetchUserPets = async () => {
     if (!user) return;
@@ -168,6 +202,28 @@ const Social = () => {
       minute: '2-digit',
       hour12: true,
     });
+  };
+
+  const handleEventClick = (event: Event, type: 'request' | 'upcoming' | 'pending') => {
+    setSelectedEvent(event);
+    setEventModalType(type);
+  };
+
+  const handleEventModalClose = () => {
+    setSelectedEvent(null);
+  };
+
+  const handleEditEvent = () => {
+    if (selectedEvent) {
+      setEditingEvent(selectedEvent);
+      setSelectedEvent(null);
+      setShowGroupWalkModal(true);
+    }
+  };
+
+  const handleGroupWalkSuccess = () => {
+    setEditingEvent(null);
+    handleRefresh();
   };
 
   const userPetIds = pets.map(pet => pet.id);
@@ -334,28 +390,6 @@ const Social = () => {
                     <p className="text-xs text-muted-foreground">Pending</p>
                   </button>
                 </div>
-
-                {/* Manage All Events */}
-                <Card className="rounded-xl bg-white border border-gray-100 shadow-sm">
-                  <CardContent className="p-3 flex items-center justify-between">
-                    <div className="text-left">
-                      <h3 className="text-sm font-semibold text-gray-900">
-                        Manage All Events
-                      </h3>
-                      <p className="text-xs text-muted-foreground">
-                        View history & manage requests
-                      </p>
-                    </div>
-                    <Button
-                      onClick={() => navigate('/events')}
-                      variant="outline"
-                      size="sm"
-                      className="h-8 px-3 rounded-full"
-                    >
-                      View All
-                    </Button>
-                  </CardContent>
-                </Card>
               </>
             )}
           </div>
@@ -426,10 +460,14 @@ const Social = () => {
         {/* Modals */}
         <GroupWalkModal
           isOpen={showGroupWalkModal}
-          onClose={() => setShowGroupWalkModal(false)}
-          onSuccess={handleRefresh}
+          onClose={() => {
+            setShowGroupWalkModal(false);
+            setEditingEvent(null);
+          }}
+          onSuccess={handleGroupWalkSuccess}
           userId={user?.id || ''}
           userPets={pets}
+          editEvent={editingEvent}
         />
 
         {/* Event Lists Drawer */}
@@ -491,15 +529,11 @@ const Social = () => {
                     <button
                       key={event.id}
                       role="listitem"
-                      onClick={() => {
-                        setOpenSheet(null);
-                        navigate(`/events?eventId=${event.id}`);
-                      }}
+                      onClick={() => handleEventClick(event, 'request')}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
-                          setOpenSheet(null);
-                          navigate(`/events?eventId=${event.id}`);
+                          handleEventClick(event, 'request');
                         }
                       }}
                       tabIndex={0}
@@ -546,15 +580,11 @@ const Social = () => {
                     <button
                       key={event.id}
                       role="listitem"
-                      onClick={() => {
-                        setOpenSheet(null);
-                        navigate(`/events?eventId=${event.id}`);
-                      }}
+                      onClick={() => handleEventClick(event, 'upcoming')}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
-                          setOpenSheet(null);
-                          navigate(`/events?eventId=${event.id}`);
+                          handleEventClick(event, 'upcoming');
                         }
                       }}
                       tabIndex={0}
@@ -601,15 +631,11 @@ const Social = () => {
                     <button
                       key={event.id}
                       role="listitem"
-                      onClick={() => {
-                        setOpenSheet(null);
-                        navigate(`/events?eventId=${event.id}`);
-                      }}
+                      onClick={() => handleEventClick(event, 'pending')}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
-                          setOpenSheet(null);
-                          navigate(`/events?eventId=${event.id}`);
+                          handleEventClick(event, 'pending');
                         }
                       }}
                       tabIndex={0}
@@ -647,28 +673,19 @@ const Social = () => {
                 )
               )}
             </div>
-
-            {(
-              (openSheet === 'requests' && incomingRequests.length > 0) ||
-              (openSheet === 'upcoming' && upcomingEvents.length > 0) ||
-              (openSheet === 'pending' && pendingEvents.length > 0)
-            ) && (
-              <div className="border-t border-gray-100 p-4 bg-white">
-                <Button
-                  onClick={() => {
-                    setOpenSheet(null);
-                    navigate('/events');
-                  }}
-                  variant="ghost"
-                  size="sm"
-                  className="w-full text-sm"
-                >
-                  View All Events
-                </Button>
-              </div>
-            )}
           </DrawerContent>
         </Drawer>
+
+        {/* Event Details Modal */}
+        <EventDetailsModal
+          event={selectedEvent}
+          isOpen={!!selectedEvent}
+          onClose={handleEventModalClose}
+          currentUserId={user?.id || ''}
+          onEventUpdate={handleRefresh}
+          modalType={eventModalType}
+          onEditEvent={handleEditEvent}
+        />
       </div>
     </Layout>
   );

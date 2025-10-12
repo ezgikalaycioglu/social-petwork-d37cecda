@@ -21,7 +21,7 @@ import PetSocial from "./pages/PetSocial";
 import UserSettings from "./pages/UserSettings";
 import PetMap from "./pages/PetMap";
 import NotFound from "./pages/NotFound";
-import Events from "./pages/Events";
+
 import PetAdventures from "./pages/PetAdventures";
 import Deals from "./pages/Deals";
 import BusinessDashboard from "./pages/BusinessDashboard";
@@ -138,7 +138,7 @@ const AppRoutes = () => {
                 } />
                 <Route path="/events" element={
                   <ProtectedRoute>
-                    <Events />
+                    <PetMap />
                   </ProtectedRoute>
                 } />
                 
