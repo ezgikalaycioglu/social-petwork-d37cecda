@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,6 +55,7 @@ interface PetProfile {
 
 const MyPets = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +65,17 @@ const MyPets = () => {
   useEffect(() => {
     checkAuthAndFetchPets();
   }, []);
+
+  // Check for openCreate query parameter to auto-open modal
+  useEffect(() => {
+    if (searchParams.get('openCreate') === 'true') {
+      setShowCreateModal(true);
+      // Clean up URL
+      const params = new URLSearchParams(searchParams);
+      params.delete('openCreate');
+      setSearchParams(params, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const checkAuthAndFetchPets = async () => {
     try {

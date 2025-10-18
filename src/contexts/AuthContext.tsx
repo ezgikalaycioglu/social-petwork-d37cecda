@@ -62,8 +62,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           data: { petOnboardingShown: true }
         }).catch(err => console.warn('Could not update user metadata:', err));
         
-        // Navigate to create pet profile
-        navigate('/create-pet-profile');
+        // Navigate to my-pets with openCreate flag
+        navigate('/my-pets?openCreate=true');
       }
     } catch (error) {
       console.error('Error in pet onboarding check:', error);
