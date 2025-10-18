@@ -15,7 +15,6 @@ import { AICoach } from '@/components/AICoach';
 import { CreateTweetModal } from '@/components/CreateTweetModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { handleAuthError } from '@/utils/authErrorHandler';
-import PWAInstallPopup from '@/components/PWAInstallPopup';
 import QuickTour from '@/components/QuickTour';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -192,7 +191,6 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <PWAInstallPopup />
       {showQuickTour && (
         <QuickTour
           onComplete={handleTourComplete}
