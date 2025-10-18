@@ -23,7 +23,10 @@ type PetProfile = Tables<'pet_profiles'>;
 
 const petProfileSchema = z.object({
   name: z.string().min(1, 'Pet name is required').max(50, 'Pet name must be 50 characters or less'),
-  age: z.string().optional(),
+  age: z.string().optional().refine(
+    (val) => !val || (parseInt(val) >= 0 && parseInt(val) <= 50),
+    { message: 'Age must be between 0 and 50 years' }
+  ),
   gender: z.enum(['Male', 'Female', 'Unknown/Other']),
   breed: z.string().min(1, 'Breed is required').max(100, 'Breed must be 100 characters or less'),
   bio: z.string().max(500, 'Bio must be 500 characters or less').optional(),
@@ -258,6 +261,8 @@ const EditPetProfile = () => {
                         <FormControl>
                           <Input
                             type="number"
+                            min="0"
+                            max="50"
                             placeholder="Age in years"
                             {...field}
                             className="border-gray-300 focus:border-green-500 focus:ring-green-500"
