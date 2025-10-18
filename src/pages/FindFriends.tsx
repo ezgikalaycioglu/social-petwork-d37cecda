@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import FindFriendsComponent from '@/components/FindFriends';
+import CreatePetProfileForm from '@/components/CreatePetProfileForm';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Heart, Search, Users } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -16,6 +18,7 @@ const FindFriendsPage: React.FC = () => {
   const [selectedPetId, setSelectedPetId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [showFinder, setShowFinder] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
@@ -71,6 +74,11 @@ const FindFriendsPage: React.FC = () => {
     }
   };
 
+  const handlePetCreated = async () => {
+    setIsCreateModalOpen(false);
+    await checkAuthAndFetchPets();
+  };
+
   const startFinding = () => {
     if (!selectedPetId) {
       toast({
@@ -119,12 +127,23 @@ const FindFriendsPage: React.FC = () => {
               <p className="text-gray-500 mb-6">
                 You need to create a pet profile before you can find friends for your pet.
               </p>
-              <Button onClick={() => navigate('/create-pet-profile')}>
+              <Button onClick={() => setIsCreateModalOpen(true)}>
                 Create Pet Profile
               </Button>
             </CardContent>
           </Card>
         </div>
+
+        {/* Create Pet Profile Modal */}
+        <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold">Create New Pet Profile</DialogTitle>
+              <p className="text-muted-foreground">Add a new furry friend to your family</p>
+            </DialogHeader>
+            <CreatePetProfileForm onSuccess={handlePetCreated} showHeader={false} />
+          </DialogContent>
+        </Dialog>
       </Layout>
     );
   }

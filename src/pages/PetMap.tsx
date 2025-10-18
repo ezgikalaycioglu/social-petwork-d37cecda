@@ -6,7 +6,8 @@ import { useToast } from '@/hooks/use-toast';
 import { PawPrint, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import CreatePetProfileForm from '@/components/CreatePetProfileForm';
 import InteractiveMap from '@/components/InteractiveMap';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -18,6 +19,7 @@ const PetMap = () => {
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     checkAuthAndFetchData();
@@ -88,6 +90,13 @@ const PetMap = () => {
     // No toasts needed here
   };
 
+  const handlePetCreated = async () => {
+    setIsCreateModalOpen(false);
+    if (user) {
+      await fetchUserPets(user.id);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-32">
@@ -136,7 +145,7 @@ const PetMap = () => {
             <h2 className="text-2xl font-semibold text-gray-700 mb-2">No pets yet!</h2>
             <p className="text-gray-600 mb-6">Create a pet profile first to use the pet map.</p>
             <button
-              onClick={() => navigate('/create-pet-profile')}
+              onClick={() => setIsCreateModalOpen(true)}
               className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium"
             >
               Create Pet Profile
@@ -197,6 +206,17 @@ const PetMap = () => {
           </div>
         )}
       </div>
+
+      {/* Create Pet Profile Modal */}
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Create New Pet Profile</DialogTitle>
+            <p className="text-muted-foreground">Add a new furry friend to your family</p>
+          </DialogHeader>
+          <CreatePetProfileForm onSuccess={handlePetCreated} showHeader={false} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

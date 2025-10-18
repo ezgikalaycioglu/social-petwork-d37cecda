@@ -9,6 +9,8 @@ import Layout from '@/components/Layout';
 import DiscoverPets from '@/components/DiscoverPets';
 import FriendRequests from '@/components/FriendRequests';
 import PetFriendsList from '@/components/PetFriendsList';
+import CreatePetProfileForm from '@/components/CreatePetProfileForm';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PetProfile = Tables<'pet_profiles'>;
@@ -19,6 +21,7 @@ const PetSocial = () => {
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     checkAuthAndFetchData();
@@ -66,6 +69,14 @@ const PetSocial = () => {
     setRefreshKey(prev => prev + 1);
   };
 
+  const handlePetCreated = async () => {
+    setIsCreateModalOpen(false);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await fetchUserPets(user.id);
+    }
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -99,7 +110,7 @@ const PetSocial = () => {
               <h2 className="text-2xl font-semibold text-gray-700 mb-2">No pets yet!</h2>
               <p className="text-gray-600 mb-6">Create a pet profile first to start making friends.</p>
               <Button
-                onClick={() => navigate('/create-pet-profile')}
+                onClick={() => setIsCreateModalOpen(true)}
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
                 Create Pet Profile
@@ -140,6 +151,17 @@ const PetSocial = () => {
           )}
         </div>
       </div>
+
+      {/* Create Pet Profile Modal */}
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Create New Pet Profile</DialogTitle>
+            <p className="text-muted-foreground">Add a new furry friend to your family</p>
+          </DialogHeader>
+          <CreatePetProfileForm onSuccess={handlePetCreated} showHeader={false} />
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import SegmentedControl from '@/components/SegmentedControl';
 import DiscoverPets from '@/components/DiscoverPets';
@@ -30,6 +31,7 @@ import UpcomingPlaydates from '@/components/UpcomingPlaydates';
 import InteractiveMap from '@/components/InteractiveMap';
 import EventDetailsModal from '@/components/EventDetailsModal';
 import PastEvents from '@/components/PastEvents';
+import CreatePetProfileForm from '@/components/CreatePetProfileForm';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Event = Tables<'events'>;
@@ -50,6 +52,7 @@ const Social = () => {
   // Shared state
   const [pets, setPets] = useState<PetProfile[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
   // Events state
   const [events, setEvents] = useState<Event[]>([]);
@@ -155,6 +158,11 @@ const Social = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePetCreated = async () => {
+    setIsCreateModalOpen(false);
+    await fetchUserPets();
   };
 
   const fetchUserEvents = async () => {
@@ -280,7 +288,7 @@ const Social = () => {
                     Create a pet profile to start making friends
                   </p>
                   <Button
-                    onClick={() => navigate('/create-pet-profile')}
+                    onClick={() => setIsCreateModalOpen(true)}
                     size="sm"
                     className="h-9"
                   >
@@ -336,7 +344,7 @@ const Social = () => {
                     Create a pet profile to schedule events
                   </p>
                   <Button
-                    onClick={() => navigate('/create-pet-profile')}
+                    onClick={() => setIsCreateModalOpen(true)}
                     size="sm"
                     className="h-9"
                   >
@@ -420,7 +428,7 @@ const Social = () => {
                     Create a pet profile to use the map
                   </p>
                   <Button
-                    onClick={() => navigate('/create-pet-profile')}
+                    onClick={() => setIsCreateModalOpen(true)}
                     size="sm"
                     className="h-9"
                   >
@@ -699,6 +707,17 @@ const Social = () => {
           modalType={eventModalType}
           onEditEvent={handleEditEvent}
         />
+
+        {/* Create Pet Profile Modal */}
+        <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold">Create New Pet Profile</DialogTitle>
+              <p className="text-muted-foreground">Add a new furry friend to your family</p>
+            </DialogHeader>
+            <CreatePetProfileForm onSuccess={handlePetCreated} showHeader={false} />
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
