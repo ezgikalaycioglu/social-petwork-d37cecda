@@ -107,10 +107,10 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUploaded, bucketName, className }
   };
 
   return (
-    <div className={`flex flex-col items-center space-y-4 ${className}`}>
-      <div className="relative">
+    <div className={`flex flex-col items-center ${className}`}>
+      <div className="relative w-32 h-32">
         <Avatar
-          className="w-32 h-32 border-4 border-green-200 cursor-pointer transition-transform duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          className="w-32 h-32 border-0 cursor-pointer transition-transform duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300"
           onClick={triggerFileInput}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -123,40 +123,33 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUploaded, bucketName, className }
           aria-label={previewUrl ? 'Change photo' : 'Upload photo'}
           title={previewUrl ? 'Change photo' : 'Upload photo'}
         >
-          <AvatarImage src={previewUrl} alt="Pet photo" />
-          <AvatarFallback className="bg-green-100 text-green-600 text-2xl">
+          <AvatarImage src={previewUrl} alt="Pet photo" className="object-cover" />
+          <AvatarFallback className="bg-green-50 text-green-600">
             <Camera className="w-8 h-8" />
           </AvatarFallback>
         </Avatar>
         
         {previewUrl && (
-          <Button
-            size="sm"
-            variant="destructive"
-            className="absolute -top-2 -right-2 rounded-full w-8 h-8 p-0"
+          <button
+            type="button"
             onClick={removePhoto}
+            className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-red-600 text-white hover:bg-red-700 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-300"
+            aria-label="Remove photo"
           >
-            <X className="w-4 h-4" />
-          </Button>
+            <X className="w-3 h-3" />
+          </button>
         )}
       </div>
 
-      <div className="flex flex-col items-center space-y-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={triggerFileInput}
-          disabled={uploading}
-          className="border-green-500 text-green-600 hover:bg-green-50"
-        >
-          <Upload className="w-4 h-4 mr-2" />
-          {uploading ? 'Uploading...' : previewUrl ? 'Change Photo' : 'Upload Photo'}
-        </Button>
-        
-        <p className="text-sm text-gray-500 text-center">
-          JPG, PNG or GIF (max 5MB)
-        </p>
-      </div>
+      <Button
+        type="button"
+        onClick={triggerFileInput}
+        disabled={uploading}
+        className="mt-4 inline-flex items-center gap-2 px-4 h-10 rounded-full border border-green-200 bg-white text-green-700 hover:bg-green-50 focus:ring-2 focus:ring-green-300 disabled:opacity-50"
+      >
+        <Upload className="w-4 h-4" />
+        {uploading ? 'Uploading...' : previewUrl ? 'Change Photo' : 'Upload Photo'}
+      </Button>
 
       <input
         ref={fileInputRef}

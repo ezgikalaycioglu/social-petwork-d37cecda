@@ -124,204 +124,218 @@ const CreatePetProfileForm = ({ onSuccess, showHeader = true }: CreatePetProfile
   };
 
   return (
-    <div>
-      {showHeader && (
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-            Create Pet Profile
-            <Heart className="h-6 w-6 text-red-500" />
-          </h1>
-          <p className="text-gray-600 mt-1">Tell us about your furry friend</p>
+    <div className="flex flex-col h-full max-h-[85vh]">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur px-5 py-3 border-b flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">Create New Pet Profile</h2>
+          <p id="create-pet-description" className="text-xs text-gray-500">Add a new furry friend to your family</p>
         </div>
-      )}
+      </div>
 
-      {/* Form */}
-      <div className="bg-white rounded-2xl shadow-lg p-8">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Profile Photo Upload */}
-            <div className="flex flex-col items-center mb-8">
-              <h3 className="text-lg font-medium text-gray-700 mb-4">Profile Picture</h3>
-              <PhotoUpload
-                currentPhotoUrl={profilePhotoUrl}
-                onPhotoUploaded={setProfilePhotoUrl}
-                bucketName="pet-photos"
-              />
-            </div>
+          <form onSubmit={form.handleSubmit(onSubmit)} id="create-pet-form">
+            {/* Profile Photo Section */}
+            <section className="px-5 py-4">
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                <div className="w-32 h-32 rounded-full bg-green-50/60 ring-1 ring-green-200 grid place-items-center mx-auto">
+                  <PhotoUpload
+                    currentPhotoUrl={profilePhotoUrl}
+                    onPhotoUploaded={setProfilePhotoUrl}
+                    bucketName="pet-photos"
+                  />
+                </div>
+              </div>
+            </section>
 
             {/* Pet Name */}
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700 font-medium">Pet Name *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter your pet's name"
-                      {...field}
-                      className="border-gray-300 focus:border-green-500 focus:ring-green-500"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <section className="px-5 py-4 border-t border-gray-100">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-800">
+                      Pet Name <span className="text-red-600">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your pet's name"
+                        {...field}
+                        className="mt-1 w-full rounded-lg border border-gray-200 bg-white h-10 px-3 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40"
+                      />
+                    </FormControl>
+                    <FormMessage className="mt-1 text-xs text-red-600" />
+                  </FormItem>
+                )}
+              />
+            </section>
 
-            {/* Age and Gender Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Age */}
+            <section className="px-5 py-4 border-t border-gray-100">
               <FormField
                 control={form.control}
                 name="age"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">Age (optional)</FormLabel>
+                    <FormLabel className="text-sm font-medium text-gray-800">Age (optional)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         placeholder="Age in years"
                         {...field}
-                        className="border-gray-300 focus:border-green-500 focus:ring-green-500"
+                        className="mt-1 w-full rounded-lg border border-gray-200 bg-white h-10 px-3 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="mt-1 text-xs text-red-600" />
                   </FormItem>
                 )}
               />
+            </section>
 
+            {/* Gender */}
+            <section className="px-5 py-4 border-t border-gray-100">
               <FormField
                 control={form.control}
                 name="gender"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">Gender</FormLabel>
+                    <FormLabel className="text-sm font-medium text-gray-800">Gender</FormLabel>
                     <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-2"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="Male" id="male" />
-                          <label htmlFor="male" className="text-sm font-medium">Male</label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="Female" id="female" />
-                          <label htmlFor="female" className="text-sm font-medium">Female</label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="Unknown/Other" id="other" />
-                          <label htmlFor="other" className="text-sm font-medium">Unknown/Other</label>
-                        </div>
-                      </RadioGroup>
+                      <div className="flex flex-wrap gap-3 mt-2" role="radiogroup" aria-label="Pet gender">
+                        {(['Male', 'Female', 'Unknown/Other'] as const).map((gender) => (
+                          <button
+                            key={gender}
+                            type="button"
+                            role="radio"
+                            aria-checked={field.value === gender}
+                            data-checked={field.value === gender}
+                            onClick={() => field.onChange(gender)}
+                            className="inline-flex items-center gap-2 px-3 h-9 rounded-full border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm data-[checked=true]:bg-primary/10 data-[checked=true]:border-primary/40 data-[checked=true]:text-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                          >
+                            {gender}
+                          </button>
+                        ))}
+                      </div>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="mt-1 text-xs text-red-600" />
                   </FormItem>
                 )}
               />
-            </div>
+            </section>
 
             {/* Breed */}
-            <FormField
-              control={form.control}
-              name="breed"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700 font-medium">Breed or Mix *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g., Golden Retriever, Mixed Breed, etc."
-                      {...field}
-                      className="border-gray-300 focus:border-green-500 focus:ring-green-500"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <section className="px-5 py-4 border-t border-gray-100">
+              <FormField
+                control={form.control}
+                name="breed"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-800">
+                      Breed or Mix <span className="text-red-600">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., Golden Retriever, Mixed Breed"
+                        {...field}
+                        className="mt-1 w-full rounded-lg border border-gray-200 bg-white h-10 px-3 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40"
+                      />
+                    </FormControl>
+                    <FormMessage className="mt-1 text-xs text-red-600" />
+                  </FormItem>
+                )}
+              />
+            </section>
 
             {/* Bio */}
-            <FormField
-              control={form.control}
-              name="bio"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700 font-medium">Bio (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Tell us about your pet's personality, favorite activities, or anything special about them..."
-                      className="border-gray-300 focus:border-green-500 focus:ring-green-500 min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {field.value?.length || 0}/500 characters
-                  </p>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <section className="px-5 py-4 border-t border-gray-100">
+              <FormField
+                control={form.control}
+                name="bio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-800">Bio (optional)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Tell us about your pet's personality..."
+                        className="mt-1 w-full rounded-lg border border-gray-200 bg-white min-h-[90px] py-2 px-3 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40"
+                        {...field}
+                      />
+                    </FormControl>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {field.value?.length || 0}/500 characters
+                    </p>
+                    <FormMessage className="mt-1 text-xs text-red-600" />
+                  </FormItem>
+                )}
+              />
+            </section>
 
             {/* Vaccination Status */}
-            <FormField
-              control={form.control}
-              name="vaccinationStatus"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700 font-medium">Vaccination Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="border-gray-300 focus:border-green-500 focus:ring-green-500">
-                        <SelectValue placeholder="Select vaccination status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Up-to-date">Up-to-date</SelectItem>
-                      <SelectItem value="Not vaccinated">Not vaccinated</SelectItem>
-                      <SelectItem value="Unknown">Unknown</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <section className="px-5 py-4 border-t border-gray-100">
+              <FormField
+                control={form.control}
+                name="vaccinationStatus"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-800">Vaccination Status</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="mt-1 w-full rounded-lg border border-gray-200 bg-white h-10 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40">
+                          <SelectValue placeholder="Select vaccination status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                        <SelectItem value="Up-to-date">Up-to-date</SelectItem>
+                        <SelectItem value="Not vaccinated">Not vaccinated</SelectItem>
+                        <SelectItem value="Unknown">Unknown</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="mt-1 text-xs text-red-600" />
+                  </FormItem>
+                )}
+              />
+            </section>
 
             {/* Personality Traits */}
-            <div className="space-y-2">
-              <label className="text-gray-700 font-medium">Personality Traits (optional)</label>
-              <PersonalityTraitsSelector
-                selectedTraits={personalityTraits}
-                onTraitsChange={setPersonalityTraits}
-              />
-            </div>
+            <section className="px-5 py-4 border-t border-gray-100">
+              <label className="text-sm font-medium text-gray-800">Personality Traits (optional)</label>
+              <div className="mt-2">
+                <PersonalityTraitsSelector
+                  selectedTraits={personalityTraits}
+                  onTraitsChange={setPersonalityTraits}
+                />
+              </div>
+            </section>
 
             {/* Additional Photos */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-700">Additional Photos (optional)</h3>
-              <MultiplePhotoUpload
-                currentPhotos={photos}
-                onPhotosUploaded={setPhotos}
-                bucketName="pet-photos"
-              />
-            </div>
-
-            {/* Submit Button */}
-            <div className="flex justify-end pt-6">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium"
-              >
-                {isSubmitting ? 'Creating Profile...' : 'Create Pet Profile'}
-              </Button>
-            </div>
+            <section className="px-5 py-4 border-t border-gray-100">
+              <label className="text-sm font-medium text-gray-800">Additional Photos (optional)</label>
+              <div className="mt-2">
+                <MultiplePhotoUpload
+                  currentPhotos={photos}
+                  onPhotosUploaded={setPhotos}
+                  bucketName="pet-photos"
+                />
+              </div>
+            </section>
           </form>
         </Form>
       </div>
 
-      {/* Help Text */}
-      <div className="mt-6 text-center text-gray-600 text-sm">
-        <p>* Required fields</p>
+      {/* Sticky Footer */}
+      <div className="sticky bottom-0 z-10 bg-white/95 backdrop-blur px-5 py-3 border-t">
+        <Button
+          type="submit"
+          form="create-pet-form"
+          disabled={isSubmitting}
+          className="w-full h-11 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 focus:ring-2 focus:ring-green-300 disabled:opacity-50"
+        >
+          {isSubmitting ? 'Creating Profile...' : 'Create Pet Profile'}
+        </Button>
+        <p className="text-xs text-gray-500 text-center mt-2">* Required fields</p>
       </div>
     </div>
   );

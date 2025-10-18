@@ -366,13 +366,10 @@ const MyPets = () => {
 
         {/* Create Pet Profile Modal - Always available */}
         <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto rounded-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-center">Create New Pet Profile</DialogTitle>
-              <DialogDescription className="text-center text-muted-foreground">
-                Add a new furry friend to your family
-              </DialogDescription>
-            </DialogHeader>
+          <DialogContent 
+            className="fixed inset-x-4 sm:inset-x-0 top-[5vh] mx-auto max-w-lg w-full rounded-2xl bg-white shadow-2xl ring-1 ring-black/5 overflow-hidden p-0 gap-0"
+            aria-describedby="create-pet-description"
+          >
             <CreatePetProfileForm
               onSuccess={handleCreateSuccess}
               showHeader={false}

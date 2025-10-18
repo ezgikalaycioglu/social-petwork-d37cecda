@@ -293,11 +293,10 @@ const Dashboard = () => {
 
       {/* Create Pet Profile Modal */}
       <Dialog open={isCreatePetModalOpen} onOpenChange={setIsCreatePetModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Create New Pet Profile</DialogTitle>
-            <p className="text-muted-foreground">Add a new furry friend to your family</p>
-          </DialogHeader>
+        <DialogContent 
+          className="fixed inset-x-4 sm:inset-x-0 top-[5vh] mx-auto max-w-lg w-full rounded-2xl bg-white shadow-2xl ring-1 ring-black/5 overflow-hidden p-0 gap-0"
+          aria-describedby="create-pet-description"
+        >
           <CreatePetProfileForm onSuccess={handlePetCreated} showHeader={false} />
         </DialogContent>
       </Dialog>

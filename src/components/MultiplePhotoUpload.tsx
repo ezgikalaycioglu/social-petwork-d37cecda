@@ -118,44 +118,38 @@ const MultiplePhotoUpload = ({ currentPhotos, onPhotosUploaded, bucketName, clas
   };
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      <div className="flex flex-wrap gap-4">
-        {photos.map((photo, index) => (
-          <div key={index} className="relative">
-            <img
-              src={photo}
-              alt={`Pet photo ${index + 1}`}
-              className="w-24 h-24 object-cover rounded-lg border-2 border-gray-200"
-            />
-            <Button
-              size="sm"
-              variant="destructive"
-              className="absolute -top-2 -right-2 rounded-full w-6 h-6 p-0"
-              onClick={() => removePhoto(index)}
-              type="button"
-            >
-              <X className="w-3 h-3" />
-            </Button>
-          </div>
-        ))}
-      </div>
+    <div className={`space-y-3 ${className}`}>
+      <Button
+        type="button"
+        onClick={triggerFileInput}
+        disabled={uploading}
+        className="inline-flex items-center gap-2 px-4 h-10 rounded-full border border-green-200 bg-white text-green-700 hover:bg-green-50 focus:ring-2 focus:ring-green-300 disabled:opacity-50"
+      >
+        <Upload className="w-4 h-4" />
+        {uploading ? 'Uploading...' : 'Add Photos'}
+      </Button>
 
-      <div className="flex flex-col items-center space-y-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={triggerFileInput}
-          disabled={uploading}
-          className="border-green-500 text-green-600 hover:bg-green-50"
-        >
-          <Upload className="w-4 h-4 mr-2" />
-          {uploading ? 'Uploading...' : 'Add Photos'}
-        </Button>
-        
-        <p className="text-sm text-gray-500 text-center">
-          JPG, PNG or GIF (max 5MB each)
-        </p>
-      </div>
+      {photos.length > 0 && (
+        <div className="grid grid-cols-3 gap-2 mt-3">
+          {photos.map((photo, index) => (
+            <div key={index} className="relative aspect-square">
+              <img
+                src={photo}
+                alt={`Pet photo ${index + 1}`}
+                className="w-full h-full object-cover rounded-lg"
+              />
+              <button
+                type="button"
+                onClick={() => removePhoto(index)}
+                className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-600 text-white hover:bg-red-700 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-300"
+                aria-label={`Remove photo ${index + 1}`}
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <input
         ref={fileInputRef}

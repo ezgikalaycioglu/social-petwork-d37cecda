@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X, Plus } from 'lucide-react';
@@ -56,74 +55,66 @@ const PersonalityTraitsSelector = ({ selectedTraits, onTraitsChange }: Personali
 
   return (
     <div className="space-y-4">
-      {/* Predefined traits */}
-      <div className="space-y-3">
-        <p className="text-sm font-medium text-gray-700">Select personality traits:</p>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {PREDEFINED_TRAITS.map((trait) => (
-            <div key={trait} className="flex items-center space-x-2">
-              <Checkbox
-                id={trait}
-                checked={selectedTraits.includes(trait)}
-                onCheckedChange={(checked) => handleTraitToggle(trait, checked as boolean)}
-              />
-              <label
-                htmlFor={trait}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                {trait}
-              </label>
-            </div>
-          ))}
-        </div>
+      {/* Predefined traits as chips */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {PREDEFINED_TRAITS.map((trait) => {
+          const isSelected = selectedTraits.includes(trait);
+          return (
+            <button
+              key={trait}
+              type="button"
+              role="checkbox"
+              aria-checked={isSelected}
+              data-selected={isSelected}
+              onClick={() => handleTraitToggle(trait, !isSelected)}
+              className="inline-flex items-center justify-center px-3 h-9 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100 text-sm data-[selected=true]:bg-primary data-[selected=true]:text-white data-[selected=true]:border-transparent focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              {trait}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Custom traits */}
+      {/* Custom traits input */}
       <div className="space-y-2">
-        <p className="text-sm font-medium text-gray-700">Add custom trait:</p>
+        <p className="text-xs text-gray-600">Add custom trait:</p>
         <div className="flex gap-2">
           <Input
-            placeholder="Enter custom personality trait"
+            placeholder="Enter custom trait"
             value={customTrait}
             onChange={(e) => setCustomTrait(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="flex-1"
+            className="flex-1 rounded-lg border border-gray-200 bg-white h-9 px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40"
           />
           <Button
             type="button"
-            size="sm"
             onClick={addCustomTrait}
             disabled={!customTrait.trim()}
-            className="bg-green-600 hover:bg-green-700"
+            className="h-9 px-3 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 focus:ring-2 focus:ring-green-300"
           >
             <Plus className="w-4 h-4" />
           </Button>
         </div>
       </div>
 
-      {/* Selected custom traits */}
+      {/* Selected custom traits display */}
       {selectedTraits.filter(trait => !PREDEFINED_TRAITS.includes(trait)).length > 0 && (
         <div className="space-y-2">
-          <p className="text-sm font-medium text-gray-700">Custom traits:</p>
+          <p className="text-xs text-gray-600">Custom traits:</p>
           <div className="flex flex-wrap gap-2">
             {selectedTraits
               .filter(trait => !PREDEFINED_TRAITS.includes(trait))
               .map((trait) => (
-                <div
+                <button
                   key={trait}
-                  className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm"
+                  type="button"
+                  onClick={() => removeCustomTrait(trait)}
+                  className="inline-flex items-center gap-1 bg-primary text-white px-3 h-8 rounded-full text-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  aria-label={`Remove ${trait}`}
                 >
                   <span>{trait}</span>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="h-4 w-4 p-0 hover:bg-green-200"
-                    onClick={() => removeCustomTrait(trait)}
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
-                </div>
+                  <X className="w-3 h-3" />
+                </button>
               ))}
           </div>
         </div>
