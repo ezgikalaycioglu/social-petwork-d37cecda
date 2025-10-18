@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { Plus, Heart, Eye, Edit, PawPrint, Users, MapPin, Send } from 'lucide-react';
@@ -13,6 +14,7 @@ import { TweetFeed } from '@/components/TweetFeed';
 import UpcomingPlaydates from '@/components/UpcomingPlaydates';
 import { AICoach } from '@/components/AICoach';
 import { CreateTweetModal } from '@/components/CreateTweetModal';
+import CreatePetProfileForm from '@/components/CreatePetProfileForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { handleAuthError } from '@/utils/authErrorHandler';
 import QuickTour from '@/components/QuickTour';
@@ -28,6 +30,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState<string>('');
   const [isCreateTweetModalOpen, setIsCreateTweetModalOpen] = useState(false);
+  const [isCreatePetModalOpen, setIsCreatePetModalOpen] = useState(false);
   const [tweetFeedKey, setTweetFeedKey] = useState(0);
   const [showQuickTour, setShowQuickTour] = useState(false);
   const [tourCompleted, setTourCompleted] = useState(false);
@@ -176,6 +179,14 @@ const Dashboard = () => {
     setTweetFeedKey(prev => prev + 1); // Force refresh of tweet feed
   };
 
+  const handlePetCreated = async () => {
+    setIsCreatePetModalOpen(false);
+    const { data } = await supabase.auth.getUser();
+    if (data?.user) {
+      await fetchPets(data.user.id);
+    }
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -258,7 +269,7 @@ const Dashboard = () => {
                       Create your first pet profile to join the community.
                     </p>
                     <Button
-                      onClick={() => handleQuickAction('Create Pet Profile', '/create-pet-profile')}
+                      onClick={() => setIsCreatePetModalOpen(true)}
                       className="bg-green-600 hover:bg-green-700 text-white"
                       size="sm"
                     >
@@ -279,6 +290,17 @@ const Dashboard = () => {
         pets={pets}
         onTweetCreated={handleTweetCreated}
       />
+
+      {/* Create Pet Profile Modal */}
+      <Dialog open={isCreatePetModalOpen} onOpenChange={setIsCreatePetModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Create New Pet Profile</DialogTitle>
+            <p className="text-muted-foreground">Add a new furry friend to your family</p>
+          </DialogHeader>
+          <CreatePetProfileForm onSuccess={handlePetCreated} showHeader={false} />
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
