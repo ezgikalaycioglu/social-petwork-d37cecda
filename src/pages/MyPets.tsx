@@ -196,31 +196,33 @@ const MyPets = () => {
     <Layout>
       <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          {/* Actions Bar */}
-          <div className="flex justify-center mb-4">
-            <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-              <DialogTrigger asChild>
-                <Button 
-                  className="h-10 rounded-full px-4 whitespace-nowrap"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add New Pet
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto rounded-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-bold text-center">Create New Pet Profile</DialogTitle>
-                  <DialogDescription className="text-center text-muted-foreground">
-                    Add a new furry friend to your family
-                  </DialogDescription>
-                </DialogHeader>
-                <CreatePetProfileForm
-                  onSuccess={handleCreateSuccess}
-                  showHeader={false}
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
+          {/* Actions Bar - Only show when there are pets */}
+          {pets.length > 0 && (
+            <div className="flex justify-center mb-4">
+              <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+                <DialogTrigger asChild>
+                  <Button 
+                    className="h-10 rounded-full px-4 whitespace-nowrap"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add New Pet
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto rounded-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold text-center">Create New Pet Profile</DialogTitle>
+                    <DialogDescription className="text-center text-muted-foreground">
+                      Add a new furry friend to your family
+                    </DialogDescription>
+                  </DialogHeader>
+                  <CreatePetProfileForm
+                    onSuccess={handleCreateSuccess}
+                    showHeader={false}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
 
           {/* Pet Grid */}
           {pets.length === 0 && !loading ? (
