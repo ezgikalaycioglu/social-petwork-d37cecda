@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { handleAuthError } from '@/utils/authErrorHandler';
 import analyticsService from '@/services/AnalyticsService';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
@@ -17,6 +18,57 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  // Check if pet onboarding should be shown
+  const checkPetOnboarding = useCallback(async (userId: string) => {
+    try {
+      // Check localStorage first
+      const localStorageKey = `petOnboardingShown:${userId}`;
+      const shownInLocalStorage = localStorage.getItem(localStorageKey) === '1';
+      
+      if (shownInLocalStorage) {
+        return; // Already shown
+      }
+
+      // Check user metadata
+      const { data: userData } = await supabase.auth.getUser();
+      const metadataShown = userData?.user?.user_metadata?.petOnboardingShown === true;
+      
+      if (metadataShown) {
+        // Sync to localStorage
+        localStorage.setItem(localStorageKey, '1');
+        return; // Already shown
+      }
+
+      // Check if user has any pets
+      const { count, error } = await supabase
+        .from('pet_profiles')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error checking pets:', error);
+        return;
+      }
+
+      // If user has no pets and hasn't seen onboarding, redirect
+      if (count === 0) {
+        // Set flag in localStorage immediately
+        localStorage.setItem(localStorageKey, '1');
+        
+        // Try to set in user metadata (non-blocking)
+        supabase.auth.updateUser({
+          data: { petOnboardingShown: true }
+        }).catch(err => console.warn('Could not update user metadata:', err));
+        
+        // Navigate to create pet profile
+        navigate('/create-pet-profile');
+      }
+    } catch (error) {
+      console.error('Error in pet onboarding check:', error);
+    }
+  }, [navigate]);
 
   // Initial session check
   useEffect(() => {
@@ -33,6 +85,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const activeSession = data?.session || null;
         setSession(activeSession);
         setUser(activeSession?.user || null);
+
+        // Check pet onboarding after auth is established
+        if (activeSession?.user) {
+          setTimeout(() => checkPetOnboarding(activeSession.user.id), 500);
+        }
       } catch (error) {
         console.error("Unexpected error while initializing auth:", error);
         await handleAuthError(error);
@@ -58,6 +115,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.warn('Analytics login event failed');
         }
 
+        // Check pet onboarding on sign in
+        if (newSession?.user) {
+          setTimeout(() => checkPetOnboarding(newSession.user.id), 500);
+        }
+
       } else if (event === 'SIGNED_OUT') {
         setSession(null);
         setUser(null);
@@ -67,7 +129,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [checkPetOnboarding]);
 
   const signOut = async () => {
     try {

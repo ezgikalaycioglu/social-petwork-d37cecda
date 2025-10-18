@@ -63,19 +63,19 @@ const queryClient = new QueryClient({
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <NotificationsProvider>
-          <ReadyToPlayProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>
+          <NotificationsProvider>
+            <ReadyToPlayProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
                 <AppRoutes />
-              </BrowserRouter>
-            </TooltipProvider>
-          </ReadyToPlayProvider>
-        </NotificationsProvider>
-      </AuthProvider>
+              </TooltipProvider>
+            </ReadyToPlayProvider>
+          </NotificationsProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 };
