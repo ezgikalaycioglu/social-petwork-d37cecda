@@ -366,7 +366,7 @@ const MyPets = () => {
 
         {/* Create Pet Profile Modal - Always available */}
         <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-          <DialogContent className="h-[calc(100vh-2rem)] sm:max-h-[85vh] p-0 overflow-hidden">
+          <DialogContent className="h-[calc(100vh-2rem)] sm:max-h-[85vh] p-0 overflow-hidden gap-0 rounded-2xl">
             <CreatePetProfileForm
               onSuccess={handleCreateSuccess}
               showHeader={false}

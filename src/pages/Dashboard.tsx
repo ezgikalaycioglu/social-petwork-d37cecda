@@ -293,7 +293,7 @@ const Dashboard = () => {
 
       {/* Create Pet Profile Modal */}
       <Dialog open={isCreatePetModalOpen} onOpenChange={setIsCreatePetModalOpen}>
-        <DialogContent className="h-[calc(100vh-2rem)] sm:max-h-[85vh] p-0 overflow-hidden">
+        <DialogContent className="h-[calc(100vh-2rem)] sm:max-h-[85vh] p-0 overflow-hidden gap-0 rounded-2xl">
           <CreatePetProfileForm onSuccess={handlePetCreated} showHeader={false} />
         </DialogContent>
       </Dialog>
