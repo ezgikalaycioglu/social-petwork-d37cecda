@@ -126,7 +126,7 @@ const CreatePetProfileForm = ({ onSuccess, showHeader = true }: CreatePetProfile
   return (
     <div className="flex flex-col h-full">
       {/* Sticky Header */}
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur px-5 py-3 border-b flex items-center justify-between flex-shrink-0">
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur px-5 py-3 pr-12 border-b flex items-center justify-between flex-shrink-0">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Create New Pet Profile</h2>
           <p id="create-pet-description" className="text-xs text-gray-500">Add a new furry friend to your family</p>

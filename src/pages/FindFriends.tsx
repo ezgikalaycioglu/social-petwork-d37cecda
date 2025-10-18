@@ -136,7 +136,7 @@ const FindFriendsPage: React.FC = () => {
 
         {/* Create Pet Profile Modal */}
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-          <DialogContent className="rounded-2xl bg-white shadow-2xl ring-1 ring-black/5 overflow-hidden p-0 gap-0 sm:max-w-lg">
+          <DialogContent className="h-[calc(100vh-2rem)] sm:max-h-[85vh] p-0 overflow-hidden">
             <CreatePetProfileForm onSuccess={handlePetCreated} showHeader={false} />
           </DialogContent>
         </Dialog>
