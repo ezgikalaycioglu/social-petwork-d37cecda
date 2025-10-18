@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { X, ArrowRight, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useFeatureFlags, type FeatureFlags } from '@/hooks/useFeatureFlags';
 
 interface TourStep {
   id: string;
@@ -13,6 +14,7 @@ interface TourStep {
   description: string;
   targetElement: string;
   arrowPosition: 'top' | 'bottom' | 'left' | 'right';
+  featureFlag?: keyof FeatureFlags;
 }
 
 const tourSteps: TourStep[] = [
@@ -35,21 +37,24 @@ const tourSteps: TourStep[] = [
     title: 'Pet Sitters',
     description: 'Need a helping paw? You can register yourself as a pet sitter to offer your services, or easily find a trusted pet sitter for your beloved companion.',
     targetElement: '[data-tour="sitters"]',
-    arrowPosition: 'top'
+    arrowPosition: 'top',
+    featureFlag: 'pet_sitters_enabled'
   },
   {
     id: 'business',
     title: 'Business',
     description: 'For our business partners! Register your business to offer exclusive discount codes to pet owners, and also gain access to special deals from other businesses.',
     targetElement: '[data-tour="business"]',
-    arrowPosition: 'top'
+    arrowPosition: 'top',
+    featureFlag: 'business_section_enabled'
   },
   {
     id: 'packs',
     title: 'Packs',
     description: 'Create your pack! Form groups with your pet\'s best friends, or join existing packs to connect with like-minded pet owners and their companions.',
     targetElement: '[data-tour="packs"]',
-    arrowPosition: 'top'
+    arrowPosition: 'top',
+    featureFlag: 'packs_enabled'
   },
   {
     id: 'profile',
@@ -70,13 +75,26 @@ const QuickTour: React.FC<QuickTourProps> = ({ onComplete, onSkip }) => {
   const [targetPosition, setTargetPosition] = useState({ top: 0, left: 0, width: 0, height: 0 });
   const { user } = useAuth();
   const { toast } = useToast();
+  const { data: featureFlags, isLoading: flagsLoading } = useFeatureFlags();
+
+  const filteredTourSteps = useMemo(() => {
+    if (!featureFlags) return tourSteps;
+    
+    return tourSteps.filter(step => {
+      // If step has no feature flag requirement, always include it
+      if (!step.featureFlag) return true;
+      
+      // Otherwise, check if the feature is enabled
+      return featureFlags[step.featureFlag] === true;
+    });
+  }, [featureFlags]);
 
   useEffect(() => {
     updateTargetPosition();
   }, [currentStep]);
 
   const updateTargetPosition = () => {
-    const targetElement = document.querySelector(tourSteps[currentStep].targetElement);
+    const targetElement = document.querySelector(filteredTourSteps[currentStep]?.targetElement);
     if (targetElement) {
       const rect = targetElement.getBoundingClientRect();
       setTargetPosition({
@@ -89,7 +107,7 @@ const QuickTour: React.FC<QuickTourProps> = ({ onComplete, onSkip }) => {
   };
 
   const handleNext = () => {
-    if (currentStep < tourSteps.length - 1) {
+    if (currentStep < filteredTourSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       completeTour();
@@ -137,8 +155,12 @@ const QuickTour: React.FC<QuickTourProps> = ({ onComplete, onSkip }) => {
     }
   };
 
-  const currentTourStep = tourSteps[currentStep];
-  const progress = ((currentStep + 1) / tourSteps.length) * 100;
+  if (flagsLoading || filteredTourSteps.length === 0) {
+    return null;
+  }
+
+  const currentTourStep = filteredTourSteps[currentStep];
+  const progress = ((currentStep + 1) / filteredTourSteps.length) * 100;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm">
@@ -174,7 +196,7 @@ const QuickTour: React.FC<QuickTourProps> = ({ onComplete, onSkip }) => {
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium text-muted-foreground">
-                  Step {currentStep + 1} of {tourSteps.length}
+                  Step {currentStep + 1} of {filteredTourSteps.length}
                 </span>
                 <Button
                   variant="ghost"
@@ -212,7 +234,7 @@ const QuickTour: React.FC<QuickTourProps> = ({ onComplete, onSkip }) => {
                 onClick={handleNext}
                 className="px-6 bg-primary hover:bg-primary/90"
               >
-                {currentStep === tourSteps.length - 1 ? 'Finish' : 'Next'}
+                {currentStep === filteredTourSteps.length - 1 ? 'Finish' : 'Next'}
                 <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
