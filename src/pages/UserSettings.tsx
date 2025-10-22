@@ -27,6 +27,7 @@ interface SettingsFormData {
   displayName: string;
   city: string;
   neighborhood: string;
+  phoneNumber: string;
   playdateRequests: boolean;
   playdateConfirmations: boolean;
   eventReminders: boolean;
@@ -50,6 +51,7 @@ const UserSettings = () => {
       displayName: '',
       city: '',
       neighborhood: '',
+      phoneNumber: '',
       playdateRequests: true,
       playdateConfirmations: true,
       eventReminders: true,
@@ -111,6 +113,7 @@ const UserSettings = () => {
         displayName: profile?.display_name || '',
         city: profile?.city || '',
         neighborhood: profile?.neighborhood || '',
+        phoneNumber: profile?.phone_number || '',
         playdateRequests: preferences?.playdate_requests ?? true,
         playdateConfirmations: preferences?.playdate_confirmations ?? true,
         eventReminders: preferences?.event_reminders ?? true,
@@ -141,6 +144,7 @@ const UserSettings = () => {
           display_name: data.displayName || null,
           city: data.city || null,
           neighborhood: data.neighborhood || null,
+          phone_number: data.phoneNumber || null,
           is_private: data.isPrivate,
           updated_at: new Date().toISOString(),
         });
@@ -310,6 +314,27 @@ const UserSettings = () => {
                         <FormControl>
                           <Input placeholder="Enter your display name" {...field} />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="tel" 
+                            placeholder="Enter your phone number" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <p className="text-sm text-muted-foreground">
+                          Your phone number will only be visible to pet owners or sitters after a booking is confirmed
+                        </p>
                         <FormMessage />
                       </FormItem>
                     )}

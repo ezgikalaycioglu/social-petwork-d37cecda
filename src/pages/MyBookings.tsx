@@ -19,9 +19,12 @@ interface Booking {
   status: string;
   special_instructions?: string;
   created_at: string;
+  sitter_id: string;
+  owner_id: string;
   
   // For bookings as owner
   sitter_display_name?: string;
+  sitter_phone_number?: string;
   sitter_photos?: {
     photo_url: string;
     is_primary: boolean;
@@ -29,6 +32,7 @@ interface Booking {
   
   // For bookings as sitter
   owner_display_name?: string;
+  owner_phone_number?: string;
   
   // Pet info
   pet_profiles: {
@@ -49,12 +53,18 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview }: BookingCar
     ? booking.sitter_display_name || 'Sitter'
     : booking.owner_display_name || 'Pet Owner';
   
+  const otherPersonPhone = userRole === 'owner'
+    ? booking.sitter_phone_number
+    : booking.owner_phone_number;
+
   const otherPersonPhoto = userRole === 'owner'
     ? booking.sitter_photos?.find(p => p.is_primary)?.photo_url || booking.sitter_photos?.[0]?.photo_url
     : undefined;
 
   const petName = booking.pet_profiles?.name || 'Pet';
   const petPhoto = booking.pet_profiles?.profile_photo_url;
+  
+  const isBookingConfirmed = booking.status === 'accepted' || booking.status === 'confirmed';
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -110,6 +120,14 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview }: BookingCar
                 {format(new Date(booking.start_date), 'MMM d')} - {format(new Date(booking.end_date), 'MMM d, yyyy')}
               </p>
               <p className="text-lg font-bold text-primary">${booking.total_price}</p>
+              
+              {/* Phone Number - Only visible when booking is confirmed */}
+              {isBookingConfirmed && otherPersonPhone && (
+                <div className="mt-2 p-2 bg-teal-50 rounded-lg border border-teal-200">
+                  <p className="text-sm text-gray-600">Contact Phone:</p>
+                  <p className="text-base font-semibold text-teal-600">{otherPersonPhone}</p>
+                </div>
+              )}
             </div>
 
             {/* Action Buttons */}
@@ -198,7 +216,7 @@ export default function MyBookings() {
         const sitterIds = [...new Set(ownerData.map(booking => booking.sitter_id))];
         const { data: sitterProfiles } = await supabase
           .from('user_profiles')
-          .select('id, display_name')
+          .select('id, display_name, phone_number')
           .in('id', sitterIds);
 
         const { data: sitterPhotos } = await supabase
@@ -209,11 +227,15 @@ export default function MyBookings() {
           `)
           .in('user_id', sitterIds);
 
-        enrichedOwnerData = ownerData.map(booking => ({
-          ...booking,
-          sitter_display_name: sitterProfiles?.find(p => p.id === booking.sitter_id)?.display_name,
-          sitter_photos: sitterPhotos?.find(sp => sp.user_id === booking.sitter_id)?.sitter_photos || []
-        }));
+        enrichedOwnerData = ownerData.map(booking => {
+          const sitterProfile = sitterProfiles?.find(p => p.id === booking.sitter_id);
+          return {
+            ...booking,
+            sitter_display_name: sitterProfile?.display_name,
+            sitter_phone_number: sitterProfile?.phone_number,
+            sitter_photos: sitterPhotos?.find(sp => sp.user_id === booking.sitter_id)?.sitter_photos || []
+          };
+        });
       }
 
       setOwnerBookings(enrichedOwnerData);
@@ -236,13 +258,17 @@ export default function MyBookings() {
         const ownerIds = [...new Set(sitterData.map(booking => booking.owner_id))];
         const { data: ownerProfiles } = await supabase
           .from('user_profiles')
-          .select('id, display_name')
+          .select('id, display_name, phone_number')
           .in('id', ownerIds);
 
-        enrichedSitterData = sitterData.map(booking => ({
-          ...booking,
-          owner_display_name: ownerProfiles?.find(p => p.id === booking.owner_id)?.display_name
-        }));
+        enrichedSitterData = sitterData.map(booking => {
+          const ownerProfile = ownerProfiles?.find(p => p.id === booking.owner_id);
+          return {
+            ...booking,
+            owner_display_name: ownerProfile?.display_name,
+            owner_phone_number: ownerProfile?.phone_number
+          };
+        });
       }
 
       setSitterBookings(enrichedSitterData);

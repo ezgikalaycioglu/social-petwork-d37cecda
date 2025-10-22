@@ -1493,6 +1493,7 @@ export type Database = {
           id: string
           is_private: boolean | null
           neighborhood: string | null
+          phone_number: string | null
           tour_completed: boolean | null
           updated_at: string | null
         }
@@ -1504,6 +1505,7 @@ export type Database = {
           id: string
           is_private?: boolean | null
           neighborhood?: string | null
+          phone_number?: string | null
           tour_completed?: boolean | null
           updated_at?: string | null
         }
@@ -1515,6 +1517,7 @@ export type Database = {
           id?: string
           is_private?: boolean | null
           neighborhood?: string | null
+          phone_number?: string | null
           tour_completed?: boolean | null
           updated_at?: string | null
         }
@@ -1545,6 +1548,10 @@ export type Database = {
     Functions: {
       can_view_pet_profile: {
         Args: { _pet_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_phone_number: {
+        Args: { profile_owner_id: string; viewer_id: string }
         Returns: boolean
       }
       can_view_user_content: {
