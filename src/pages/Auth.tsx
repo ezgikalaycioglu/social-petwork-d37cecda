@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,6 +24,7 @@ const Auth = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const { checkRateLimit, logSecurityEvent, generateCSRFToken } = useSecurity();
@@ -33,8 +34,17 @@ const Auth = () => {
     const resetParam = searchParams.get('reset');
     if (resetParam === 'true') {
       setIsPasswordReset(true);
+      return;
     }
-  }, [searchParams]);
+
+    // Check for mode passed via navigation state
+    const state = location.state as { mode?: 'signup' | 'login' } | null;
+    if (state?.mode === 'signup') {
+      setIsSignUp(true);
+    } else if (state?.mode === 'login') {
+      setIsSignUp(false);
+    }
+  }, [searchParams, location.state]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();

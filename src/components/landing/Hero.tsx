@@ -120,27 +120,34 @@ const Hero = () => {
             {t('landing.hero.subtitle')}
           </p>
           
-          {/* CTA Button */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+          {/* CTA Block */}
+          <div className="flex flex-col items-center mb-12">
             <Button
               size="lg"
-              onClick={() => navigate('/auth')}
-              className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold text-lg px-8 py-6 rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300 border-0 min-w-[240px]"
-              style={{ 
-                background: 'linear-gradient(135deg, #FFB3A7 0%, #A8DAB5 100%)',
-                boxShadow: '0 10px 30px rgba(255, 179, 167, 0.4)'
-              }}
+              onClick={() => navigate('/auth', { state: { mode: 'signup' } })}
+              className="bg-pink-600 hover:bg-pink-700 text-white font-bold text-lg px-8 py-6 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 min-w-[240px]"
             >
-              {t('landing.hero.getStarted')}
+              Join the Pack
             </Button>
             
-            <button 
-              onClick={() => scrollToSection('features')}
-              className="flex items-center font-medium hover:opacity-80 transition-opacity text-lg px-6 py-3 text-gray-600 hover:text-gray-800"
-            >
-              {t('landing.hero.learnMore')} <ArrowRight className="ml-2 h-5 w-5" />
-            </button>
+            <p className="mt-4 text-sm text-gray-600">
+              Already have an account?{' '}
+              <button
+                onClick={() => navigate('/auth', { state: { mode: 'login' } })}
+                className="text-gray-600 hover:text-gray-800 underline cursor-pointer font-medium transition-colors"
+              >
+                Log in
+              </button>
+            </p>
           </div>
+          
+          {/* Learn More Link */}
+          <button 
+            onClick={() => scrollToSection('features')}
+            className="flex items-center font-medium hover:opacity-80 transition-opacity text-lg px-6 py-3 text-gray-600 hover:text-gray-800 mx-auto"
+          >
+            {t('landing.hero.learnMore')} <ArrowRight className="ml-2 h-5 w-5" />
+          </button>
         </div>
       </div>
       </section>
