@@ -37,6 +37,7 @@ import FindFriends from "./pages/FindFriends";
 import BecomeSitter from "./pages/BecomeSitter";
 import PetSitters from "./pages/PetSitters";
 import SitterProfile from "./pages/SitterProfile";
+import PublicSitterProfile from "./pages/PublicSitterProfile";
 import SitterAvailability from "./pages/SitterAvailability";
 import Discover from "./pages/Discover";
 import Social from "./pages/Social";
@@ -243,6 +244,7 @@ const AppRoutes = () => {
                 <Route path="/find-sitter" element={<Navigate to="/pet-sitters" replace />} />
                 <Route path="/my-bookings" element={<Navigate to="/pet-sitters" replace />} />
                 <Route path="/sitter/:sitterId" element={<SitterProfile />} />
+                <Route path="/sitter/profile/:sitterId" element={<PublicSitterProfile />} />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
