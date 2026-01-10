@@ -1288,37 +1288,52 @@ export type Database = {
       }
       sitter_profiles: {
         Row: {
+          accepted_pet_types: string[] | null
           bio: string | null
           created_at: string
           currency: string
+          headline: string | null
           id: string
           is_active: boolean | null
+          is_verified: boolean | null
           location: string | null
           rate_per_day: number | null
+          response_time: string | null
           updated_at: string
           user_id: string
+          years_experience: string | null
         }
         Insert: {
+          accepted_pet_types?: string[] | null
           bio?: string | null
           created_at?: string
           currency?: string
+          headline?: string | null
           id?: string
           is_active?: boolean | null
+          is_verified?: boolean | null
           location?: string | null
           rate_per_day?: number | null
+          response_time?: string | null
           updated_at?: string
           user_id: string
+          years_experience?: string | null
         }
         Update: {
+          accepted_pet_types?: string[] | null
           bio?: string | null
           created_at?: string
           currency?: string
+          headline?: string | null
           id?: string
           is_active?: boolean | null
+          is_verified?: boolean | null
           location?: string | null
           rate_per_day?: number | null
+          response_time?: string | null
           updated_at?: string
           user_id?: string
+          years_experience?: string | null
         }
         Relationships: [
           {
