@@ -24,9 +24,10 @@ interface PetProfile {
   bio: string | null;
   vaccination_status: string | null;
   boop_count: number;
+  user_id: string;
 }
 
-interface MatchedPet extends PetProfile {
+interface MatchedPet extends Omit<PetProfile, 'user_id'> {
   compatibilityScore: number;
   distance: number;
 }
@@ -135,31 +136,76 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create Supabase client with user's auth token
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: { Authorization: authHeader }
+      }
+    });
+
+    // Get the authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { petId, latitude, longitude, radius = 5 }: MatchRequest = await req.json();
 
-    if (!petId || !latitude || !longitude) {
+    // Validate required fields
+    if (!petId || latitude === undefined || longitude === undefined) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields: petId, latitude, longitude' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Create Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Validate petId format (UUID)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(petId)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid petId format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    // Get user's pet profile
+    // Validate latitude and longitude are valid numbers
+    if (typeof latitude !== 'number' || typeof longitude !== 'number' ||
+        latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid latitude or longitude values' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate radius
+    const safeRadius = Math.min(Math.max(1, radius), 100); // Limit radius between 1 and 100 km
+
+    // Get user's pet profile and verify ownership
     const { data: userPet, error: userPetError } = await supabase
       .from('pet_profiles')
       .select('*')
       .eq('id', petId)
+      .eq('user_id', user.id)
       .single();
 
     if (userPetError || !userPet) {
       return new Response(
-        JSON.stringify({ error: 'Pet profile not found' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Pet not found or you do not own this pet' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -174,11 +220,12 @@ Deno.serve(async (req) => {
       excludedPetIds.add(f.requester_pet_id === petId ? f.recipient_pet_id : f.requester_pet_id);
     });
 
-    // Query for nearby pets within radius
+    // Query for nearby pets within radius (RLS will apply)
     const { data: nearbyPets, error: petsError } = await supabase
       .from('pet_profiles')
-      .select('*')
+      .select('id, name, breed, age, latitude, longitude, personality_traits, profile_photo_url, bio, vaccination_status, boop_count, user_id')
       .neq('id', petId)
+      .neq('user_id', user.id) // Exclude user's own pets
       .not('latitude', 'is', null)
       .not('longitude', 'is', null);
 
@@ -200,11 +247,14 @@ Deno.serve(async (req) => {
       const distance = calculateDistance(latitude, longitude, pet.latitude, pet.longitude);
       
       // Only include pets within radius
-      if (distance <= radius) {
+      if (distance <= safeRadius) {
         const compatibilityScore = calculateCompatibilityScore(userPet, pet, distance);
         
+        // Exclude user_id from the response for privacy
+        const { user_id, ...petWithoutUserId } = pet;
+        
         matches.push({
-          ...pet,
+          ...petWithoutUserId,
           compatibilityScore,
           distance: Math.round(distance * 10) / 10 // round to 1 decimal
         });
@@ -215,7 +265,7 @@ Deno.serve(async (req) => {
     matches.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
     const topMatches = matches.slice(0, 10);
 
-    console.log(`Found ${matches.length} potential matches, returning top ${topMatches.length}`);
+    console.log(`User ${user.id} found ${matches.length} potential matches, returning top ${topMatches.length}`);
 
     return new Response(
       JSON.stringify({ matches: topMatches }),
