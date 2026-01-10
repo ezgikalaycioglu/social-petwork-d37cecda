@@ -1130,7 +1130,7 @@ export type Database = {
           email: string | null
           event_type: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           severity: string
           user_agent: string | null
           user_id: string | null
@@ -1141,7 +1141,7 @@ export type Database = {
           email?: string | null
           event_type: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           severity?: string
           user_agent?: string | null
           user_id?: string | null
@@ -1152,7 +1152,7 @@ export type Database = {
           email?: string | null
           event_type?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           severity?: string
           user_agent?: string | null
           user_id?: string | null
@@ -1558,14 +1558,8 @@ export type Database = {
         Args: { content_owner_id: string; viewer_id: string }
         Returns: boolean
       }
-      cleanup_rate_limit_attempts: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_security_events: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_rate_limit_attempts: { Args: never; Returns: undefined }
+      cleanup_security_events: { Args: never; Returns: undefined }
       delete_user_account: {
         Args: { user_id_to_delete: string }
         Returns: undefined
@@ -1574,10 +1568,7 @@ export type Database = {
         Args: { user_id_to_clear: string }
         Returns: undefined
       }
-      generate_redemption_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      generate_redemption_code: { Args: never; Returns: string }
       generate_unique_pet_username: {
         Args: { base_name: string }
         Returns: string
@@ -1590,14 +1581,8 @@ export type Database = {
         Args: { radius_km?: number; user_lat: number; user_lng: number }
         Returns: number
       }
-      get_waitlist_count: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      get_waitlist_count: { Args: never; Returns: number }
+      is_admin: { Args: never; Returns: boolean }
       secure_delete_user_account: {
         Args: { user_email: string; user_password: string }
         Returns: Json
