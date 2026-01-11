@@ -50,6 +50,8 @@ import ChildSafety from "./pages/ChildSafety";
 import DeleteAccount from "./pages/DeleteAccount";
 import DeleteData from "./pages/DeleteData";
 import Beta from "./pages/Beta";
+import CommunityGuidelines from "./pages/CommunityGuidelines";
+import Contact from "./pages/Contact";
 
 
 const queryClient = new QueryClient({
@@ -95,6 +97,8 @@ const AppRoutes = () => {
                 <Route path="/delete-account" element={<DeleteAccount />} />
                 <Route path="/delete-data" element={<DeleteData />} />
                 <Route path="/beta" element={<Beta />} />
+                <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+                <Route path="/contact" element={<Contact />} />
                 
                 {/* Protected Routes */}
                 <Route path="/dashboard" element={
