@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
+import { useNativeCamera } from '@/hooks/useNativeCamera';
+import { useHaptics } from '@/hooks/useHaptics';
 import { Camera, Upload, X } from 'lucide-react';
 
 interface PhotoUploadProps {
@@ -18,6 +20,8 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUploaded, bucketName, className }
   const [previewUrl, setPreviewUrl] = useState<string>(currentPhotoUrl || '');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { isNative, takePhoto, isCapturing } = useNativeCamera();
+  const { successHaptic, errorHaptic } = useHaptics();
 
   const uploadPhoto = async (file: File) => {
     try {
@@ -50,6 +54,7 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUploaded, bucketName, className }
 
       setPreviewUrl(publicUrl);
       onPhotoUploaded(publicUrl);
+      await successHaptic();
 
       toast({
         title: "Success!",
@@ -57,6 +62,7 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUploaded, bucketName, className }
       });
     } catch (error) {
       console.error('Error uploading photo:', error);
+      await errorHaptic();
       toast({
         title: "Upload Failed",
         description: "Failed to upload photo. Please try again.",
@@ -102,7 +108,16 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUploaded, bucketName, className }
     }
   };
 
-  const triggerFileInput = () => {
+  const triggerFileInput = async () => {
+    // Try native camera first if available
+    if (isNative) {
+      const file = await takePhoto();
+      if (file) {
+        uploadPhoto(file);
+        return;
+      }
+    }
+    // Fallback to file input
     fileInputRef.current?.click();
   };
 
@@ -144,11 +159,11 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUploaded, bucketName, className }
       <Button
         type="button"
         onClick={triggerFileInput}
-        disabled={uploading}
+        disabled={uploading || isCapturing}
         className="mt-4 inline-flex items-center gap-2 px-4 h-10 rounded-full border border-green-200 bg-white text-green-700 hover:bg-green-50 focus:ring-2 focus:ring-green-300 disabled:opacity-50"
       >
-        <Upload className="w-4 h-4" />
-        {uploading ? 'Uploading...' : previewUrl ? 'Change Photo' : 'Upload Photo'}
+        {isNative ? <Camera className="w-4 h-4" /> : <Upload className="w-4 h-4" />}
+        {uploading || isCapturing ? 'Uploading...' : previewUrl ? 'Change Photo' : isNative ? 'Take Photo' : 'Upload Photo'}
       </Button>
 
       <input

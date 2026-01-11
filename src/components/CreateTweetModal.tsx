@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import PhotoUpload from "@/components/PhotoUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useHaptics } from "@/hooks/useHaptics";
 import { Camera, Send } from "lucide-react";
 
 interface CreateTweetModalProps {
@@ -30,6 +31,7 @@ export const CreateTweetModal: React.FC<CreateTweetModalProps> = ({
   const [photoUrl, setPhotoUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { successHaptic, errorHaptic } = useHaptics();
   
   // Set first pet as default when pets are available
   useEffect(() => {
@@ -64,6 +66,7 @@ export const CreateTweetModal: React.FC<CreateTweetModalProps> = ({
 
       if (error) throw error;
 
+      await successHaptic();
       toast({
         title: "Success!",
         description: "Tweet posted",
@@ -76,6 +79,7 @@ export const CreateTweetModal: React.FC<CreateTweetModalProps> = ({
       onClose();
     } catch (error) {
       console.error('Error creating tweet:', error);
+      await errorHaptic();
       toast({
         title: "Error",
         description: "Error posting tweet",

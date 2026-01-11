@@ -3,7 +3,9 @@ import React, { useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, X, Image } from 'lucide-react';
+import { useNativeCamera } from '@/hooks/useNativeCamera';
+import { useHaptics } from '@/hooks/useHaptics';
+import { Upload, X, Image, Camera } from 'lucide-react';
 
 interface MultiplePhotoUploadProps {
   currentPhotos: string[];
@@ -17,6 +19,8 @@ const MultiplePhotoUpload = ({ currentPhotos, onPhotosUploaded, bucketName, clas
   const [photos, setPhotos] = useState<string[]>(currentPhotos);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { isNative, takePhoto, isCapturing } = useNativeCamera();
+  const { successHaptic, errorHaptic } = useHaptics();
 
   const uploadPhotos = async (files: FileList) => {
     try {
@@ -56,6 +60,7 @@ const MultiplePhotoUpload = ({ currentPhotos, onPhotosUploaded, bucketName, clas
       
       setPhotos(newPhotos);
       onPhotosUploaded(newPhotos);
+      await successHaptic();
 
       toast({
         title: "Success!",
@@ -63,6 +68,7 @@ const MultiplePhotoUpload = ({ currentPhotos, onPhotosUploaded, bucketName, clas
       });
     } catch (error) {
       console.error('Error uploading photos:', error);
+      await errorHaptic();
       toast({
         title: "Upload Failed",
         description: "Failed to upload photos. Please try again.",
@@ -113,7 +119,18 @@ const MultiplePhotoUpload = ({ currentPhotos, onPhotosUploaded, bucketName, clas
     onPhotosUploaded(newPhotos);
   };
 
-  const triggerFileInput = () => {
+  const triggerFileInput = async () => {
+    // Try native camera first if available
+    if (isNative) {
+      const file = await takePhoto();
+      if (file) {
+        const fileList = new DataTransfer();
+        fileList.items.add(file);
+        await uploadPhotos(fileList.files);
+        return;
+      }
+    }
+    // Fallback to file input
     fileInputRef.current?.click();
   };
 
@@ -122,11 +139,11 @@ const MultiplePhotoUpload = ({ currentPhotos, onPhotosUploaded, bucketName, clas
       <Button
         type="button"
         onClick={triggerFileInput}
-        disabled={uploading}
+        disabled={uploading || isCapturing}
         className="inline-flex items-center gap-2 px-4 h-10 rounded-full border border-green-200 bg-white text-green-700 hover:bg-green-50 focus:ring-2 focus:ring-green-300 disabled:opacity-50"
       >
-        <Upload className="w-4 h-4" />
-        {uploading ? 'Uploading...' : 'Add Photos'}
+        {isNative ? <Camera className="w-4 h-4" /> : <Upload className="w-4 h-4" />}
+        {uploading || isCapturing ? 'Uploading...' : isNative ? 'Take Photos' : 'Add Photos'}
       </Button>
 
       {photos.length > 0 && (

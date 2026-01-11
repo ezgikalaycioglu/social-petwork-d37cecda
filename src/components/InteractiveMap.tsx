@@ -7,7 +7,9 @@ import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { useLocationOnDemand } from '@/hooks/useLocationOnDemand'; // This hook's internal logic is crucial
+import { useLocationOnDemand } from '@/hooks/useLocationOnDemand';
+import { useNativeLocation } from '@/hooks/useNativeLocation';
+import { useHaptics } from '@/hooks/useHaptics';
 import { useReadyToPlay } from '@/contexts/ReadyToPlayContext';
 import { MapPin, Navigation, PawPrint } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
@@ -90,9 +92,9 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   showLocationToasts = false
 }) => {
   const { toast } = useToast();
-  // Ensure useLocationOnDemand's requestLocation re-prompts or re-acquires.
-  // Ensure useLocationOnDemand's clearLocation truly stops tracking and clears state.
   const { loading, coordinates, error, requestLocation, clearLocation, hasPermission } = useLocationOnDemand();
+  const { isNative, startBackgroundTracking, stopBackgroundTracking, isBackgroundTrackingActive } = useNativeLocation();
+  const { lightHaptic, successHaptic } = useHaptics();
   const { setIsReady: setGlobalIsReady } = useReadyToPlay();
   
   const [isReady, setIsReady] = useState(false); // Actual "Ready to Play" status (location confirmed)
@@ -305,6 +307,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   }, [isReady, setGlobalIsReady]);
 
   const handleReadyToPlayToggle = async (checked: boolean) => {
+    await lightHaptic();
+    
     if (userPets.length === 0) {
       toast({
         title: "Error",
@@ -319,6 +323,11 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     setIsReadyIntent(checked);
 
     if (checked) { // User wants to be ready
+      // Start native background tracking if available
+      if (isNative) {
+        await startBackgroundTracking();
+      }
+      
       if (!hasPermission || !coordinates) { // If we don't have active permission or coordinates
         try {
           console.log('Requesting location for Ready to Play...');
@@ -352,9 +361,15 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       }
     } else { // User wants to turn off 'Ready to Play'
       try {
+        // Stop native background tracking if it was active
+        if (isNative) {
+          await stopBackgroundTracking();
+        }
+        
         clearLocation(); // Tell the hook to stop location tracking
         setIsReady(false); // Immediately reflect 'off' in UI
         await updatePetsAvailabilityInDB(false, null, null); // Clear location in DB
+        await successHaptic();
         toast({
           title: "No longer available",
           description: "Your pets have been removed from the map and location tracking stopped.",
