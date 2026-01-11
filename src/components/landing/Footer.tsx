@@ -18,6 +18,14 @@ const Footer = () => {
     navigate('/privacy');
   };
 
+  const handleCommunityGuidelinesClick = () => {
+    navigate('/community-guidelines');
+  };
+
+  const handleContactClick = () => {
+    navigate('/contact');
+  };
+
   return (
     <footer className="bg-gray-900 text-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -60,18 +68,10 @@ const Footer = () => {
               </li>
               <li>
                 <button 
-                  onClick={handleLinkClick}
+                  onClick={handleCommunityGuidelinesClick}
                   className="text-gray-400 hover:text-white transition-colors text-left"
                 >
-                  Terms of Service
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={handleLinkClick}
-                  className="text-gray-400 hover:text-white transition-colors text-left"
-                >
-                  Cookie Policy
+                  Community Guidelines
                 </button>
               </li>
             </ul>
@@ -90,7 +90,7 @@ const Footer = () => {
               </li>
               <li>
                 <button 
-                  onClick={handleLinkClick}
+                  onClick={handleContactClick}
                   className="text-gray-400 hover:text-white transition-colors text-left"
                 >
                   Contact Us
@@ -102,14 +102,6 @@ const Footer = () => {
                   className="text-gray-400 hover:text-white transition-colors text-left"
                 >
                   Changelog
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={handleLinkClick}
-                  className="text-gray-400 hover:text-white transition-colors text-left"
-                >
-                  Community Guidelines
                 </button>
               </li>
             </ul>
