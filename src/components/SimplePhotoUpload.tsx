@@ -2,7 +2,9 @@ import React, { useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, X } from 'lucide-react';
+import { useNativeCamera } from '@/hooks/useNativeCamera';
+import { useHaptics } from '@/hooks/useHaptics';
+import { Upload, X, Camera } from 'lucide-react';
 
 interface SimplePhotoUploadProps {
   onPhotosChange: (urls: string[]) => void;
@@ -15,6 +17,8 @@ const SimplePhotoUpload = ({ onPhotosChange, maxPhotos = 8, className }: SimpleP
   const [photos, setPhotos] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { isNative, takePhoto, isCapturing } = useNativeCamera();
+  const { successHaptic, errorHaptic } = useHaptics();
 
   const uploadPhotos = async (files: FileList) => {
     try {
@@ -54,6 +58,7 @@ const SimplePhotoUpload = ({ onPhotosChange, maxPhotos = 8, className }: SimpleP
       
       setPhotos(newPhotos);
       onPhotosChange(newPhotos);
+      await successHaptic();
 
       toast({
         title: "Success!",
@@ -61,6 +66,7 @@ const SimplePhotoUpload = ({ onPhotosChange, maxPhotos = 8, className }: SimpleP
       });
     } catch (error) {
       console.error('Error uploading photos:', error);
+      await errorHaptic();
       toast({
         title: "Upload Failed",
         description: "Failed to upload photos. Please try again.",
@@ -121,7 +127,18 @@ const SimplePhotoUpload = ({ onPhotosChange, maxPhotos = 8, className }: SimpleP
     onPhotosChange(newPhotos);
   };
 
-  const triggerFileInput = () => {
+  const triggerFileInput = async () => {
+    // Try native camera first if available
+    if (isNative) {
+      const file = await takePhoto();
+      if (file) {
+        const fileList = new DataTransfer();
+        fileList.items.add(file);
+        await uploadPhotos(fileList.files);
+        return;
+      }
+    }
+    // Fallback to file input
     fileInputRef.current?.click();
   };
 
@@ -151,12 +168,12 @@ const SimplePhotoUpload = ({ onPhotosChange, maxPhotos = 8, className }: SimpleP
           <button
             type="button"
             onClick={triggerFileInput}
-            disabled={uploading}
-            className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center hover:border-primary hover:bg-primary/5 transition-colors"
+            disabled={uploading || isCapturing}
+            className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center hover:border-primary hover:bg-primary/5 transition-colors disabled:opacity-50"
           >
-            <Upload className="w-8 h-8 text-gray-400 mb-2" />
+            {isNative ? <Camera className="w-8 h-8 text-gray-400 mb-2" /> : <Upload className="w-8 h-8 text-gray-400 mb-2" />}
             <span className="text-sm text-gray-500">
-              {uploading ? 'Uploading...' : 'Add Photo'}
+              {uploading || isCapturing ? 'Uploading...' : isNative ? 'Take Photo' : 'Add Photo'}
             </span>
           </button>
         )}

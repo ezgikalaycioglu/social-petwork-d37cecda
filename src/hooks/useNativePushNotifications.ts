@@ -29,14 +29,16 @@ export const useNativePushNotifications = (): UseNativePushNotificationsReturn =
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
+        // Use type assertion for new column not yet in types
         const { data: profile } = await supabase
           .from('user_profiles')
-          .select('onesignal_player_id')
+          .select('*')
           .eq('id', user.id)
           .single();
 
-        if (profile?.onesignal_player_id) {
-          setPlayerId(profile.onesignal_player_id);
+        const playerIdFromDb = (profile as { onesignal_player_id?: string } | null)?.onesignal_player_id;
+        if (playerIdFromDb) {
+          setPlayerId(playerIdFromDb);
           setIsRegistered(true);
         }
       } catch (error) {
@@ -72,9 +74,10 @@ export const useNativePushNotifications = (): UseNativePushNotificationsReturn =
         return false;
       }
 
+      // Use RPC or raw update for new column not in types yet
       const { error } = await supabase
         .from('user_profiles')
-        .update({ onesignal_player_id: newPlayerId })
+        .update({ onesignal_player_id: newPlayerId } as Record<string, unknown>)
         .eq('id', user.id);
 
       if (error) {

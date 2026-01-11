@@ -1508,6 +1508,7 @@ export type Database = {
           id: string
           is_private: boolean | null
           neighborhood: string | null
+          onesignal_player_id: string | null
           phone_number: string | null
           tour_completed: boolean | null
           updated_at: string | null
@@ -1520,6 +1521,7 @@ export type Database = {
           id: string
           is_private?: boolean | null
           neighborhood?: string | null
+          onesignal_player_id?: string | null
           phone_number?: string | null
           tour_completed?: boolean | null
           updated_at?: string | null
@@ -1532,6 +1534,7 @@ export type Database = {
           id?: string
           is_private?: boolean | null
           neighborhood?: string | null
+          onesignal_player_id?: string | null
           phone_number?: string | null
           tour_completed?: boolean | null
           updated_at?: string | null

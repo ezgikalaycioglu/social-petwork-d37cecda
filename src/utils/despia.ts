@@ -55,10 +55,17 @@ export const despia = async (
 
   try {
     // Dynamic import for native environment only
-    const { default: despiaSDK } = await import('despia-native');
-    const result = await despiaSDK(command, watchVars);
-    console.log('[Despia] Command executed:', command, result);
-    return result;
+    // The despia-native module is injected by the Despia native wrapper
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const despiaSDK = (window as any).despia;
+    if (typeof despiaSDK === 'function') {
+      const result = await despiaSDK(command, watchVars);
+      console.log('[Despia] Command executed:', command, result);
+      return result;
+    } else {
+      console.warn('[Despia] SDK not available on window');
+      return null;
+    }
   } catch (error) {
     console.error('[Despia] Error executing command:', command, error);
     return null;
