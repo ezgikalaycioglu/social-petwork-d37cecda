@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Loader2 } from 'lucide-react';
+import { MapPin, Loader2, Navigation } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLocationOnDemand } from '@/hooks/useLocationOnDemand';
 
 interface LocationSuggestion {
   display_name: string;
@@ -31,9 +33,66 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [reverseGeocodingLoading, setReverseGeocodingLoading] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout>();
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  const { 
+    loading: locationLoading, 
+    coordinates, 
+    error: locationError, 
+    requestLocation 
+  } = useLocationOnDemand();
+
+  // Reverse geocode coordinates to location name
+  const reverseGeocode = async (lat: number, lng: number): Promise<string | null> => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        const address = data.address || {};
+        const city = address.city || address.town || address.village || address.county || '';
+        const state = address.state || '';
+        const country = address.country || '';
+        
+        const parts = [city, state, country].filter(Boolean);
+        return parts.slice(0, 2).join(', ') || data.display_name?.split(',').slice(0, 2).join(',');
+      }
+      return null;
+    } catch (error) {
+      console.error('Reverse geocoding error:', error);
+      return null;
+    }
+  };
+
+  // Handle current location button click
+  const handleUseCurrentLocation = async () => {
+    setReverseGeocodingLoading(true);
+    await requestLocation();
+  };
+
+  // Effect to handle reverse geocoding when coordinates change
+  useEffect(() => {
+    const performReverseGeocode = async () => {
+      if (coordinates && reverseGeocodingLoading) {
+        const locationName = await reverseGeocode(coordinates.lat, coordinates.lng);
+        if (locationName) {
+          onChange(locationName);
+          onLocationSelect?.({
+            display_name: locationName,
+            lat: String(coordinates.lat),
+            lon: String(coordinates.lng),
+            place_id: `current_${Date.now()}`
+          });
+        }
+        setReverseGeocodingLoading(false);
+      }
+    };
+    performReverseGeocode();
+  }, [coordinates, reverseGeocodingLoading, onChange, onLocationSelect]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -108,6 +167,8 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     return parts.slice(0, Math.min(4, parts.length)).join(',');
   };
 
+  const isGettingLocation = locationLoading || reverseGeocodingLoading;
+
   return (
     <div className="relative">
       <div className="relative">
@@ -116,7 +177,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
           value={value}
           onChange={(e) => handleInputChange(e.target.value)}
           placeholder={placeholder}
-          className={cn("pr-8", className)}
+          className={cn("pr-20", className)}
           disabled={disabled}
           onFocus={() => {
             if (suggestions.length > 0) {
@@ -124,14 +185,30 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
             }
           }}
         />
-        <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-          {isLoading ? (
+        <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          {isLoading && (
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-          ) : (
-            <MapPin className="h-4 w-4 text-muted-foreground" />
           )}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 hover:bg-primary/10"
+            onClick={handleUseCurrentLocation}
+            disabled={isGettingLocation || disabled}
+            aria-label="Use current location"
+          >
+            {isGettingLocation ? (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            ) : (
+              <Navigation className="h-4 w-4 text-primary" />
+            )}
+          </Button>
         </div>
       </div>
+      {locationError && (
+        <p className="text-xs text-destructive mt-1">{locationError}</p>
+      )}
 
       {showSuggestions && suggestions.length > 0 && (
         <Card 
