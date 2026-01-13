@@ -7,12 +7,14 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CalendarIcon, MapPin, Star, Search } from "lucide-react";
+import { CalendarIcon, MapPin, Star, Search, Navigation, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import type { DateRange } from "react-day-picker";
+import { useLocationOnDemand } from "@/hooks/useLocationOnDemand";
+import { useToast } from "@/hooks/use-toast";
 
 interface SitterData {
   id: string;
@@ -95,6 +97,7 @@ function SitterCard({ sitter, onViewProfile }: SitterCardProps) {
 
 export default function FindSitter() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [sitters, setSitters] = useState<SitterData[]>([]);
   const [filteredSitters, setFilteredSitters] = useState<SitterData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -104,6 +107,15 @@ export default function FindSitter() {
   const [service, setService] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
+  // Location hook for "use current location" feature
+  const { 
+    loading: locationLoading, 
+    coordinates, 
+    error: locationError, 
+    requestLocation 
+  } = useLocationOnDemand();
+  const [reverseGeocodingLoading, setReverseGeocodingLoading] = useState(false);
+
   const services = [
     "Dog Walking",
     "House Sitting", 
@@ -112,6 +124,64 @@ export default function FindSitter() {
     "Overnight Care",
     "Pet Training"
   ];
+
+  // Reverse geocode function
+  const reverseGeocode = async (lat: number, lng: number): Promise<string | null> => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        const address = data.address || {};
+        const city = address.city || address.town || address.village || address.county || '';
+        const state = address.state || '';
+        const country = address.country || '';
+        
+        const parts = [city, state, country].filter(Boolean);
+        return parts.slice(0, 2).join(', ') || data.display_name?.split(',').slice(0, 2).join(',');
+      }
+      return null;
+    } catch (error) {
+      console.error('Reverse geocoding error:', error);
+      return null;
+    }
+  };
+
+  // Handle "use current location" button click
+  const handleUseCurrentLocation = async () => {
+    try {
+      setReverseGeocodingLoading(true);
+      await requestLocation();
+    } catch (error) {
+      console.error('Failed to get location:', error);
+      setReverseGeocodingLoading(false);
+      toast({
+        title: "Location Error",
+        description: "Unable to get your current location. Please check your permissions.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Effect to handle reverse geocoding when coordinates change
+  useEffect(() => {
+    const performReverseGeocode = async () => {
+      if (coordinates && reverseGeocodingLoading) {
+        const locationName = await reverseGeocode(coordinates.lat, coordinates.lng);
+        if (locationName) {
+          setLocation(locationName);
+        } else {
+          toast({
+            title: "Location Found",
+            description: "Got your coordinates but couldn't determine the city name.",
+          });
+        }
+        setReverseGeocodingLoading(false);
+      }
+    };
+    performReverseGeocode();
+  }, [coordinates, reverseGeocodingLoading]);
 
   useEffect(() => {
     fetchSitters();
@@ -295,11 +365,32 @@ export default function FindSitter() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Location</label>
-                <Input
-                  placeholder="City or Zip Code"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                />
+                <div className="relative">
+                  <Input
+                    placeholder="City or Zip Code"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-primary/10"
+                    onClick={handleUseCurrentLocation}
+                    disabled={locationLoading || reverseGeocodingLoading}
+                    aria-label="Use current location"
+                  >
+                    {locationLoading || reverseGeocodingLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    ) : (
+                      <Navigation className="h-4 w-4 text-primary" />
+                    )}
+                  </Button>
+                </div>
+                {locationError && (
+                  <p className="text-xs text-destructive">{locationError}</p>
+                )}
               </div>
 
               <div className="space-y-2">
