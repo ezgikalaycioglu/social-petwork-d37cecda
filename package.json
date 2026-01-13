@@ -47,6 +47,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
+    "despia-native": "^1.0.19",
     "embla-carousel-react": "^8.3.0",
     "emoji-picker-react": "^4.13.2",
     "i18next": "^25.3.2",

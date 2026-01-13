@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { useNativeCamera } from '@/hooks/useNativeCamera';
 import { useHaptics } from '@/hooks/useHaptics';
-import { Camera, Upload, X } from 'lucide-react';
+import { Camera, Upload, X, RefreshCw } from 'lucide-react';
 
 interface PhotoUploadProps {
   currentPhotoUrl?: string;
@@ -121,6 +121,15 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUploaded, bucketName, className }
     fileInputRef.current?.click();
   };
 
+  const handleRetake = async () => {
+    // Clear current photo and trigger new capture
+    setPreviewUrl('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    await triggerFileInput();
+  };
+
   return (
     <div className={`flex flex-col items-center ${className}`}>
       <div className="relative w-32 h-32">
@@ -156,15 +165,40 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUploaded, bucketName, className }
         )}
       </div>
 
-      <Button
-        type="button"
-        onClick={triggerFileInput}
-        disabled={uploading || isCapturing}
-        className="mt-4 inline-flex items-center gap-2 px-4 h-10 rounded-full border border-green-200 bg-white text-green-700 hover:bg-green-50 focus:ring-2 focus:ring-green-300 disabled:opacity-50"
-      >
-        {isNative ? <Camera className="w-4 h-4" /> : <Upload className="w-4 h-4" />}
-        {uploading || isCapturing ? 'Uploading...' : previewUrl ? 'Change Photo' : isNative ? 'Take Photo' : 'Upload Photo'}
-      </Button>
+      <div className="flex gap-2 mt-4">
+        {previewUrl ? (
+          <>
+            <Button
+              type="button"
+              onClick={handleRetake}
+              disabled={uploading || isCapturing}
+              className="inline-flex items-center gap-2 px-4 h-10 rounded-full border border-green-200 bg-white text-green-700 hover:bg-green-50 focus:ring-2 focus:ring-green-300 disabled:opacity-50"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Retake
+            </Button>
+            <Button
+              type="button"
+              onClick={triggerFileInput}
+              disabled={uploading || isCapturing}
+              className="inline-flex items-center gap-2 px-4 h-10 rounded-full border border-green-200 bg-white text-green-700 hover:bg-green-50 focus:ring-2 focus:ring-green-300 disabled:opacity-50"
+            >
+              {isNative ? <Camera className="w-4 h-4" /> : <Upload className="w-4 h-4" />}
+              Change
+            </Button>
+          </>
+        ) : (
+          <Button
+            type="button"
+            onClick={triggerFileInput}
+            disabled={uploading || isCapturing}
+            className="inline-flex items-center gap-2 px-4 h-10 rounded-full border border-green-200 bg-white text-green-700 hover:bg-green-50 focus:ring-2 focus:ring-green-300 disabled:opacity-50"
+          >
+            {isNative ? <Camera className="w-4 h-4" /> : <Upload className="w-4 h-4" />}
+            {uploading || isCapturing ? 'Uploading...' : isNative ? 'Take Photo' : 'Upload Photo'}
+          </Button>
+        )}
+      </div>
 
       <input
         ref={fileInputRef}

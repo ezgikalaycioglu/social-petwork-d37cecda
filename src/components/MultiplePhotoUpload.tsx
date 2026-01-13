@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useNativeCamera } from '@/hooks/useNativeCamera';
 import { useHaptics } from '@/hooks/useHaptics';
-import { Upload, X, Image, Camera } from 'lucide-react';
+import { Upload, X, Camera, RefreshCw } from 'lucide-react';
 
 interface MultiplePhotoUploadProps {
   currentPhotos: string[];
@@ -17,6 +17,7 @@ interface MultiplePhotoUploadProps {
 const MultiplePhotoUpload = ({ currentPhotos, onPhotosUploaded, bucketName, className }: MultiplePhotoUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [photos, setPhotos] = useState<string[]>(currentPhotos);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { isNative, takePhoto, isCapturing } = useNativeCamera();
@@ -117,6 +118,7 @@ const MultiplePhotoUpload = ({ currentPhotos, onPhotosUploaded, bucketName, clas
     const newPhotos = photos.filter((_, index) => index !== indexToRemove);
     setPhotos(newPhotos);
     onPhotosUploaded(newPhotos);
+    setSelectedPhotoIndex(null);
   };
 
   const triggerFileInput = async () => {
@@ -134,6 +136,15 @@ const MultiplePhotoUpload = ({ currentPhotos, onPhotosUploaded, bucketName, clas
     fileInputRef.current?.click();
   };
 
+  const handleRetakePhoto = async (index: number) => {
+    // Remove the photo at index and trigger new capture
+    const newPhotos = photos.filter((_, i) => i !== index);
+    setPhotos(newPhotos);
+    onPhotosUploaded(newPhotos);
+    setSelectedPhotoIndex(null);
+    await triggerFileInput();
+  };
+
   return (
     <div className={`space-y-3 ${className}`}>
       <Button
@@ -149,16 +160,51 @@ const MultiplePhotoUpload = ({ currentPhotos, onPhotosUploaded, bucketName, clas
       {photos.length > 0 && (
         <div className="grid grid-cols-3 gap-2 mt-3">
           {photos.map((photo, index) => (
-            <div key={index} className="relative aspect-square">
+            <div 
+              key={index} 
+              className={`relative aspect-square group ${selectedPhotoIndex === index ? 'ring-2 ring-primary' : ''}`}
+              onClick={() => setSelectedPhotoIndex(selectedPhotoIndex === index ? null : index)}
+            >
               <img
                 src={photo}
                 alt={`Pet photo ${index + 1}`}
-                className="w-full h-full object-cover rounded-lg"
+                className="w-full h-full object-cover rounded-lg cursor-pointer"
               />
+              
+              {/* Action buttons overlay */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRetakePhoto(index);
+                  }}
+                  className="w-8 h-8 rounded-full bg-white text-green-700 hover:bg-green-50 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-green-300"
+                  aria-label={`Retake photo ${index + 1}`}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removePhoto(index);
+                  }}
+                  className="w-8 h-8 rounded-full bg-red-600 text-white hover:bg-red-700 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-300"
+                  aria-label={`Remove photo ${index + 1}`}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              
+              {/* Quick remove button */}
               <button
                 type="button"
-                onClick={() => removePhoto(index)}
-                className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-600 text-white hover:bg-red-700 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-300"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removePhoto(index);
+                }}
+                className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-600 text-white hover:bg-red-700 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-300 md:hidden"
                 aria-label={`Remove photo ${index + 1}`}
               >
                 <X className="w-3 h-3" />

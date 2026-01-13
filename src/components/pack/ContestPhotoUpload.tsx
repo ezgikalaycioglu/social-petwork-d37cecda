@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, X, Camera } from 'lucide-react';
+import { Upload, X, Camera, RefreshCw } from 'lucide-react';
 import { useNativeCamera } from '@/hooks/useNativeCamera';
 import { useHaptics } from '@/hooks/useHaptics';
 
@@ -67,21 +67,61 @@ const ContestPhotoUpload: React.FC<ContestPhotoUploadProps> = ({
     fileInputRef.current?.click();
   };
 
+  const handleRetake = async () => {
+    // Clear current and trigger new capture
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl(null);
+    onPhotoSelected(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    await triggerFileInput();
+  };
+
   return (
     <div className="space-y-4">
       {previewUrl ? (
-        <div className="relative">
+        <div className="relative group">
           <img
             src={previewUrl}
             alt="Contest submission preview"
             className="w-full h-48 object-cover rounded-lg border-2 border-border"
           />
+          
+          {/* Action buttons overlay */}
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-3">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="rounded-full w-10 h-10 p-0 bg-white hover:bg-green-50"
+              onClick={handleRetake}
+              aria-label="Retake photo"
+            >
+              <RefreshCw className="w-4 h-4 text-green-700" />
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="destructive"
+              className="rounded-full w-10 h-10 p-0"
+              onClick={removePhoto}
+              aria-label="Remove photo"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          {/* Quick remove button for mobile */}
           <Button
             type="button"
             size="sm"
             variant="destructive"
-            className="absolute -top-2 -right-2 rounded-full w-6 h-6 p-0"
+            className="absolute -top-2 -right-2 rounded-full w-6 h-6 p-0 md:hidden"
             onClick={removePhoto}
+            aria-label="Remove photo"
           >
             <X className="w-3 h-3" />
           </Button>
@@ -98,6 +138,23 @@ const ContestPhotoUpload: React.FC<ContestPhotoUploadProps> = ({
             {isCapturing ? 'Opening camera...' : isNative ? 'Take a photo' : 'Click to select a photo'}
           </span>
         </button>
+      )}
+
+      {/* Retake button below image on mobile */}
+      {previewUrl && (
+        <div className="flex justify-center gap-2 md:hidden">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleRetake}
+            disabled={isCapturing}
+            className="inline-flex items-center gap-2"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Retake
+          </Button>
+        </div>
       )}
 
       <div className="text-center">
