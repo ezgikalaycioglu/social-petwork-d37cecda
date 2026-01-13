@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, Search, Users, User, Heart, Building2 } from 'lucide-react';
+import { Home, PawPrint, Users, User, HandHeart, Building2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 
@@ -13,8 +13,8 @@ const MobileBottomNav = () => {
 
   const allNavItems = [
     { name: t('navigation.dashboard'), href: '/dashboard', icon: Home, tourId: 'dashboard' },
-    { name: 'Social', href: '/social', icon: Search, tourId: 'social' },
-    { name: 'Sitters', href: '/find-sitter', icon: Heart, tourId: 'sitters' },
+    { name: 'Social', href: '/social', icon: PawPrint, tourId: 'social' },
+    { name: 'Sitters', href: '/find-sitter', icon: HandHeart, tourId: 'sitters' },
     { name: t('navigation.business'), href: '/business', icon: Building2, tourId: 'business', requiresBusiness: true },
     { name: t('navigation.packs'), href: '/packs/discover', icon: Users, tourId: 'packs' },
     { name: t('navigation.profile'), href: '/profile', icon: User, tourId: 'profile' },
@@ -60,18 +60,25 @@ const MobileBottomNav = () => {
       <nav className="flex h-20">
         {navItems.map((item) => {
           const Icon = item.icon;
+          const active = isActive(item.href);
           return (
             <Link
               key={item.name}
               to={item.href}
               data-tour={item.tourId}
-              className={`flex-1 flex flex-col items-center justify-center py-3 px-2 transition-colors ${
-                isActive(item.href)
+              aria-current={active ? 'page' : undefined}
+              className={`flex-1 flex flex-col items-center justify-center py-3 px-2 min-h-[44px] min-w-[44px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-xl ${
+                active
                   ? 'text-primary bg-primary/10'
-                  : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
+                  : 'text-muted-foreground hover:text-primary hover:bg-primary/5 hover:opacity-90'
               }`}
             >
-              <Icon className="w-6 h-6 mb-1" />
+              <div className="transition-transform duration-150">
+                <Icon 
+                  className={`w-6 h-6 mb-1 ${active ? 'scale-105' : ''}`} 
+                  aria-hidden="true" 
+                />
+              </div>
               <span className="text-xs font-medium">{item.name}</span>
             </Link>
           );
