@@ -22,76 +22,122 @@ export const useNativeLocation = (): UseNativeLocationReturn => {
   const [isBackgroundTrackingActive, setIsBackgroundTrackingActive] = useState(false);
   const [backgroundCoordinates, setBackgroundCoordinates] = useState<Coordinates | null>(null);
   const isNative = isDespiaNative();
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const watchIdRef = useRef<number | null>(null);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
       }
     };
   }, []);
 
   const startBackgroundTracking = useCallback(async (): Promise<boolean> => {
-    if (!isNative) {
-      console.log('[NativeLocation] Not in native environment, use web geolocation instead');
-      return false;
-    }
-
-    try {
-      // Start background location tracking
-      await despia('backgroundlocationon://');
-      setIsBackgroundTrackingActive(true);
-      console.log('[NativeLocation] Background tracking started');
-
-      // Poll for location updates (Despia updates these variables)
-      pollingIntervalRef.current = setInterval(async () => {
-        try {
-          // In a real implementation, you'd read from Despia's window variables
-          // For now, we'll use the standard Geolocation API as a fallback
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                setBackgroundCoordinates({
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude,
-                });
-              },
-              (error) => {
-                console.warn('[NativeLocation] Position update error:', error);
-              }
-            );
-          }
-        } catch (error) {
-          console.warn('[NativeLocation] Polling error:', error);
+    // In native environment, use Despia SDK
+    if (isNative) {
+      try {
+        await despia('backgroundlocationon://');
+        setIsBackgroundTrackingActive(true);
+        console.log('[NativeLocation] Background tracking started via Despia');
+        
+        // Still use web geolocation for coordinate updates
+        // Despia handles background permissions, web API provides coordinates
+        if (navigator.geolocation) {
+          watchIdRef.current = navigator.geolocation.watchPosition(
+            (position) => {
+              setBackgroundCoordinates({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              });
+            },
+            (error) => {
+              console.warn('[NativeLocation] Position update error:', error);
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 30000,
+            }
+          );
         }
-      }, 30000); // Poll every 30 seconds
-
-      return true;
-    } catch (error) {
-      console.error('[NativeLocation] Error starting background tracking:', error);
-      return false;
+        return true;
+      } catch (error) {
+        console.error('[NativeLocation] Error starting background tracking:', error);
+        return false;
+      }
     }
+
+    // Web fallback - use standard geolocation
+    console.log('[NativeLocation] Using web geolocation fallback');
+    
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        console.error('[NativeLocation] Geolocation not supported');
+        resolve(false);
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setBackgroundCoordinates({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+          setIsBackgroundTrackingActive(true);
+          
+          // Set up watch for continuous updates
+          watchIdRef.current = navigator.geolocation.watchPosition(
+            (pos) => {
+              setBackgroundCoordinates({
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude,
+              });
+            },
+            (error) => {
+              console.warn('[NativeLocation] Watch position error:', error);
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 30000,
+            }
+          );
+          
+          resolve(true);
+        },
+        (error) => {
+          console.error('[NativeLocation] Permission denied or error:', error);
+          resolve(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        }
+      );
+    });
   }, [isNative]);
 
   const stopBackgroundTracking = useCallback(async (): Promise<void> => {
-    if (!isNative) return;
-
-    try {
-      await despia('backgroundlocationoff://');
-      setIsBackgroundTrackingActive(false);
-      setBackgroundCoordinates(null);
-      
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
+    // Stop Despia background tracking if native
+    if (isNative) {
+      try {
+        await despia('backgroundlocationoff://');
+        console.log('[NativeLocation] Background tracking stopped via Despia');
+      } catch (error) {
+        console.error('[NativeLocation] Error stopping background tracking:', error);
       }
-      
-      console.log('[NativeLocation] Background tracking stopped');
-    } catch (error) {
-      console.error('[NativeLocation] Error stopping background tracking:', error);
     }
+
+    // Clear web geolocation watch
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+
+    setIsBackgroundTrackingActive(false);
+    setBackgroundCoordinates(null);
   }, [isNative]);
 
   return {

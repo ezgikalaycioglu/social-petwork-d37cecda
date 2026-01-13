@@ -10,7 +10,7 @@ interface UseNativeCameraReturn {
 
 /**
  * Hook for native camera functionality via Despia SDK
- * Falls back gracefully on web browsers
+ * Falls back gracefully on web browsers (use file input instead)
  */
 export const useNativeCamera = (): UseNativeCameraReturn => {
   const [isCapturing, setIsCapturing] = useState(false);

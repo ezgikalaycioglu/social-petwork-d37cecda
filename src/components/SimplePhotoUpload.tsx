@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useNativeCamera } from '@/hooks/useNativeCamera';
 import { useHaptics } from '@/hooks/useHaptics';
-import { Upload, X, Camera } from 'lucide-react';
+import { Upload, X, Camera, RefreshCw } from 'lucide-react';
 
 interface SimplePhotoUploadProps {
   onPhotosChange: (urls: string[]) => void;
@@ -142,22 +142,57 @@ const SimplePhotoUpload = ({ onPhotosChange, maxPhotos = 8, className }: SimpleP
     fileInputRef.current?.click();
   };
 
+  const handleRetakePhoto = async (index: number) => {
+    // Remove the photo at index and trigger new capture
+    const newPhotos = photos.filter((_, i) => i !== index);
+    setPhotos(newPhotos);
+    onPhotosChange(newPhotos);
+    await triggerFileInput();
+  };
+
   return (
     <div className={`space-y-4 ${className}`}>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {photos.map((photo, index) => (
-          <div key={index} className="relative aspect-square">
+          <div key={index} className="relative aspect-square group">
             <img
               src={photo}
               alt={`Photo ${index + 1}`}
               className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
             />
+            
+            {/* Action buttons overlay */}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-full w-8 h-8 p-0 bg-white hover:bg-green-50"
+                onClick={() => handleRetakePhoto(index)}
+                type="button"
+                aria-label={`Retake photo ${index + 1}`}
+              >
+                <RefreshCw className="w-4 h-4 text-green-700" />
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                className="rounded-full w-8 h-8 p-0"
+                onClick={() => removePhoto(index)}
+                type="button"
+                aria-label={`Remove photo ${index + 1}`}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {/* Quick remove button for mobile */}
             <Button
               size="sm"
               variant="destructive"
-              className="absolute -top-2 -right-2 rounded-full w-6 h-6 p-0"
+              className="absolute -top-2 -right-2 rounded-full w-6 h-6 p-0 md:hidden"
               onClick={() => removePhoto(index)}
               type="button"
+              aria-label={`Remove photo ${index + 1}`}
             >
               <X className="w-3 h-3" />
             </Button>

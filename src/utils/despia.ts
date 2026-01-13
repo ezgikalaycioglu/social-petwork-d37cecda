@@ -6,6 +6,8 @@
  * when running in a standard web browser.
  */
 
+import despiaSDK from 'despia-native';
+
 // Check if running in Despia native environment
 export const isDespiaNative = (): boolean => {
   if (typeof navigator === 'undefined') return false;
@@ -38,7 +40,8 @@ interface DespiaResult {
 }
 
 /**
- * Execute a Despia native command
+ * Execute a Despia native command using the official SDK
+ * Falls back gracefully when not in native environment
  * 
  * @param command - The Despia command to execute
  * @param watchVars - Variables to watch for the result
@@ -54,18 +57,9 @@ export const despia = async (
   }
 
   try {
-    // Dynamic import for native environment only
-    // The despia-native module is injected by the Despia native wrapper
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const despiaSDK = (window as any).despia;
-    if (typeof despiaSDK === 'function') {
-      const result = await despiaSDK(command, watchVars);
-      console.log('[Despia] Command executed:', command, result);
-      return result;
-    } else {
-      console.warn('[Despia] SDK not available on window');
-      return null;
-    }
+    const result = await despiaSDK(command, watchVars);
+    console.log('[Despia] Command executed:', command, result);
+    return result as DespiaResult;
   } catch (error) {
     console.error('[Despia] Error executing command:', command, error);
     return null;
@@ -76,7 +70,9 @@ export const despia = async (
  * Convert base64 image data to a File object for upload
  */
 export const base64ToFile = (base64: string, filename: string = 'photo.jpg'): File => {
-  const arr = base64.split(',');
+  // Handle both data URL format and raw base64
+  const hasDataPrefix = base64.includes(',');
+  const arr = hasDataPrefix ? base64.split(',') : ['', base64];
   const mime = arr[0]?.match(/:(.*?);/)?.[1] || 'image/jpeg';
   const bstr = atob(arr[1] || base64);
   let n = bstr.length;
