@@ -118,9 +118,11 @@ const PetSitters = () => {
 
   const fetchSitters = async () => {
     setLoading(true);
+    console.log('[PetSitters] fetchSitters called');
     try {
       // Get current user to exclude them from results
       const { data: { user } } = await supabase.auth.getUser();
+      console.log('[PetSitters] Current user:', user?.id);
       
       let query = supabase
         .from('sitter_profiles')
@@ -141,7 +143,12 @@ const PetSitters = () => {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      console.log('[PetSitters] Fetched sitters:', data?.length, data?.map(s => ({ id: s.id, user_id: s.user_id, location: s.location })));
+      
+      if (error) {
+        console.error('[PetSitters] Fetch error:', error);
+        throw error;
+      }
       setSitters((data || []) as unknown as SitterData[]);
     } catch (error) {
       console.error('Error fetching sitters:', error);
@@ -296,6 +303,7 @@ const PetSitters = () => {
   };
 
   const filterSitters = () => {
+    console.log('[PetSitters] filterSitters called - sitters:', sitters.length, 'searchLocation:', searchLocation, 'selectedService:', selectedService);
     let filtered = sitters;
 
     if (searchLocation) {
@@ -318,6 +326,7 @@ const PetSitters = () => {
       );
     }
 
+    console.log('[PetSitters] filterSitters result:', filtered.length);
     setFilteredSitters(filtered);
   };
 
