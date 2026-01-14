@@ -45,7 +45,6 @@ interface SitterData {
   is_active: boolean;
   sitter_services: { service_type: string }[];
   sitter_photos: { photo_url: string; is_primary: boolean }[];
-  user_profiles: { display_name: string } | null;
 }
 
 interface BookingData {
@@ -75,7 +74,7 @@ const PetSitters = () => {
   const [sitters, setSitters] = useState<SitterData[]>([]);
   const [filteredSitters, setFilteredSitters] = useState<SitterData[]>([]);
   const [searchLocation, setSearchLocation] = useState('');
-  const [selectedService, setSelectedService] = useState('');
+  const [selectedService, setSelectedService] = useState('all');
   
   // My Bookings state
   const [bookings, setBookings] = useState<BookingData[]>([]);
@@ -129,8 +128,7 @@ const PetSitters = () => {
         .select(`
           *,
           sitter_services (service_type),
-          sitter_photos (photo_url, is_primary),
-          user_profiles!inner (display_name)
+          sitter_photos (photo_url, is_primary)
         `);
 
       // Only show active sitters
@@ -505,16 +503,17 @@ const PetSitters = () => {
                               <SelectItem value="all">All Services</SelectItem>
                               <SelectItem value="House Sitting">House Sitting</SelectItem>
                               <SelectItem value="Dog Walking">Dog Walking</SelectItem>
-                              <SelectItem value="Pet Boarding">Pet Boarding</SelectItem>
+                              <SelectItem value="Overnight Boarding">Pet Boarding</SelectItem>
                               <SelectItem value="Day Care">Day Care</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <Button 
-                          onClick={filterSitters}
+                          onClick={() => fetchSitters()}
+                          disabled={loading}
                           className="h-10 px-4 rounded-full text-sm font-medium bg-primary text-white shadow-sm hover:bg-primary/90 self-end"
                         >
-                          Search
+                          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
                         </Button>
                       </div>
                     </CardContent>
@@ -533,11 +532,20 @@ const PetSitters = () => {
                       <CardContent className="p-4 text-center space-y-3">
                         <Search className="w-8 h-8 mx-auto text-muted-foreground" />
                         <h3 className="text-base font-semibold text-foreground">
-                          No sitters found
+                          {sitters.length === 0 ? 'No active sitters available' : 'No sitters match your filters'}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          Try adjusting your search criteria
+                          {sitters.length === 0 ? 'Check back later or become a sitter yourself!' : 'Try adjusting your search criteria'}
                         </p>
+                        {sitters.length > 0 && (
+                          <Button 
+                            variant="outline"
+                            onClick={() => { setSearchLocation(''); setSelectedService('all'); }}
+                            className="h-9 px-4 rounded-full text-sm"
+                          >
+                            Clear Filters
+                          </Button>
+                        )}
                       </CardContent>
                     </Card>
                   ) : (
@@ -555,15 +563,15 @@ const PetSitters = () => {
                             <div className="flex items-start justify-between gap-3 min-w-0">
                               <div className="flex items-start gap-3 min-w-0 flex-1">
                                 <Avatar className="h-12 w-12 border border-gray-100 shrink-0">
-                                  <AvatarImage src={primaryPhoto} alt={sitter.user_profiles?.display_name} />
+                                  <AvatarImage src={primaryPhoto} alt="Pet Sitter" />
                                   <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
-                                    {sitter.user_profiles?.display_name?.charAt(0)}
+                                    <PawPrint className="w-5 h-5" />
                                   </AvatarFallback>
                                 </Avatar>
                                 
                                 <div className="min-w-0 flex-1">
                                   <h3 className="font-semibold text-foreground truncate">
-                                    {sitter.user_profiles?.display_name || 'Unknown Sitter'}
+                                    Pet Sitter
                                   </h3>
                                   <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">
                                     {sitter.bio || 'Professional pet sitter'}
