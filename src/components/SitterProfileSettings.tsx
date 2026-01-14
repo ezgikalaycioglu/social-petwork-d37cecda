@@ -174,7 +174,7 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
           Edit Profile
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full max-w-[560px] md:max-w-[640px] max-h-[86vh] flex flex-col p-0 rounded-2xl bg-background shadow-lg gap-0 sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2">
+      <DialogContent className="w-full max-w-[560px] md:max-w-[640px] max-h-[86vh] flex flex-col p-0 rounded-2xl bg-background shadow-lg gap-0 mx-auto">
         {/* Sticky Header */}
         <div 
           className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border px-4 sm:px-5 py-3 flex items-center flex-shrink-0"
