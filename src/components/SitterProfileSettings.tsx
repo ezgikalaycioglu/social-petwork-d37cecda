@@ -4,13 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, DollarSign, MapPin, FileText, Loader2, Sparkles, PawPrint, Share2, Copy, Check } from 'lucide-react';
+import { Settings, DollarSign, MapPin, FileText, Loader2, Sparkles, PawPrint, Link, Copy, Check, X, Power } from 'lucide-react';
 import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 
 interface SitterProfile {
@@ -100,7 +100,6 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
     try {
       await navigator.clipboard.writeText(publicProfileUrl);
       setCopied(true);
-      toast({ title: "Link copied!", description: "Share it on social media." });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast({ title: "Failed to copy", variant: "destructive" });
@@ -170,65 +169,109 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Settings className="w-4 h-4 mr-2" />
+        <Button variant="outline" size="sm" className="gap-2">
+          <Settings className="w-4 h-4" />
           Edit Profile
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Settings className="w-5 h-5" />
-            Sitter Profile Settings
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="w-full max-w-[560px] md:max-w-[640px] max-h-[86vh] flex flex-col p-0 rounded-2xl bg-white shadow-lg gap-0 pt-[max(env(safe-area-inset-top),0px)] pb-[max(env(safe-area-inset-bottom),0px)]">
+        {/* Sticky Header */}
+        <div 
+          className="sticky top-0 z-20 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-border px-4 sm:px-5 py-3 flex items-center justify-between flex-shrink-0"
+          role="heading" 
+          aria-level={2}
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Settings className="w-[18px] h-[18px] text-primary" />
+            </div>
+            <h2 className="text-base font-semibold text-foreground">Sitter Profile Settings</h2>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsOpen(false)}
+            className="min-h-[44px] min-w-[44px] h-11 w-11 p-0 rounded-full hover:bg-muted focus:ring-2 focus:ring-ring"
+            aria-label="Close settings"
+          >
+            <X className="w-5 h-5 text-muted-foreground" />
+          </Button>
+        </div>
 
-        <div className="space-y-6 py-4 overflow-y-auto flex-1 pb-24">
-          {/* Share Profile Link */}
-          <Card className="bg-primary/5 border-primary/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <Share2 className="w-5 h-5 text-primary flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <Label className="text-base font-medium">Share Your Profile</Label>
-                  <p className="text-sm text-muted-foreground truncate">{publicProfileUrl}</p>
-                </div>
-                <Button variant="outline" size="sm" onClick={copyProfileLink}>
-                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                </Button>
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-5 space-y-5 pb-28">
+          
+          {/* Section 1: Share Your Profile */}
+          <Card className="rounded-xl border border-border focus-within:ring-2 focus-within:ring-ring/20 transition-shadow" aria-labelledby="share-profile-title">
+            <CardContent className="p-4 sm:p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Link className="w-[18px] h-[18px] text-primary" />
+                <h3 id="share-profile-title" className="text-sm font-semibold text-foreground">Share Your Profile</h3>
               </div>
+              <div className="flex items-center gap-2">
+                <Input
+                  readOnly
+                  value={publicProfileUrl}
+                  className="h-11 rounded-xl px-4 bg-muted/50 text-sm text-muted-foreground flex-1 border-border"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={copyProfileLink}
+                  className="min-h-[44px] min-w-[44px] h-11 w-11 p-0 rounded-xl border-border hover:border-muted-foreground/30 hover:bg-muted focus:ring-2 focus:ring-ring"
+                  aria-label="Copy profile link"
+                >
+                  {copied ? (
+                    <Check className="w-4 h-4 text-primary" />
+                  ) : (
+                    <Copy className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </Button>
+                <span aria-live="polite" className="sr-only">
+                  {copied && "Link copied to clipboard"}
+                </span>
+              </div>
+              {copied && (
+                <p className="text-xs text-primary mt-2 font-medium">Copied!</p>
+              )}
             </CardContent>
           </Card>
 
-          {/* Headline & Experience */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Sparkles className="w-5 h-5" />
-                Your Brand
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          {/* Section 2: Your Brand */}
+          <Card className="rounded-xl border border-border focus-within:ring-2 focus-within:ring-ring/20 transition-shadow" aria-labelledby="brand-title">
+            <CardContent className="p-4 sm:p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-[18px] h-[18px] text-primary" />
+                <h3 id="brand-title" className="text-sm font-semibold text-foreground">Your Brand</h3>
+              </div>
+              
               <div className="space-y-2">
-                <Label htmlFor="headline">Headline (max 140 characters)</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="headline" className="text-sm font-medium text-foreground">Headline</Label>
+                  <span className="text-xs text-muted-foreground">{formData.headline.length}/140</span>
+                </div>
                 <Input
                   id="headline"
+                  value={formData.headline}
+                  onChange={(e) => setFormData({ ...formData, headline: e.target.value.slice(0, 140) })}
                   placeholder="e.g., The Dog Whisperer of Stockholm 🐕"
                   maxLength={140}
-                  value={formData.headline}
-                  onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
+                  className="h-11 rounded-xl px-4 border-border hover:border-muted-foreground/30 focus:ring-2 focus:ring-ring focus:border-primary transition-colors"
                 />
-                <p className="text-xs text-muted-foreground">{formData.headline.length}/140 characters</p>
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="experience">Years of Experience</Label>
-                <Select value={formData.years_experience} onValueChange={(value) => setFormData({ ...formData, years_experience: value })}>
-                  <SelectTrigger>
+                <Label htmlFor="experience" className="text-sm font-medium text-foreground">Years of Experience</Label>
+                <Select
+                  value={formData.years_experience}
+                  onValueChange={(value) => setFormData({ ...formData, years_experience: value })}
+                >
+                  <SelectTrigger id="experience" className="h-11 rounded-xl px-4 border-border hover:border-muted-foreground/30 focus:ring-2 focus:ring-ring">
                     <SelectValue placeholder="Select experience level" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-xl">
                     {experienceLevels.map((level) => (
-                      <SelectItem key={level.value} value={level.value}>
+                      <SelectItem key={level.value} value={level.value} className="rounded-lg">
                         {level.label}
                       </SelectItem>
                     ))}
@@ -238,65 +281,68 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
             </CardContent>
           </Card>
 
-          {/* Pet Types */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <PawPrint className="w-5 h-5" />
-                Pet Types You Accept
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-3">
+          {/* Section 3: Pet Types You Accept */}
+          <Card className="rounded-xl border border-border focus-within:ring-2 focus-within:ring-ring/20 transition-shadow" aria-labelledby="pet-types-title">
+            <CardContent className="p-4 sm:p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <PawPrint className="w-[18px] h-[18px] text-primary" />
+                <h3 id="pet-types-title" className="text-sm font-semibold text-foreground">Pet Types You Accept</h3>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {petTypes.map((petType) => (
-                  <div key={petType} className="flex items-center space-x-2">
+                  <label
+                    key={petType}
+                    className="flex items-center gap-3 p-3 rounded-xl border border-border hover:border-muted-foreground/30 hover:bg-muted/50 cursor-pointer transition-colors min-h-[44px] has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
+                  >
                     <Checkbox
                       id={petType}
                       checked={formData.accepted_pet_types.includes(petType)}
                       onCheckedChange={(checked) => handlePetTypeChange(petType, checked as boolean)}
+                      className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
-                    <Label htmlFor={petType} className="text-sm font-normal cursor-pointer">
-                      {petType}
-                    </Label>
-                  </div>
+                    <span className="text-sm font-medium text-foreground">{petType}</span>
+                  </label>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Rate and Currency */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <DollarSign className="w-5 w-5" />
-                Pricing
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Section 4: Pricing */}
+          <Card className="rounded-xl border border-border focus-within:ring-2 focus-within:ring-ring/20 transition-shadow" aria-labelledby="pricing-title">
+            <CardContent className="p-4 sm:p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-[18px] h-[18px] text-primary" />
+                <h3 id="pricing-title" className="text-sm font-semibold text-foreground">Pricing</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="rate">Rate per Day</Label>
+                  <Label htmlFor="rate" className="text-sm font-medium text-foreground">Rate per Day</Label>
                   <Input
                     id="rate"
                     type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="Enter your daily rate"
                     value={formData.rate_per_day}
                     onChange={(e) => setFormData({ ...formData, rate_per_day: e.target.value })}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    className="h-11 rounded-xl px-4 border-border hover:border-muted-foreground/30 focus:ring-2 focus:ring-ring focus:border-primary transition-colors"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="currency">Currency</Label>
-                  <Select value={formData.currency} onValueChange={(value) => setFormData({ ...formData, currency: value })}>
-                    <SelectTrigger>
+                  <Label htmlFor="currency" className="text-sm font-medium text-foreground">Currency</Label>
+                  <Select
+                    value={formData.currency}
+                    onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                  >
+                    <SelectTrigger id="currency" className="h-11 rounded-xl px-4 border-border hover:border-muted-foreground/30 focus:ring-2 focus:ring-ring">
                       <SelectValue>
-                        {selectedCurrency ? `${selectedCurrency.symbol} ${selectedCurrency.name}` : 'Select currency'}
+                        {selectedCurrency ? `${selectedCurrency.symbol} ${selectedCurrency.code}` : 'Select currency'}
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-xl">
                       {currencies.map((currency) => (
-                        <SelectItem key={currency.code} value={currency.code}>
+                        <SelectItem key={currency.code} value={currency.code} className="rounded-lg">
                           {currency.symbol} {currency.name} ({currency.code})
                         </SelectItem>
                       ))}
@@ -305,99 +351,100 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
                 </div>
               </div>
               {formData.rate_per_day && selectedCurrency && (
-                <div className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Display: {selectedCurrency.symbol}{formData.rate_per_day} per day
-                </div>
+                </p>
               )}
             </CardContent>
           </Card>
 
-          {/* Location */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <MapPin className="w-5 h-5" />
-                Location
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <Label htmlFor="location">Your Location</Label>
-                <LocationAutocomplete
-                  value={formData.location}
-                  onChange={(value) => setFormData({ ...formData, location: value })}
-                  placeholder="Search for your location..."
-                  onLocationSelect={(loc) => setFormData({ ...formData, location: loc.display_name })}
-                />
+          {/* Section 5: Location */}
+          <Card className="rounded-xl border border-border focus-within:ring-2 focus-within:ring-ring/20 transition-shadow" aria-labelledby="location-title">
+            <CardContent className="p-4 sm:p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="w-[18px] h-[18px] text-primary" />
+                <h3 id="location-title" className="text-sm font-semibold text-foreground">Location</h3>
               </div>
+              <LocationAutocomplete
+                value={formData.location}
+                onChange={(value) => setFormData({ ...formData, location: value })}
+                placeholder="Search for your location..."
+                onLocationSelect={(loc) => setFormData({ ...formData, location: loc.display_name })}
+                className="h-11 rounded-xl"
+              />
             </CardContent>
           </Card>
 
-          {/* Bio */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <FileText className="w-5 h-5" />
-                About You
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+          {/* Section 6: About You */}
+          <Card className="rounded-xl border border-border focus-within:ring-2 focus-within:ring-ring/20 transition-shadow" aria-labelledby="about-title">
+            <CardContent className="p-4 sm:p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="w-[18px] h-[18px] text-primary" />
+                <h3 id="about-title" className="text-sm font-semibold text-foreground">About You</h3>
+              </div>
               <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="bio" className="text-sm font-medium text-foreground sr-only">Bio</Label>
+                  <span className="text-xs text-muted-foreground ml-auto">{formData.bio.length}/500</span>
+                </div>
                 <Textarea
                   id="bio"
-                  placeholder="Tell pet owners about your experience and why you love caring for pets..."
-                  rows={4}
                   value={formData.bio}
-                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, bio: e.target.value.slice(0, 500) })}
+                  placeholder="Tell pet owners about yourself, your experience, and why you love caring for pets..."
+                  maxLength={500}
+                  rows={4}
+                  className="min-h-[120px] max-h-[200px] rounded-xl px-4 py-3 border-border hover:border-muted-foreground/30 focus:ring-2 focus:ring-ring focus:border-primary transition-colors resize-none"
                 />
               </div>
             </CardContent>
           </Card>
 
-          {/* Profile Status */}
-          <Card>
-            <CardContent className="pt-6">
+          {/* Section 7: Profile Active */}
+          <Card className="rounded-xl border border-border focus-within:ring-2 focus-within:ring-ring/20 transition-shadow" aria-labelledby="status-title">
+            <CardContent className="p-4 sm:p-5">
               <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base">Profile Active</Label>
-                  <div className="text-sm text-muted-foreground">
-                    Make your profile visible to pet owners looking for sitters
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Power className="w-[18px] h-[18px] text-primary" />
+                  </div>
+                  <div>
+                    <h3 id="status-title" className="text-sm font-semibold text-foreground">Profile Active</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {formData.is_active ? 'Your profile is visible to pet owners' : 'Your profile is hidden'}
+                    </p>
                   </div>
                 </div>
                 <Switch
                   checked={formData.is_active}
                   onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                  className="min-h-[44px] min-w-[44px] data-[state=checked]:bg-primary"
+                  aria-label="Toggle profile visibility"
                 />
               </div>
             </CardContent>
           </Card>
+
         </div>
 
         {/* Sticky Footer */}
-        <div className="sticky bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t px-4 py-3 pb-[calc(80px+env(safe-area-inset-bottom))] z-[100]">
-          <div className="flex justify-between sm:justify-end gap-2">
+        <div className="sticky bottom-0 z-20 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-t border-border px-4 sm:px-5 py-3 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
             <Button 
               variant="ghost" 
-              onClick={() => setIsOpen(false)} 
+              onClick={() => setIsOpen(false)}
               disabled={loading}
-              className="h-11 rounded-full px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="h-11 w-full sm:w-auto px-5 text-muted-foreground hover:text-foreground hover:bg-muted focus:ring-2 focus:ring-ring rounded-xl font-medium order-2 sm:order-1"
             >
               Cancel
             </Button>
             <Button 
-              onClick={handleSave} 
+              onClick={handleSave}
               disabled={loading}
-              className="h-11 rounded-full px-5 text-sm font-medium bg-primary text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="h-11 w-full sm:w-auto px-6 bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-ring rounded-xl font-medium order-1 sm:order-2"
             >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                'Save Changes'
-              )}
+              {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+              Save Changes
             </Button>
           </div>
         </div>
