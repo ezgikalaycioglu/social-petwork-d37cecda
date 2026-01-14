@@ -30,7 +30,10 @@ import {
   CalendarCheck,
   AlertCircle,
   ArrowRight,
-  Loader2
+  Loader2,
+  Pencil,
+  Check,
+  X
 } from 'lucide-react';
 
 interface SitterData {
@@ -83,6 +86,14 @@ const PetSitters = () => {
   // Sitter Availability state
   const [sitterProfile, setSitterProfile] = useState<any>(null);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
+
+  // Inline editing state
+  const [editingRate, setEditingRate] = useState(false);
+  const [editingLocation, setEditingLocation] = useState(false);
+  const [tempRate, setTempRate] = useState('');
+  const [tempLocation, setTempLocation] = useState('');
+  const [savingRate, setSavingRate] = useState(false);
+  const [savingLocation, setSavingLocation] = useState(false);
 
   // Check sitter status on mount
   useEffect(() => {
@@ -226,6 +237,62 @@ const PetSitters = () => {
       JPY: '¥', CHF: 'Fr', SEK: 'kr', NOK: 'kr', DKK: 'kr'
     };
     return symbols[currency] || '$';
+  };
+
+  const handleSaveRate = async () => {
+    if (!sitterProfile) return;
+    setSavingRate(true);
+    try {
+      const rate = parseFloat(tempRate);
+      if (isNaN(rate) || rate < 0) {
+        toast({ 
+          title: "Invalid Rate", 
+          description: "Please enter a valid positive number", 
+          variant: "destructive" 
+        });
+        setSavingRate(false);
+        return;
+      }
+      const { error } = await supabase
+        .from('sitter_profiles')
+        .update({ rate_per_day: rate, updated_at: new Date().toISOString() })
+        .eq('id', sitterProfile.id);
+      if (error) throw error;
+      toast({ title: "Rate Updated" });
+      setEditingRate(false);
+      checkSitterProfile();
+    } catch (error) {
+      toast({ 
+        title: "Error", 
+        description: "Failed to update rate", 
+        variant: "destructive" 
+      });
+    } finally {
+      setSavingRate(false);
+    }
+  };
+
+  const handleSaveLocation = async () => {
+    if (!sitterProfile) return;
+    setSavingLocation(true);
+    try {
+      const { error } = await supabase
+        .from('sitter_profiles')
+        .update({ location: tempLocation.trim() || null, updated_at: new Date().toISOString() })
+        .eq('id', sitterProfile.id);
+      if (error) throw error;
+      toast({ title: "Location Updated" });
+      setEditingLocation(false);
+      checkSitterProfile();
+    } catch (error) {
+      toast({ 
+        title: "Error", 
+        description: "Failed to update location", 
+        variant: "destructive" 
+      });
+    } finally {
+      setSavingLocation(false);
+    }
   };
 
   const filterSitters = () => {
@@ -659,13 +726,47 @@ const PetSitters = () => {
                                 <DollarSign className="w-5 h-5 text-primary" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-foreground text-sm">Rate per Day</h4>
-                                <p className="text-xs text-muted-foreground mt-0.5">
-                                  {sitterProfile?.rate_per_day 
-                                    ? `${getCurrencySymbol(sitterProfile.currency)}${sitterProfile.rate_per_day}` 
-                                    : 'Not set'
-                                  }
-                                </p>
+                                <div className="flex items-center justify-between">
+                                  <h4 className="font-semibold text-foreground text-sm">Rate per Day</h4>
+                                  {!editingRate && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 w-7 p-0"
+                                      onClick={() => {
+                                        setTempRate(sitterProfile?.rate_per_day?.toString() || '');
+                                        setEditingRate(true);
+                                      }}
+                                    >
+                                      <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                                    </Button>
+                                  )}
+                                </div>
+                                {editingRate ? (
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <Input
+                                      type="number"
+                                      value={tempRate}
+                                      onChange={(e) => setTempRate(e.target.value)}
+                                      className="h-8 text-sm"
+                                      placeholder="0.00"
+                                      min="0"
+                                      step="0.01"
+                                    />
+                                    <Button size="sm" className="h-8 px-2" onClick={handleSaveRate} disabled={savingRate}>
+                                      {savingRate ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                                    </Button>
+                                    <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => setEditingRate(false)}>
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-muted-foreground mt-0.5">
+                                    {sitterProfile?.rate_per_day 
+                                      ? `${getCurrencySymbol(sitterProfile.currency)}${sitterProfile.rate_per_day}` 
+                                      : 'Not set - tap to add'}
+                                  </p>
+                                )}
                               </div>
                             </div>
                           </CardContent>
@@ -678,10 +779,46 @@ const PetSitters = () => {
                                 <MapPin className="w-5 h-5 text-primary" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-foreground text-sm">Location</h4>
-                                <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                                  {sitterProfile?.location || 'Not set'}
-                                </p>
+                                <div className="flex items-center justify-between">
+                                  <h4 className="font-semibold text-foreground text-sm">Location</h4>
+                                  {!editingLocation && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 w-7 p-0"
+                                      onClick={() => {
+                                        setTempLocation(sitterProfile?.location || '');
+                                        setEditingLocation(true);
+                                      }}
+                                    >
+                                      <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                                    </Button>
+                                  )}
+                                </div>
+                                {editingLocation ? (
+                                  <div className="mt-1 space-y-2">
+                                    <LocationAutocomplete
+                                      value={tempLocation}
+                                      onChange={setTempLocation}
+                                      placeholder="Search for your location..."
+                                      className="h-9 text-sm"
+                                      onLocationSelect={(loc) => setTempLocation(loc.display_name)}
+                                    />
+                                    <div className="flex items-center gap-2">
+                                      <Button size="sm" className="h-8" onClick={handleSaveLocation} disabled={savingLocation}>
+                                        {savingLocation ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                                        Save
+                                      </Button>
+                                      <Button size="sm" variant="ghost" className="h-8" onClick={() => setEditingLocation(false)}>
+                                        Cancel
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                                    {sitterProfile?.location || 'Not set - tap to add'}
+                                  </p>
+                                )}
                               </div>
                             </div>
                           </CardContent>

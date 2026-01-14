@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { Settings, DollarSign, MapPin, FileText, Loader2, Sparkles, PawPrint, Share2, Copy, Check } from 'lucide-react';
+import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 
 interface SitterProfile {
   id: string;
@@ -322,11 +323,11 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
             <CardContent>
               <div className="space-y-2">
                 <Label htmlFor="location">Your Location</Label>
-                <Input
-                  id="location"
-                  placeholder="e.g., San Francisco, CA"
+                <LocationAutocomplete
                   value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  onChange={(value) => setFormData({ ...formData, location: value })}
+                  placeholder="Search for your location..."
+                  onLocationSelect={(loc) => setFormData({ ...formData, location: loc.display_name })}
                 />
               </div>
             </CardContent>
