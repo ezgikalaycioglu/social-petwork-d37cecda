@@ -326,9 +326,17 @@ export default function FindSitter() {
     let filtered = [...sitters];
 
     if (location) {
-      filtered = filtered.filter(sitter => 
-        sitter.location.toLowerCase().includes(location.toLowerCase())
-      );
+      const searchLower = location.toLowerCase().trim();
+      filtered = filtered.filter(sitter => {
+        const sitterLower = sitter.location.toLowerCase();
+        // Match if either contains the other, or if they share common terms
+        return sitterLower.includes(searchLower) || 
+               searchLower.includes(sitterLower) ||
+               // Also check individual words for partial matches (min 3 chars)
+               searchLower.split(/[\s,]+/).some(term => 
+                 term.length > 2 && sitterLower.includes(term)
+               );
+      });
     }
 
     if (service && service !== "all") {
