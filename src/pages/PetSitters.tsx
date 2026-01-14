@@ -299,9 +299,17 @@ const PetSitters = () => {
     let filtered = sitters;
 
     if (searchLocation) {
-      filtered = filtered.filter(sitter =>
-        sitter.location.toLowerCase().includes(searchLocation.toLowerCase())
-      );
+      const searchLower = searchLocation.toLowerCase().trim();
+      filtered = filtered.filter(sitter => {
+        const sitterLower = sitter.location.toLowerCase();
+        // Match if either contains the other, or if they share common terms
+        return sitterLower.includes(searchLower) || 
+               searchLower.includes(sitterLower) ||
+               // Also check individual words for partial matches (min 3 chars)
+               searchLower.split(/[\s,]+/).some(term => 
+                 term.length > 2 && sitterLower.includes(term)
+               );
+      });
     }
 
     if (selectedService && selectedService !== 'all') {
