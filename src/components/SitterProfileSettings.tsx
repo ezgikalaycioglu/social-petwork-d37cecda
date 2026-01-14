@@ -174,10 +174,10 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
           Edit Profile
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full max-w-[560px] md:max-w-[640px] max-h-[86vh] flex flex-col p-0 rounded-2xl bg-white shadow-lg gap-0 pt-[max(env(safe-area-inset-top),0px)] pb-[max(env(safe-area-inset-bottom),0px)]">
+      <DialogContent className="w-full max-w-[560px] md:max-w-[640px] max-h-[86vh] flex flex-col p-0 rounded-2xl bg-background shadow-lg gap-0 sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2">
         {/* Sticky Header */}
         <div 
-          className="sticky top-0 z-20 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-border px-4 sm:px-5 py-3 flex items-center justify-between flex-shrink-0"
+          className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border px-4 sm:px-5 py-3 flex items-center flex-shrink-0"
           role="heading" 
           aria-level={2}
         >
@@ -187,15 +187,6 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
             </div>
             <h2 className="text-base font-semibold text-foreground">Sitter Profile Settings</h2>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsOpen(false)}
-            className="min-h-[44px] min-w-[44px] h-11 w-11 p-0 rounded-full hover:bg-muted focus:ring-2 focus:ring-ring"
-            aria-label="Close settings"
-          >
-            <X className="w-5 h-5 text-muted-foreground" />
-          </Button>
         </div>
 
         {/* Scrollable Content */}
