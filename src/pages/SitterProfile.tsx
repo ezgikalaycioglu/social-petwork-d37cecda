@@ -9,7 +9,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ArrowLeft, Star, MapPin, CalendarIcon, MessageCircle } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ArrowLeft, Star, MapPin, CalendarIcon, MessageCircle, AlertCircle } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -105,6 +107,7 @@ export default function SitterProfile() {
   // Booking form state
   const [selectedPet, setSelectedPet] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [messageToSitter, setMessageToSitter] = useState("");
 
   useEffect(() => {
     if (sitterId) {
@@ -241,7 +244,20 @@ export default function SitterProfile() {
 
     setSubmitting(true);
     try {
-      const { error } = await supabase
+      // Get pet name for the message
+      const selectedPetData = userPets.find(p => p.id === selectedPet);
+      const petName = selectedPetData?.name || 'my pet';
+      const startDateStr = format(dateRange.from, 'MMM d, yyyy');
+      const endDateStr = format(dateRange.to, 'MMM d, yyyy');
+      
+      // Build the initial message
+      let initialMessage = `Hi! I'd like to book pet sitting from ${startDateStr} to ${endDateStr} for ${petName}.`;
+      if (messageToSitter.trim()) {
+        initialMessage += `\n\n${messageToSitter.trim()}`;
+      }
+
+      // Create the booking
+      const { data: booking, error: bookingError } = await supabase
         .from('sitter_bookings')
         .insert({
           sitter_id: sitter.id,
@@ -250,17 +266,42 @@ export default function SitterProfile() {
           start_date: format(dateRange.from, 'yyyy-MM-dd'),
           end_date: format(dateRange.to, 'yyyy-MM-dd'),
           total_price: calculateTotal(),
-          status: 'pending'
+          status: 'pending',
+          initial_message: initialMessage
+        })
+        .select()
+        .single();
+
+      if (bookingError) throw bookingError;
+
+      // Create or find conversation using the database function
+      const { data: conversationId, error: convError } = await supabase
+        .rpc('find_or_create_conversation', {
+          user_a: user.id,
+          user_b: sitter.user_id,
+          linked_booking_id: booking.id
         });
 
-      if (error) throw error;
+      if (convError) throw convError;
+
+      // Send the initial message
+      const { error: msgError } = await supabase
+        .from('sitter_messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_user_id: user.id,
+          body: initialMessage
+        });
+
+      if (msgError) throw msgError;
 
       toast({
         title: "Booking Request Sent!",
-        description: "Your booking request has been sent to the sitter.",
+        description: "Your booking request has been sent to the sitter. You can continue the conversation in messages.",
       });
 
-      navigate('/my-bookings');
+      // Navigate to the chat
+      navigate(`/messages/${conversationId}`);
     } catch (error) {
       console.error('Error creating booking:', error);
       toast({
@@ -270,6 +311,34 @@ export default function SitterProfile() {
       });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleOpenChat = async () => {
+    if (!user || !sitter) {
+      navigate('/auth');
+      return;
+    }
+
+    try {
+      // Find or create conversation
+      const { data: conversationId, error } = await supabase
+        .rpc('find_or_create_conversation', {
+          user_a: user.id,
+          user_b: sitter.user_id,
+          linked_booking_id: null
+        });
+
+      if (error) throw error;
+
+      navigate(`/messages/${conversationId}`);
+    } catch (error) {
+      console.error('Error opening chat:', error);
+      toast({
+        title: "Error",
+        description: "Failed to open chat. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -436,6 +505,15 @@ export default function SitterProfile() {
 
                 {user && (
                   <>
+                    {/* Important Notice */}
+                    <Alert className="bg-amber-50 border-amber-200">
+                      <AlertCircle className="h-4 w-4 text-amber-600" />
+                      <AlertTitle className="text-amber-800 text-sm">Important Notice</AlertTitle>
+                      <AlertDescription className="text-amber-700 text-xs">
+                        PawCult only facilitates connections between pet owners and pet sitters. Payments are handled directly between users. If a booking is accepted, communication happens via in-app messaging. PawCult is not responsible for agreements, payments, or outcomes.
+                      </AlertDescription>
+                    </Alert>
+
                     {/* Booking Form */}
                     <div className="space-y-3 border-t pt-4">
                       <h3 className="font-semibold text-sm">Book This Sitter</h3>
@@ -496,6 +574,17 @@ export default function SitterProfile() {
                         </Popover>
                       </div>
 
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Message to Sitter (optional)</Label>
+                        <Textarea
+                          value={messageToSitter}
+                          onChange={(e) => setMessageToSitter(e.target.value)}
+                          placeholder="Hi! I'd like to book your services. My pet is friendly and..."
+                          rows={3}
+                          className="text-sm"
+                        />
+                      </div>
+
                       {dateRange?.from && dateRange?.to && (
                         <div className="bg-muted/50 p-2.5 rounded-lg">
                           <div className="flex justify-between text-sm">
@@ -515,7 +604,12 @@ export default function SitterProfile() {
                         >
                           {submitting ? "Sending..." : "Request Booking"}
                         </Button>
-                        <Button variant="outline" size="icon" className="h-10 w-10 flex-shrink-0">
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          className="h-10 w-10 flex-shrink-0"
+                          onClick={handleOpenChat}
+                        >
                           <MessageCircle className="w-4 h-4" />
                         </Button>
                       </div>

@@ -52,7 +52,9 @@ import DeleteData from "./pages/DeleteData";
 import Beta from "./pages/Beta";
 import CommunityGuidelines from "./pages/CommunityGuidelines";
 import Contact from "./pages/Contact";
-
+import Messages from "./pages/Messages";
+import Chat from "./pages/Chat";
+import ReviewBooking from "./pages/ReviewBooking";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -249,6 +251,23 @@ const AppRoutes = () => {
                 <Route path="/my-bookings" element={<Navigate to="/pet-sitters" replace />} />
                 <Route path="/sitter/:sitterId" element={<SitterProfile />} />
                 <Route path="/sitter/profile/:sitterId" element={<PublicSitterProfile />} />
+                
+                {/* Messages routes */}
+                <Route path="/messages" element={
+                  <ProtectedRoute>
+                    <Messages />
+                  </ProtectedRoute>
+                } />
+                <Route path="/messages/:conversationId" element={
+                  <ProtectedRoute>
+                    <Chat />
+                  </ProtectedRoute>
+                } />
+                <Route path="/review/:bookingId" element={
+                  <ProtectedRoute>
+                    <ReviewBooking />
+                  </ProtectedRoute>
+                } />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
