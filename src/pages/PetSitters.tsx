@@ -45,6 +45,7 @@ interface SitterData {
   rate_per_day: number;
   currency: string;
   is_active: boolean;
+  profile_photo_url: string | null;
   sitter_services: { service_type: string }[];
   sitter_photos: { photo_url: string; is_primary: boolean }[];
 }
@@ -553,7 +554,7 @@ const PetSitters = () => {
                     </Card>
                   ) : (
                     filteredSitters.map((sitter) => {
-                      const primaryPhoto = sitter.sitter_photos.find(p => p.is_primary)?.photo_url;
+                      const primaryPhoto = sitter.profile_photo_url || sitter.sitter_photos.find(p => p.is_primary)?.photo_url;
                       const services = sitter.sitter_services.map(s => s.service_type);
                       
                       const displayName = sitter.name || 'Pet Sitter';

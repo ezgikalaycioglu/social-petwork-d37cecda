@@ -25,6 +25,7 @@ interface SitterData {
   rate_per_day: number;
   currency: string;
   display_name?: string;
+  profile_photo_url?: string | null;
   sitter_services: {
     service_type: string;
   }[];
@@ -289,7 +290,8 @@ export default function SitterProfile() {
   }
 
   const displayName = sitter.display_name || 'Sitter';
-  const primaryPhoto = sitter.sitter_photos.find(p => p.is_primary)?.photo_url || 
+  const primaryPhoto = sitter.profile_photo_url || 
+                       sitter.sitter_photos.find(p => p.is_primary)?.photo_url || 
                        sitter.sitter_photos[0]?.photo_url;
   const averageRating = reviews.length > 0 
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length 
