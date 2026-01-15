@@ -24,7 +24,7 @@ import {
   Heart,
   Shield,
   PawPrint,
-  DollarSign,
+  Banknote,
   Clock,
   CheckCircle,
   CalendarCheck,
@@ -618,7 +618,7 @@ const PetSitters = () => {
                                     </span>
                                     <span className="hidden sm:inline">•</span>
                                     <span className="flex items-center gap-1">
-                                      <DollarSign className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
+                                      <Banknote className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
                                       {currencySymbol}{sitter.rate_per_day}/day
                                     </span>
                                   </div>
@@ -783,7 +783,7 @@ const PetSitters = () => {
                           <CardContent className="p-4">
                             <div className="flex items-start gap-3">
                               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                <DollarSign className="w-5 h-5 text-primary" />
+                                <Banknote className="w-5 h-5 text-primary" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between">
@@ -938,7 +938,7 @@ const PetSitters = () => {
                         <p className="text-xs text-muted-foreground">Verified profiles</p>
                       </div>
                       <div className="text-center">
-                        <DollarSign className="w-8 h-8 mx-auto mb-2 text-primary" />
+                        <Banknote className="w-8 h-8 mx-auto mb-2 text-primary" />
                         <h4 className="text-sm font-semibold text-foreground">Flexible</h4>
                         <p className="text-xs text-muted-foreground">Set your rates</p>
                       </div>
