@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, PawPrint, Users, MapPin, Calendar, Gift, Building, Settings, User, Heart, UserCheck, Search, Star, CalendarCheck, MessageSquare } from 'lucide-react';
+import { Home, PawPrint, Users, MapPin, Calendar, Gift, Building, Settings, User, Heart, UserCheck, Search, Star, CalendarCheck, MessageSquare, Mail } from 'lucide-react';
 import ContactUs from './ContactUs';
 import {
   Dialog,
@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import SocialPetworkLogo from './SocialPetworkLogo';
 import AuthButton from './AuthButton';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
 const DesktopSidebar = () => {
   const location = useLocation();
@@ -23,6 +24,7 @@ const DesktopSidebar = () => {
   const { t } = useTranslation();
   const [isContactOpen, setIsContactOpen] = React.useState(false);
   const { data: featureFlags } = useFeatureFlags();
+  const { unreadCount } = useUnreadMessages();
 
   const allNavItems = [
     { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
@@ -33,6 +35,7 @@ const DesktopSidebar = () => {
     { name: t('navigation.deals'), href: '/deals', icon: Gift, requiresBusiness: true },
     { name: t('navigation.packs'), href: '/packs/discover', icon: Users },
     { name: 'Pet Sitters', href: '/pet-sitters', icon: Search },
+    { name: 'Messages', href: '/messages', icon: Mail, showBadge: true },
     { name: 'Business', href: '/business-dashboard', icon: Building, requiresBusiness: true },
   ];
 
@@ -54,6 +57,9 @@ const DesktopSidebar = () => {
     if (href === '/packs/discover') {
       return location.pathname.startsWith('/packs');
     }
+    if (href === '/messages') {
+      return location.pathname.startsWith('/messages');
+    }
     return location.pathname === href;
   };
 
@@ -74,6 +80,7 @@ const DesktopSidebar = () => {
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
+            const showBadge = (item as any).showBadge && unreadCount > 0;
             return (
               <Link
                 key={item.name}
@@ -84,7 +91,14 @@ const DesktopSidebar = () => {
                     : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
                 }`}
               >
-                <Icon className="w-5 h-5" />
+                <div className="relative">
+                  <Icon className="w-5 h-5" />
+                  {showBadge && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </div>
                 <span>{item.name}</span>
               </Link>
             );

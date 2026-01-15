@@ -1185,11 +1185,15 @@ export type Database = {
       }
       sitter_bookings: {
         Row: {
+          completed_at: string | null
           created_at: string
           end_date: string
           id: string
+          initial_message: string | null
+          owner_completed: boolean | null
           owner_id: string
           pet_id: string
+          sitter_completed: boolean | null
           sitter_id: string
           special_instructions: string | null
           start_date: string
@@ -1198,11 +1202,15 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          completed_at?: string | null
           created_at?: string
           end_date: string
           id?: string
+          initial_message?: string | null
+          owner_completed?: boolean | null
           owner_id: string
           pet_id: string
+          sitter_completed?: boolean | null
           sitter_id: string
           special_instructions?: string | null
           start_date: string
@@ -1211,11 +1219,15 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          completed_at?: string | null
           created_at?: string
           end_date?: string
           id?: string
+          initial_message?: string | null
+          owner_completed?: boolean | null
           owner_id?: string
           pet_id?: string
+          sitter_completed?: boolean | null
           sitter_id?: string
           special_instructions?: string | null
           start_date?: string
@@ -1250,6 +1262,79 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pet_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sitter_conversations: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          id: string
+          last_message_at: string | null
+          participant_a: string
+          participant_b: string
+          updated_at: string
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          participant_a: string
+          participant_b: string
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          participant_a?: string
+          participant_b?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sitter_conversations_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "sitter_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sitter_messages: {
+        Row: {
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sender_user_id: string
+        }
+        Insert: {
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_user_id: string
+        }
+        Update: {
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sitter_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "sitter_conversations"
             referencedColumns: ["id"]
           },
         ]
@@ -1591,6 +1676,10 @@ export type Database = {
       delete_user_data_only: {
         Args: { user_id_to_clear: string }
         Returns: undefined
+      }
+      find_or_create_conversation: {
+        Args: { linked_booking_id?: string; user_a: string; user_b: string }
+        Returns: string
       }
       generate_redemption_code: { Args: never; Returns: string }
       generate_unique_pet_username: {
