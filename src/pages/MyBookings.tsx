@@ -22,7 +22,11 @@ interface Booking {
   sitter_id: string;
   owner_id: string;
   
-  // For bookings as owner
+  // Currency from sitter profile
+  currency?: string;
+  
+  // For bookings as owner - sitter's user_id for chat
+  sitter_user_id?: string;
   sitter_display_name?: string;
   sitter_phone_number?: string;
   sitter_photos?: {
@@ -46,9 +50,32 @@ interface BookingCardProps {
   userRole: 'owner' | 'sitter';
   onStatusUpdate: (bookingId: string, status: string) => void;
   onReview: (bookingId: string) => void;
+  onOpenChat: (booking: Booking) => void;
 }
 
-function BookingCard({ booking, userRole, onStatusUpdate, onReview }: BookingCardProps) {
+// Format price with correct currency symbol
+const formatPrice = (amount: number, currency: string = 'USD') => {
+  const currencySymbols: Record<string, string> = {
+    'USD': '$',
+    'EUR': '€',
+    'GBP': '£',
+    'SEK': 'kr',
+    'NOK': 'kr',
+    'DKK': 'kr',
+    'CAD': 'C$',
+    'AUD': 'A$',
+  };
+  
+  const symbol = currencySymbols[currency] || currency;
+  
+  // For Nordic currencies, symbol comes after the number
+  if (['SEK', 'NOK', 'DKK'].includes(currency)) {
+    return `${amount} ${symbol}`;
+  }
+  return `${symbol}${amount}`;
+};
+
+function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat }: BookingCardProps) {
   const otherPersonName = userRole === 'owner' 
     ? booking.sitter_display_name || 'Sitter'
     : booking.owner_display_name || 'Pet Owner';
@@ -87,7 +114,10 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview }: BookingCar
   };
 
   return (
-    <Card className="rounded-2xl shadow-sm border">
+    <Card 
+      className="rounded-2xl shadow-sm border cursor-pointer hover:shadow-md transition-shadow"
+      onClick={() => onOpenChat(booking)}
+    >
       <CardContent className="p-6">
         <div className="flex items-start space-x-4">
           {/* Profile Picture */}
@@ -119,7 +149,7 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview }: BookingCar
               <p className="text-sm font-medium">
                 {format(new Date(booking.start_date), 'MMM d')} - {format(new Date(booking.end_date), 'MMM d, yyyy')}
               </p>
-              <p className="text-lg font-bold text-primary">${booking.total_price}</p>
+              <p className="text-lg font-bold text-primary">{formatPrice(booking.total_price, booking.currency)}</p>
               
               {/* Phone Number - Only visible when booking is confirmed */}
               {isBookingConfirmed && otherPersonPhone && (
@@ -131,7 +161,7 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview }: BookingCar
             </div>
 
             {/* Action Buttons */}
-            <div className="flex space-x-2">
+            <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
               {booking.status === 'pending' && userRole === 'sitter' && (
                 <>
                   <Button
@@ -155,7 +185,7 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview }: BookingCar
               )}
 
               {booking.status === 'accepted' && (
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" onClick={() => onOpenChat(booking)}>
                   <MessageCircle className="w-4 h-4 mr-1" />
                   Message
                 </Button>
@@ -214,26 +244,41 @@ export default function MyBookings() {
       let enrichedOwnerData: Booking[] = [];
       if (ownerData && ownerData.length > 0) {
         const sitterIds = [...new Set(ownerData.map(booking => booking.sitter_id))];
-        const { data: sitterProfiles } = await supabase
+        
+        // Note: sitter_id in bookings refers to sitter_profiles.id, not user_id
+        // We need to get the sitter profile to find the user_id and currency
+        const { data: sitterProfilesData } = await supabase
+          .from('sitter_profiles')
+          .select('id, user_id, currency')
+          .in('id', sitterIds);
+
+        // Get user profiles using the user_ids from sitter_profiles
+        const sitterUserIds = sitterProfilesData?.map(sp => sp.user_id) || [];
+        const { data: sitterUserProfiles } = await supabase
           .from('user_profiles')
           .select('id, display_name, phone_number')
-          .in('id', sitterIds);
+          .in('id', sitterUserIds);
 
         const { data: sitterPhotos } = await supabase
           .from('sitter_profiles')
           .select(`
+            id,
             user_id,
             sitter_photos(photo_url, is_primary)
           `)
-          .in('user_id', sitterIds);
+          .in('id', sitterIds);
 
         enrichedOwnerData = ownerData.map(booking => {
-          const sitterProfile = sitterProfiles?.find(p => p.id === booking.sitter_id);
+          const sitterProfileData = sitterProfilesData?.find(sp => sp.id === booking.sitter_id);
+          const sitterUserProfile = sitterUserProfiles?.find(p => p.id === sitterProfileData?.user_id);
+          const sitterPhotoData = sitterPhotos?.find(sp => sp.id === booking.sitter_id);
           return {
             ...booking,
-            sitter_display_name: sitterProfile?.display_name,
-            sitter_phone_number: sitterProfile?.phone_number,
-            sitter_photos: sitterPhotos?.find(sp => sp.user_id === booking.sitter_id)?.sitter_photos || []
+            sitter_user_id: sitterProfileData?.user_id,
+            currency: sitterProfileData?.currency || 'USD',
+            sitter_display_name: sitterUserProfile?.display_name,
+            sitter_phone_number: sitterUserProfile?.phone_number,
+            sitter_photos: sitterPhotoData?.sitter_photos || []
           };
         });
       }
@@ -261,10 +306,18 @@ export default function MyBookings() {
           .select('id, display_name, phone_number')
           .in('id', ownerIds);
 
+        // Get the sitter's own currency for display
+        const { data: ownSitterProfile } = await supabase
+          .from('sitter_profiles')
+          .select('id, currency')
+          .eq('user_id', user.id)
+          .single();
+
         enrichedSitterData = sitterData.map(booking => {
           const ownerProfile = ownerProfiles?.find(p => p.id === booking.owner_id);
           return {
             ...booking,
+            currency: ownSitterProfile?.currency || 'USD',
             owner_display_name: ownerProfile?.display_name,
             owner_phone_number: ownerProfile?.phone_number
           };
@@ -314,6 +367,44 @@ export default function MyBookings() {
     navigate(`/review/${bookingId}`);
   };
 
+  const handleOpenChat = async (booking: Booking) => {
+    if (!user) return;
+    
+    try {
+      // Determine the other user ID based on role
+      const otherUserId = booking.owner_id === user.id 
+        ? booking.sitter_user_id  // When I'm the owner, chat with sitter
+        : booking.owner_id;       // When I'm the sitter, chat with owner
+      
+      if (!otherUserId) {
+        toast({
+          title: "Error",
+          description: "Could not find the other user for this booking.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Find or create conversation
+      const { data: conversationId, error } = await supabase
+        .rpc('find_or_create_conversation', {
+          user_a: user.id,
+          user_b: otherUserId,
+          linked_booking_id: booking.id
+        });
+
+      if (error) throw error;
+      navigate(`/messages/${conversationId}`);
+    } catch (error) {
+      console.error('Error opening chat:', error);
+      toast({
+        title: "Error",
+        description: "Failed to open chat. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/5 to-teal/5 flex items-center justify-center">
@@ -358,6 +449,7 @@ export default function MyBookings() {
                       userRole="owner"
                       onStatusUpdate={handleStatusUpdate}
                       onReview={handleReview}
+                      onOpenChat={handleOpenChat}
                     />
                   ))
                 ) : (
@@ -381,6 +473,7 @@ export default function MyBookings() {
                       userRole="sitter"
                       onStatusUpdate={handleStatusUpdate}
                       onReview={handleReview}
+                      onOpenChat={handleOpenChat}
                     />
                   ))
                 ) : (
