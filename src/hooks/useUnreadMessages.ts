@@ -14,9 +14,10 @@ export const useUnreadMessages = () => {
 
     fetchUnreadCount();
 
-    // Subscribe to new messages
+    // Subscribe to new messages with unique channel name
+    const channelName = `unread-messages-${user.id}-${Date.now()}`;
     const channel = supabase
-      .channel('unread-messages')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
