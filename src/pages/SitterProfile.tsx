@@ -52,35 +52,39 @@ function ReviewCard({ review }: { review: Review }) {
   const petName = review.pet_name || 'Pet';
 
   return (
-    <Card className="rounded-xl">
-      <CardContent className="p-4">
-        <div className="flex items-start space-x-3">
-          <Avatar className="w-10 h-10">
-            <AvatarFallback>{reviewerName.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <div className="flex items-center space-x-2 mb-2">
-              <span className="font-medium text-sm">{reviewerName}</span>
+    <div className="py-3 border-b last:border-0 last:pb-0 first:pt-0">
+      <div className="flex items-start gap-3">
+        <Avatar className="w-8 h-8 flex-shrink-0">
+          <AvatarFallback className="text-xs bg-primary/10 text-primary">
+            {reviewerName.charAt(0)}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="font-medium text-sm truncate">{reviewerName}</span>
               <span className="text-xs text-muted-foreground">with {petName}</span>
             </div>
-            <div className="flex items-center space-x-1 mb-2">
+            <div className="flex items-center gap-0.5 flex-shrink-0">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
                   className={`w-3 h-3 ${
-                    i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                    i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted'
                   }`}
                 />
               ))}
             </div>
-            <p className="text-sm text-muted-foreground">{review.comment}</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {format(new Date(review.created_at), 'MMM d, yyyy')}
-            </p>
           </div>
+          {review.comment && (
+            <p className="text-sm text-muted-foreground">{review.comment}</p>
+          )}
+          <p className="text-xs text-muted-foreground mt-1">
+            {format(new Date(review.created_at), 'MMM d, yyyy')}
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -291,118 +295,137 @@ export default function SitterProfile() {
     : 5.0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-teal/5">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-3xl mx-auto px-4 py-4 sm:py-6">
+        {/* Back button */}
         <Button
           variant="ghost"
+          size="sm"
           onClick={() => navigate('/find-sitter')}
-          className="mb-6"
+          className="mb-4 -ml-2 text-muted-foreground"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft className="w-4 h-4 mr-1.5" />
           Back to Search
         </Button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Main Info */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Photo Gallery */}
-            <Card className="rounded-2xl shadow-lg">
-              <CardContent className="p-6">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {sitter.sitter_photos.map((photo, index) => (
-                    <div
-                      key={index}
-                      className={`aspect-square rounded-xl overflow-hidden ${
-                        index === 0 ? 'md:col-span-2 md:row-span-2' : ''
-                      }`}
-                    >
-                      <img
-                        src={photo.photo_url}
-                        alt={`Sitter photo ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
+        {/* Mobile: Stack, Desktop: Side by side */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-3 space-y-4">
+            
+            {/* Profile Header Card */}
+            <Card className="rounded-xl border-0 shadow-sm">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start gap-4">
+                  <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-background shadow-md flex-shrink-0">
+                    <AvatarImage src={primaryPhoto} alt={displayName} />
+                    <AvatarFallback className="text-lg sm:text-xl bg-primary/10 text-primary">
+                      {displayName.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-lg sm:text-xl font-bold truncate">{displayName}</h1>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                      <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="truncate">{sitter.location || 'Location not set'}</span>
                     </div>
-                  ))}
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <span className="font-semibold text-sm">{averageRating.toFixed(1)}</span>
+                      <span className="text-xs text-muted-foreground">({reviews.length} reviews)</span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Photo Gallery - only show if photos exist */}
+            {sitter.sitter_photos.length > 0 && (
+              <Card className="rounded-xl border-0 shadow-sm">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="grid grid-cols-3 gap-2">
+                    {sitter.sitter_photos.slice(0, 6).map((photo, index) => (
+                      <div
+                        key={index}
+                        className={`aspect-square rounded-lg overflow-hidden ${
+                          index === 0 && sitter.sitter_photos.length > 1 ? 'col-span-2 row-span-2' : ''
+                        }`}
+                      >
+                        <img
+                          src={photo.photo_url}
+                          alt={`Photo ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* About Me */}
-            <Card className="rounded-2xl shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-xl">About Me</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">{sitter.bio}</p>
-              </CardContent>
-            </Card>
+            {sitter.bio && (
+              <Card className="rounded-xl border-0 shadow-sm">
+                <CardContent className="p-4 sm:p-5">
+                  <h2 className="font-semibold text-base mb-2">About Me</h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{sitter.bio}</p>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Reviews */}
-            <Card className="rounded-2xl shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-xl">Reviews ({reviews.length})</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {reviews.length > 0 ? (
-                  reviews.map((review) => (
-                    <ReviewCard key={review.id} review={review} />
-                  ))
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">
-                    No reviews yet. Be the first to book!
-                  </p>
-                )}
+            <Card className="rounded-xl border-0 shadow-sm">
+              <CardContent className="p-4 sm:p-5">
+                <h2 className="font-semibold text-base mb-3">Reviews ({reviews.length})</h2>
+                <div className="space-y-3">
+                  {reviews.length > 0 ? (
+                    reviews.map((review) => (
+                      <ReviewCard key={review.id} review={review} />
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No reviews yet. Be the first to book!
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Right Column - Action Panel */}
-          <div className="lg:col-span-1">
-            <Card className="rounded-2xl shadow-lg sticky top-8">
-              <CardContent className="p-6 space-y-6">
-                {/* Sitter Info */}
-                <div className="text-center">
-                  <Avatar className="w-20 h-20 mx-auto mb-4">
-                    <AvatarImage src={primaryPhoto} alt={displayName} />
-                    <AvatarFallback className="text-xl">
-                      {displayName.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <h2 className="text-xl font-bold">{displayName}</h2>
-                  <div className="flex items-center justify-center space-x-1 mt-2">
-                    <MapPin className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">{sitter.location}</span>
-                  </div>
-                  <div className="flex items-center justify-center space-x-1 mt-2">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-medium">{averageRating.toFixed(1)}</span>
-                    <span className="text-muted-foreground">({reviews.length} reviews)</span>
-                  </div>
-                </div>
-
-                {/* Services & Prices */}
+          {/* Booking Panel - Sidebar on desktop, bottom on mobile */}
+          <div className="lg:col-span-2">
+            <Card className="rounded-xl border-0 shadow-sm lg:sticky lg:top-4">
+              <CardContent className="p-4 sm:p-5 space-y-4">
+                {/* Services & Rates */}
                 <div>
-                  <h3 className="font-semibold mb-3">Services & Rates</h3>
-                  <div className="space-y-2">
-                    {sitter.sitter_services.map((service, index) => (
-                      <div key={index} className="flex justify-between items-center">
-                        <span className="text-sm">{service.service_type}</span>
+                  <h3 className="font-semibold text-sm mb-2">Services & Rates</h3>
+                  <div className="space-y-1.5">
+                    {sitter.sitter_services.length > 0 ? (
+                      sitter.sitter_services.map((service, index) => (
+                        <div key={index} className="flex justify-between items-center text-sm">
+                          <span className="text-muted-foreground">{service.service_type}</span>
+                          <span className="font-medium">${sitter.rate_per_day}/day</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-muted-foreground">Pet Sitting</span>
                         <span className="font-medium">${sitter.rate_per_day}/day</span>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
 
                 {user && (
                   <>
                     {/* Booking Form */}
-                    <div className="space-y-4 border-t pt-6">
-                      <h3 className="font-semibold">Book This Sitter</h3>
+                    <div className="space-y-3 border-t pt-4">
+                      <h3 className="font-semibold text-sm">Book This Sitter</h3>
                       
-                      <div className="space-y-2">
-                        <Label>Select Your Pet</Label>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Select Your Pet</Label>
                         <Select value={selectedPet} onValueChange={setSelectedPet}>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-10">
                             <SelectValue placeholder="Choose a pet" />
                           </SelectTrigger>
                           <SelectContent>
@@ -415,14 +438,14 @@ export default function SitterProfile() {
                         </Select>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label>Select Dates</Label>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Select Dates</Label>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
                               className={cn(
-                                "w-full justify-start text-left font-normal",
+                                "w-full h-10 justify-start text-left font-normal",
                                 !dateRange?.from && "text-muted-foreground"
                               )}
                             >
@@ -430,8 +453,7 @@ export default function SitterProfile() {
                               {dateRange?.from ? (
                                 dateRange?.to ? (
                                   <>
-                                    {format(dateRange.from, "LLL dd")} -{" "}
-                                    {format(dateRange.to, "LLL dd")}
+                                    {format(dateRange.from, "LLL dd")} - {format(dateRange.to, "LLL dd")}
                                   </>
                                 ) : (
                                   format(dateRange.from, "LLL dd, y")
@@ -457,40 +479,38 @@ export default function SitterProfile() {
                       </div>
 
                       {dateRange?.from && dateRange?.to && (
-                        <div className="bg-muted/50 p-3 rounded-lg">
+                        <div className="bg-muted/50 p-2.5 rounded-lg">
                           <div className="flex justify-between text-sm">
-                            <span>
+                            <span className="text-muted-foreground">
                               {differenceInDays(dateRange.to!, dateRange.from!) + 1} days
                             </span>
-                            <span className="font-medium">
-                              ${calculateTotal()}
-                            </span>
+                            <span className="font-semibold">${calculateTotal()}</span>
                           </div>
                         </div>
                       )}
 
-                      <Button
-                        onClick={handleBookingRequest}
-                        disabled={!selectedPet || !dateRange?.from || !dateRange?.to || submitting}
-                        className="w-full bg-coral hover:bg-coral/90"
-                      >
-                        {submitting ? "Sending..." : "Request to Book"}
-                      </Button>
+                      <div className="flex gap-2 pt-1">
+                        <Button
+                          onClick={handleBookingRequest}
+                          disabled={!selectedPet || !dateRange?.from || !dateRange?.to || submitting}
+                          className="flex-1 h-10 bg-coral hover:bg-coral/90"
+                        >
+                          {submitting ? "Sending..." : "Request Booking"}
+                        </Button>
+                        <Button variant="outline" size="icon" className="h-10 w-10 flex-shrink-0">
+                          <MessageCircle className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-
-                    <Button variant="outline" className="w-full">
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      Contact Sitter
-                    </Button>
                   </>
                 )}
 
                 {!user && (
-                  <div className="text-center pt-6 border-t">
-                    <p className="text-sm text-muted-foreground mb-4">
+                  <div className="text-center pt-3 border-t">
+                    <p className="text-xs text-muted-foreground mb-3">
                       Sign in to book this sitter
                     </p>
-                    <Button onClick={() => navigate('/auth')} className="w-full">
+                    <Button onClick={() => navigate('/auth')} className="w-full h-10">
                       Sign In
                     </Button>
                   </div>
