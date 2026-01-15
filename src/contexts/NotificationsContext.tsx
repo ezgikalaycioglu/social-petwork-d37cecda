@@ -161,9 +161,10 @@ export const NotificationsProvider: React.FC<{ children: ReactNode }> = ({ child
 
     fetchCounts();
 
-    // Set up real-time subscriptions with unique channel names
+    // Set up real-time subscriptions with unique channel names to avoid duplicate subscription errors
+    const channelId = `${user.id}-${Date.now()}`;
     const friendsChannel = supabase
-      .channel('friend_requests_notifications_global')
+      .channel(`friend_requests_notifications_${channelId}`)
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'pet_friendships' },
         () => fetchCounts()
@@ -171,7 +172,7 @@ export const NotificationsProvider: React.FC<{ children: ReactNode }> = ({ child
       .subscribe();
 
     const eventsChannel = supabase
-      .channel('events_notifications_global')
+      .channel(`events_notifications_${channelId}`)
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'events' },
         () => fetchCounts()

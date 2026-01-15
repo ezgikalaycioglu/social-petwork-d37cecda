@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useUnreadMessages = () => {
   const { user } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -14,25 +15,30 @@ export const useUnreadMessages = () => {
 
     fetchUnreadCount();
 
-    // Subscribe to new messages with unique channel name
-    const channelName = `unread-messages-${user.id}-${Date.now()}`;
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'sitter_messages',
-        },
-        () => {
-          fetchUnreadCount();
-        }
-      )
-      .subscribe();
+    // Only subscribe if not already subscribed
+    if (!channelRef.current) {
+      const channelName = `unread-messages-${user.id}-${Date.now()}`;
+      channelRef.current = supabase
+        .channel(channelName)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'sitter_messages',
+          },
+          () => {
+            fetchUnreadCount();
+          }
+        )
+        .subscribe();
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
   }, [user]);
 
