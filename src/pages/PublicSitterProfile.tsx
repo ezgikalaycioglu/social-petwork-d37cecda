@@ -212,7 +212,8 @@ export default function PublicSitterProfile() {
   const primaryPhoto = photos.find(p => p.is_primary)?.photo_url || photos[0]?.photo_url || userProfile?.avatar_url;
   const averageRating = reviews.length > 0 
     ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length 
-    : 5.0;
+    : null;
+  const hasReviews = reviews.length > 0;
 
   // Mock data for stats (to be replaced with real data later)
   const repeatClients = Math.floor(Math.random() * 20) + 5;
@@ -271,13 +272,20 @@ export default function PublicSitterProfile() {
             </div>
 
             {/* Rating */}
-            <div className="flex items-center justify-center gap-2">
-              <div className="flex items-center gap-1">
-                <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                <span className="font-semibold">{averageRating.toFixed(1)}</span>
+            {hasReviews ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="flex items-center gap-1">
+                  <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                  <span className="font-semibold">{averageRating?.toFixed(1)}</span>
+                </div>
+                <span className="text-muted-foreground">({reviews.length} reviews)</span>
               </div>
-              <span className="text-muted-foreground">({reviews.length} reviews)</span>
-            </div>
+            ) : (
+              <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                <Star className="w-4 h-4" />
+                <span className="text-sm">New sitter</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -477,55 +485,15 @@ export default function PublicSitterProfile() {
                 </Card>
               ))
             ) : (
-              // Placeholder testimonials
-              <>
-                <Card className="rounded-xl">
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <Avatar className="w-10 h-10">
-                        <AvatarFallback className="bg-primary/10 text-primary">S</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium text-sm">Sarah M.</span>
-                          <div className="flex items-center gap-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          "Amazing with my anxious pup! Will definitely book again."
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-2">Sample review</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card className="rounded-xl">
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <Avatar className="w-10 h-10">
-                        <AvatarFallback className="bg-primary/10 text-primary">J</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium text-sm">John D.</span>
-                          <div className="flex items-center gap-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          "Professional, caring, and sent updates throughout the day!"
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-2">Sample review</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </>
+              <Card className="rounded-xl">
+                <CardContent className="p-6 text-center">
+                  <Star className="w-10 h-10 text-muted-foreground/50 mx-auto mb-3" />
+                  <p className="font-medium text-muted-foreground">No reviews yet</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Be the first to book and leave a review!
+                  </p>
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>
