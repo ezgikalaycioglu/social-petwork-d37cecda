@@ -15,6 +15,7 @@ import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 
 interface SitterProfile {
   id: string;
+  name: string | null;
   rate_per_day: number | null;
   currency: string;
   bio: string | null;
@@ -60,6 +61,7 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [formData, setFormData] = useState({
+    name: sitterProfile.name || '',
     rate_per_day: sitterProfile.rate_per_day?.toString() || '',
     currency: sitterProfile.currency || 'USD',
     bio: sitterProfile.bio || '',
@@ -76,6 +78,7 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
 
   useEffect(() => {
     setFormData({
+      name: sitterProfile.name || '',
       rate_per_day: sitterProfile.rate_per_day?.toString() || '',
       currency: sitterProfile.currency || 'USD',
       bio: sitterProfile.bio || '',
@@ -111,6 +114,7 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
 
     try {
       const updateData: Record<string, unknown> = {
+        name: formData.name.trim() || null,
         currency: formData.currency,
         bio: formData.bio.trim() || null,
         location: formData.location.trim() || null,
@@ -228,7 +232,6 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
             </CardContent>
           </Card>
 
-          {/* Section 2: Your Brand */}
           <Card className="rounded-xl border border-border focus-within:ring-2 focus-within:ring-ring/20 transition-shadow" aria-labelledby="brand-title">
             <CardContent className="p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2">
@@ -236,6 +239,17 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
                 <h3 id="brand-title" className="text-sm font-semibold text-foreground">Your Brand</h3>
               </div>
               
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium text-foreground">Display Name</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Your name as shown to pet owners"
+                  className="h-11 rounded-xl px-4 border-border hover:border-muted-foreground/30 focus:ring-2 focus:ring-ring focus:border-primary transition-colors"
+                />
+              </div>
+
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="headline" className="text-sm font-medium text-foreground">Headline</Label>
