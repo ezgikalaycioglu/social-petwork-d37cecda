@@ -58,6 +58,9 @@ interface BookingData {
   total_price: number;
   pet_profiles: { name: string };
   sitter_profiles: { 
+    id: string;
+    user_id: string;
+    currency: string;
     user_profiles: { display_name: string } | null; 
     location: string;
   } | null;
@@ -175,6 +178,9 @@ const PetSitters = () => {
           *,
           pet_profiles!fk_sitter_bookings_pet_profiles (name),
           sitter_profiles (
+            id,
+            user_id,
+            currency,
             user_profiles!fk_sitter_profiles_user_profiles (display_name),
             location
           )
@@ -246,6 +252,48 @@ const PetSitters = () => {
       JPY: '¥', CHF: 'Fr', SEK: 'kr', NOK: 'kr', DKK: 'kr'
     };
     return symbols[currency] || '$';
+  };
+
+  const formatPrice = (amount: number, currency: string = 'USD') => {
+    const symbol = getCurrencySymbol(currency);
+    if (['SEK', 'NOK', 'DKK'].includes(currency)) {
+      return `${amount} ${symbol}`;
+    }
+    return `${symbol}${amount}`;
+  };
+
+  const handleOpenBookingChat = async (booking: BookingData) => {
+    if (!user) return;
+    
+    const otherUserId = booking.sitter_profiles?.user_id;
+    
+    if (!otherUserId) {
+      toast({
+        title: "Error",
+        description: "Could not find the sitter for this booking.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      const { data: conversationId, error } = await supabase
+        .rpc('find_or_create_conversation', {
+          user_a: user.id,
+          user_b: otherUserId,
+          linked_booking_id: booking.id
+        });
+
+      if (error) throw error;
+      navigate(`/messages/${conversationId}`);
+    } catch (error) {
+      console.error('Error opening chat:', error);
+      toast({
+        title: "Error",
+        description: "Failed to open chat. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSaveRate = async () => {
@@ -681,7 +729,8 @@ const PetSitters = () => {
                     {bookings.map((booking) => (
                       <Card 
                         key={booking.id}
-                        className="rounded-2xl bg-white border border-gray-100 shadow-sm"
+                        className="rounded-2xl bg-white border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                        onClick={() => handleOpenBookingChat(booking)}
                       >
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between gap-3">
@@ -703,7 +752,7 @@ const PetSitters = () => {
                             </div>
                             <div className="text-right">
                               <p className="font-semibold text-foreground">
-                                ${booking.total_price}
+                                {formatPrice(booking.total_price, booking.sitter_profiles?.currency || 'USD')}
                               </p>
                             </div>
                           </div>
