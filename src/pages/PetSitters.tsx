@@ -39,6 +39,7 @@ import {
 interface SitterData {
   id: string;
   user_id: string;
+  name: string | null;
   bio: string;
   location: string;
   rate_per_day: number;
@@ -46,7 +47,6 @@ interface SitterData {
   is_active: boolean;
   sitter_services: { service_type: string }[];
   sitter_photos: { photo_url: string; is_primary: boolean }[];
-  display_name?: string;
 }
 
 interface BookingData {
@@ -150,23 +150,7 @@ const PetSitters = () => {
         throw error;
       }
 
-      // Fetch display names separately (RLS allows reading own profile, so we use a workaround)
-      const sittersWithNames = await Promise.all(
-        (data || []).map(async (sitter) => {
-          const { data: profileData } = await supabase
-            .from('user_profiles')
-            .select('display_name')
-            .eq('id', sitter.user_id)
-            .maybeSingle();
-          
-          return {
-            ...sitter,
-            display_name: profileData?.display_name || null,
-          };
-        })
-      );
-
-      setSitters(sittersWithNames as unknown as SitterData[]);
+      setSitters((data || []) as unknown as SitterData[]);
     } catch (error) {
       console.error('Error fetching sitters:', error);
       toast({
@@ -572,7 +556,7 @@ const PetSitters = () => {
                       const primaryPhoto = sitter.sitter_photos.find(p => p.is_primary)?.photo_url;
                       const services = sitter.sitter_services.map(s => s.service_type);
                       
-                      const displayName = sitter.display_name || 'Pet Sitter';
+                      const displayName = sitter.name || 'Pet Sitter';
                       const currencySymbol = sitter.currency === 'SEK' ? 'kr' : sitter.currency === 'EUR' ? '€' : '$';
                       
                       return (
