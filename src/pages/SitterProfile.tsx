@@ -23,6 +23,7 @@ interface SitterData {
   bio: string;
   location: string;
   rate_per_day: number;
+  currency: string;
   display_name?: string;
   sitter_services: {
     service_type: string;
@@ -292,7 +293,15 @@ export default function SitterProfile() {
                        sitter.sitter_photos[0]?.photo_url;
   const averageRating = reviews.length > 0 
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length 
-    : 5.0;
+    : null;
+  const hasReviews = reviews.length > 0;
+
+  const getCurrencySymbol = (currency: string) => {
+    const symbols: Record<string, string> = {
+      'USD': '$', 'EUR': '€', 'GBP': '£', 'SEK': 'kr', 'TRY': '₺'
+    };
+    return symbols[currency] || currency;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -329,11 +338,18 @@ export default function SitterProfile() {
                       <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
                       <span className="truncate">{sitter.location || 'Location not set'}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-semibold text-sm">{averageRating.toFixed(1)}</span>
-                      <span className="text-xs text-muted-foreground">({reviews.length} reviews)</span>
-                    </div>
+                    {hasReviews ? (
+                      <div className="flex items-center gap-1.5 mt-2">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        <span className="font-semibold text-sm">{averageRating?.toFixed(1)}</span>
+                        <span className="text-xs text-muted-foreground">({reviews.length} reviews)</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 mt-2 text-muted-foreground">
+                        <Star className="w-4 h-4" />
+                        <span className="text-sm">New sitter</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -404,13 +420,13 @@ export default function SitterProfile() {
                       sitter.sitter_services.map((service, index) => (
                         <div key={index} className="flex justify-between items-center text-sm">
                           <span className="text-muted-foreground">{service.service_type}</span>
-                          <span className="font-medium">${sitter.rate_per_day}/day</span>
+                          <span className="font-medium">{getCurrencySymbol(sitter.currency)}{sitter.rate_per_day}/day</span>
                         </div>
                       ))
                     ) : (
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-muted-foreground">Pet Sitting</span>
-                        <span className="font-medium">${sitter.rate_per_day}/day</span>
+                        <span className="font-medium">{getCurrencySymbol(sitter.currency)}{sitter.rate_per_day}/day</span>
                       </div>
                     )}
                   </div>
@@ -484,7 +500,7 @@ export default function SitterProfile() {
                             <span className="text-muted-foreground">
                               {differenceInDays(dateRange.to!, dateRange.from!) + 1} days
                             </span>
-                            <span className="font-semibold">${calculateTotal()}</span>
+                            <span className="font-semibold">{getCurrencySymbol(sitter.currency)}{calculateTotal()}</span>
                           </div>
                         </div>
                       )}
