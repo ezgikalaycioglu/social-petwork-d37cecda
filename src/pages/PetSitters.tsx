@@ -42,9 +42,11 @@ interface SitterData {
   bio: string;
   location: string;
   rate_per_day: number;
+  currency: string;
   is_active: boolean;
   sitter_services: { service_type: string }[];
   sitter_photos: { photo_url: string; is_primary: boolean }[];
+  display_name?: string;
 }
 
 interface BookingData {
@@ -141,13 +143,30 @@ const PetSitters = () => {
 
       const { data, error } = await query;
 
-      console.log('[PetSitters] Fetched sitters:', data?.length, data?.map(s => ({ id: s.id, user_id: s.user_id, location: s.location })));
+      console.log('[PetSitters] Fetched sitters:', data?.length);
       
       if (error) {
         console.error('[PetSitters] Fetch error:', error);
         throw error;
       }
-      setSitters((data || []) as unknown as SitterData[]);
+
+      // Fetch display names separately (RLS allows reading own profile, so we use a workaround)
+      const sittersWithNames = await Promise.all(
+        (data || []).map(async (sitter) => {
+          const { data: profileData } = await supabase
+            .from('user_profiles')
+            .select('display_name')
+            .eq('id', sitter.user_id)
+            .maybeSingle();
+          
+          return {
+            ...sitter,
+            display_name: profileData?.display_name || null,
+          };
+        })
+      );
+
+      setSitters(sittersWithNames as unknown as SitterData[]);
     } catch (error) {
       console.error('Error fetching sitters:', error);
       toast({
@@ -553,49 +572,65 @@ const PetSitters = () => {
                       const primaryPhoto = sitter.sitter_photos.find(p => p.is_primary)?.photo_url;
                       const services = sitter.sitter_services.map(s => s.service_type);
                       
+                      const displayName = sitter.display_name || 'Pet Sitter';
+                      const currencySymbol = sitter.currency === 'SEK' ? 'kr' : sitter.currency === 'EUR' ? '€' : '$';
+                      
                       return (
                         <Card 
                           key={sitter.id}
                           className="rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
                           onClick={() => navigate(`/sitter/${sitter.id}`)}
                         >
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between gap-3 min-w-0">
-                              <div className="flex items-start gap-3 min-w-0 flex-1">
-                                <Avatar className="h-12 w-12 border border-gray-100 shrink-0">
-                                  <AvatarImage src={primaryPhoto} alt="Pet Sitter" />
+                          <CardContent className="p-3 sm:p-4">
+                            <div className="flex items-start justify-between gap-2 sm:gap-3">
+                              <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
+                                <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border border-gray-100 shrink-0">
+                                  <AvatarImage src={primaryPhoto} alt={displayName} />
                                   <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
-                                    <PawPrint className="w-5 h-5" />
+                                    {displayName.charAt(0).toUpperCase()}
                                   </AvatarFallback>
                                 </Avatar>
                                 
                                 <div className="min-w-0 flex-1">
-                                  <h3 className="font-semibold text-foreground truncate">
-                                    Pet Sitter
-                                  </h3>
-                                  <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <h3 className="font-semibold text-foreground truncate text-sm sm:text-base">
+                                      {displayName}
+                                    </h3>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-8 sm:h-9 rounded-full px-3 text-xs sm:text-sm shrink-0 sm:hidden"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/sitter/${sitter.id}`);
+                                      }}
+                                    >
+                                      View
+                                    </Button>
+                                  </div>
+                                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 mt-0.5">
                                     {sitter.bio || 'Professional pet sitter'}
                                   </p>
-                                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1 flex-wrap">
-                                    <span className="flex items-center gap-1">
-                                      <MapPin className="h-3.5 w-3.5" />
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground mt-1.5">
+                                    <span className="flex items-center gap-1 truncate max-w-full">
+                                      <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
                                       <span className="truncate">{sitter.location}</span>
                                     </span>
-                                    <span>•</span>
+                                    <span className="hidden sm:inline">•</span>
                                     <span className="flex items-center gap-1">
-                                      <DollarSign className="h-3.5 w-3.5" />
-                                      ${sitter.rate_per_day}/day
+                                      <DollarSign className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
+                                      {currencySymbol}{sitter.rate_per_day}/day
                                     </span>
                                   </div>
                                   {services.length > 0 && (
                                     <div className="flex flex-wrap gap-1 mt-2">
                                       {services.slice(0, 2).map((service) => (
-                                        <Badge key={service} variant="secondary" className="text-xs px-2 py-0.5">
+                                        <Badge key={service} variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5">
                                           {service}
                                         </Badge>
                                       ))}
                                       {services.length > 2 && (
-                                        <Badge variant="outline" className="text-xs px-2 py-0.5">
+                                        <Badge variant="outline" className="text-xs px-1.5 sm:px-2 py-0.5">
                                           +{services.length - 2}
                                         </Badge>
                                       )}
@@ -607,7 +642,7 @@ const PetSitters = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-9 rounded-full px-3 text-sm shrink-0"
+                                className="h-9 rounded-full px-3 text-sm shrink-0 hidden sm:flex"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   navigate(`/sitter/${sitter.id}`);
