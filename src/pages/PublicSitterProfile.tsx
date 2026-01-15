@@ -35,6 +35,8 @@ interface SitterProfile {
   is_verified: boolean | null;
   response_time: string | null;
   is_active: boolean | null;
+  profile_photo_url: string | null;
+  name: string | null;
 }
 
 interface UserProfile {
@@ -208,8 +210,8 @@ export default function PublicSitterProfile() {
     );
   }
 
-  const displayName = userProfile?.display_name || 'Pet Sitter';
-  const primaryPhoto = photos.find(p => p.is_primary)?.photo_url || photos[0]?.photo_url || userProfile?.avatar_url;
+  const displayName = sitter.name || userProfile?.display_name || 'Pet Sitter';
+  const primaryPhoto = sitter.profile_photo_url || photos.find(p => p.is_primary)?.photo_url || photos[0]?.photo_url || userProfile?.avatar_url;
   const averageRating = reviews.length > 0 
     ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length 
     : null;

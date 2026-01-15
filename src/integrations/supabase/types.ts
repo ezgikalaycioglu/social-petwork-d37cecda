@@ -1298,6 +1298,7 @@ export type Database = {
           is_verified: boolean | null
           location: string | null
           name: string | null
+          profile_photo_url: string | null
           rate_per_day: number | null
           response_time: string | null
           updated_at: string
@@ -1315,6 +1316,7 @@ export type Database = {
           is_verified?: boolean | null
           location?: string | null
           name?: string | null
+          profile_photo_url?: string | null
           rate_per_day?: number | null
           response_time?: string | null
           updated_at?: string
@@ -1332,6 +1334,7 @@ export type Database = {
           is_verified?: boolean | null
           location?: string | null
           name?: string | null
+          profile_photo_url?: string | null
           rate_per_day?: number | null
           response_time?: string | null
           updated_at?: string

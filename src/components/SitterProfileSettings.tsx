@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,8 +9,10 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, DollarSign, MapPin, FileText, Loader2, Sparkles, PawPrint, Link, Copy, Check, X, Power } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Settings, DollarSign, MapPin, FileText, Loader2, Sparkles, PawPrint, Link, Copy, Check, X, Power, Camera, User } from 'lucide-react';
 import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 
 interface SitterProfile {
@@ -24,6 +26,7 @@ interface SitterProfile {
   headline?: string | null;
   years_experience?: string | null;
   accepted_pet_types?: string[] | null;
+  profile_photo_url?: string | null;
 }
 
 interface SitterProfileSettingsProps {
@@ -59,7 +62,10 @@ const experienceLevels = [
 const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSettingsProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [copied, setCopied] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: sitterProfile.name || '',
     rate_per_day: sitterProfile.rate_per_day?.toString() || '',
@@ -70,6 +76,7 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
     headline: sitterProfile.headline || '',
     years_experience: sitterProfile.years_experience || '',
     accepted_pet_types: sitterProfile.accepted_pet_types || [],
+    profile_photo_url: sitterProfile.profile_photo_url || '',
   });
   
   const { toast } = useToast();
@@ -87,8 +94,68 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
       headline: sitterProfile.headline || '',
       years_experience: sitterProfile.years_experience || '',
       accepted_pet_types: sitterProfile.accepted_pet_types || [],
+      profile_photo_url: sitterProfile.profile_photo_url || '',
     });
   }, [sitterProfile]);
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file",
+        description: "Please upload an image file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please upload an image smaller than 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingPhoto(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/profile.${fileExt}`;
+
+      // Upload to sitter-photos bucket
+      const { error: uploadError } = await supabase.storage
+        .from('sitter-photos')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('sitter-photos')
+        .getPublicUrl(fileName);
+
+      setFormData(prev => ({ ...prev, profile_photo_url: publicUrl }));
+      
+      toast({
+        title: "Photo uploaded",
+        description: "Your profile photo has been uploaded. Save to apply changes.",
+      });
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload photo. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   const handlePetTypeChange = (petType: string, checked: boolean) => {
     setFormData(prev => ({
@@ -122,6 +189,7 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
         headline: formData.headline.trim() || null,
         years_experience: formData.years_experience || null,
         accepted_pet_types: formData.accepted_pet_types.length > 0 ? formData.accepted_pet_types : null,
+        profile_photo_url: formData.profile_photo_url || null,
         updated_at: new Date().toISOString(),
       };
 
@@ -229,6 +297,63 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
               {copied && (
                 <p className="text-xs text-primary mt-2 font-medium">Copied!</p>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Section 2: Profile Photo */}
+          <Card className="rounded-xl border border-border focus-within:ring-2 focus-within:ring-ring/20 transition-shadow" aria-labelledby="photo-title">
+            <CardContent className="p-4 sm:p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Camera className="w-[18px] h-[18px] text-primary" />
+                <h3 id="photo-title" className="text-sm font-semibold text-foreground">Profile Photo</h3>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <Avatar className="w-20 h-20 border-2 border-border">
+                    <AvatarImage src={formData.profile_photo_url || undefined} alt="Profile" />
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      <User className="w-8 h-8" />
+                    </AvatarFallback>
+                  </Avatar>
+                  {uploadingPhoto && (
+                    <div className="absolute inset-0 bg-background/80 rounded-full flex items-center justify-center">
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingPhoto}
+                    className="h-10 rounded-xl"
+                  >
+                    {uploadingPhoto ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Camera className="w-4 h-4 mr-2" />
+                        {formData.profile_photo_url ? 'Change Photo' : 'Upload Photo'}
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    JPG, PNG or WebP. Max 5MB.
+                  </p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
