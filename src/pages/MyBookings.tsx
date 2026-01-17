@@ -4,12 +4,23 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, Check, X, Star } from "lucide-react";
+import { MessageCircle, Check, X, Star, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Booking {
   id: string;
@@ -51,6 +62,7 @@ interface BookingCardProps {
   onStatusUpdate: (bookingId: string, status: string) => void;
   onReview: (bookingId: string) => void;
   onOpenChat: (booking: Booking) => void;
+  cancellingId: string | null;
 }
 
 // Format price with correct currency symbol
@@ -75,7 +87,7 @@ const formatPrice = (amount: number, currency: string = 'USD') => {
   return `${symbol}${amount}`;
 };
 
-function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat }: BookingCardProps) {
+function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat, cancellingId }: BookingCardProps) {
   const otherPersonName = userRole === 'owner' 
     ? booking.sitter_display_name || 'Sitter'
     : booking.owner_display_name || 'Pet Owner';
@@ -92,6 +104,7 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat }
   const petPhoto = booking.pet_profiles?.profile_photo_url;
   
   const isBookingConfirmed = booking.status === 'accepted' || booking.status === 'confirmed';
+  const isCancelling = cancellingId === booking.id;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -99,6 +112,7 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat }
       case 'accepted': return 'bg-green-100 text-green-800 border-green-200';
       case 'completed': return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'declined': return 'bg-red-100 text-red-800 border-red-200';
+      case 'cancelled': return 'bg-gray-100 text-gray-800 border-gray-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
@@ -109,6 +123,7 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat }
       case 'accepted': return 'Accepted';
       case 'completed': return 'Completed';
       case 'declined': return 'Declined';
+      case 'cancelled': return 'Cancelled';
       default: return status;
     }
   };
@@ -161,7 +176,7 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat }
             </div>
 
             {/* Action Buttons */}
-            <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
+            <div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
               {booking.status === 'pending' && userRole === 'sitter' && (
                 <>
                   <Button
@@ -182,6 +197,46 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat }
                     Decline
                   </Button>
                 </>
+              )}
+
+              {/* Cancel button for owners on pending/accepted bookings */}
+              {(booking.status === 'pending' || booking.status === 'accepted') && userRole === 'owner' && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-red-300 text-red-600 hover:bg-red-50"
+                      disabled={isCancelling}
+                    >
+                      {isCancelling ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          <X className="w-4 h-4 mr-1" />
+                          Cancel
+                        </>
+                      )}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Cancel Booking Request?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to cancel this booking request? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Keep Booking</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={() => onStatusUpdate(booking.id, 'cancelled')}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Yes, Cancel
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               )}
 
               {booking.status === 'accepted' && (
@@ -217,6 +272,7 @@ export default function MyBookings() {
   const [ownerBookings, setOwnerBookings] = useState<Booking[]>([]);
   const [sitterBookings, setSitterBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -338,6 +394,10 @@ export default function MyBookings() {
   };
 
   const handleStatusUpdate = async (bookingId: string, status: string) => {
+    if (status === 'cancelled') {
+      setCancellingId(bookingId);
+    }
+    
     try {
       const { error } = await supabase
         .from('sitter_bookings')
@@ -347,8 +407,10 @@ export default function MyBookings() {
       if (error) throw error;
 
       toast({
-        title: "Booking Updated",
-        description: `Booking has been ${status}`,
+        title: status === 'cancelled' ? "Booking Cancelled" : "Booking Updated",
+        description: status === 'cancelled' 
+          ? "Your booking request has been cancelled."
+          : `Booking has been ${status}`,
       });
 
       fetchBookings(); // Refresh the data
@@ -359,6 +421,8 @@ export default function MyBookings() {
         description: "Failed to update booking",
         variant: "destructive",
       });
+    } finally {
+      setCancellingId(null);
     }
   };
 
@@ -441,17 +505,20 @@ export default function MyBookings() {
               </TabsList>
 
               <TabsContent value="owner" className="space-y-4">
-                {ownerBookings.length > 0 ? (
-                  ownerBookings.map((booking) => (
-                    <BookingCard
-                      key={booking.id}
-                      booking={booking}
-                      userRole="owner"
-                      onStatusUpdate={handleStatusUpdate}
-                      onReview={handleReview}
-                      onOpenChat={handleOpenChat}
-                    />
-                  ))
+                {ownerBookings.filter(b => b.status !== 'cancelled').length > 0 ? (
+                  ownerBookings
+                    .filter(b => b.status !== 'cancelled')
+                    .map((booking) => (
+                      <BookingCard
+                        key={booking.id}
+                        booking={booking}
+                        userRole="owner"
+                        onStatusUpdate={handleStatusUpdate}
+                        onReview={handleReview}
+                        onOpenChat={handleOpenChat}
+                        cancellingId={cancellingId}
+                      />
+                    ))
                 ) : (
                   <div className="text-center py-12">
                     <p className="text-lg text-muted-foreground mb-4">
@@ -474,6 +541,7 @@ export default function MyBookings() {
                       onStatusUpdate={handleStatusUpdate}
                       onReview={handleReview}
                       onOpenChat={handleOpenChat}
+                      cancellingId={cancellingId}
                     />
                   ))
                 ) : (
