@@ -75,35 +75,47 @@ const Messages = () => {
         (convos || []).map(async (conv) => {
           const otherUserId = conv.participant_a === user.id ? conv.participant_b : conv.participant_a;
 
-          // Fetch other user profile
-          const { data: userProfile } = await supabase
-            .from('user_profiles')
-            .select('id, display_name, email')
-            .eq('id', otherUserId)
-            .single();
+          // Fetch other user profile and sitter profile in parallel
+          const [userProfileResult, sitterProfileResult, lastMessageResult, unreadCountResult] = await Promise.all([
+            supabase
+              .from('user_profiles')
+              .select('id, display_name, email')
+              .eq('id', otherUserId)
+              .single(),
+            supabase
+              .from('sitter_profiles')
+              .select('name')
+              .eq('user_id', otherUserId)
+              .single(),
+            supabase
+              .from('sitter_messages')
+              .select('body, sender_user_id')
+              .eq('conversation_id', conv.id)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .single(),
+            supabase
+              .from('sitter_messages')
+              .select('*', { count: 'exact', head: true })
+              .eq('conversation_id', conv.id)
+              .neq('sender_user_id', user.id)
+              .is('read_at', null)
+          ]);
 
-          // Fetch last message
-          const { data: lastMessage } = await supabase
-            .from('sitter_messages')
-            .select('body, sender_user_id')
-            .eq('conversation_id', conv.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-
-          // Count unread messages
-          const { count: unreadCount } = await supabase
-            .from('sitter_messages')
-            .select('*', { count: 'exact', head: true })
-            .eq('conversation_id', conv.id)
-            .neq('sender_user_id', user.id)
-            .is('read_at', null);
+          // Prefer sitter name, then display_name, then email
+          const displayName = sitterProfileResult.data?.name || 
+                              userProfileResult.data?.display_name || 
+                              userProfileResult.data?.email || 
+                              null;
 
           return {
             ...conv,
-            other_user: userProfile,
-            last_message: lastMessage,
-            unread_count: unreadCount || 0,
+            other_user: {
+              ...userProfileResult.data,
+              display_name: displayName,
+            },
+            last_message: lastMessageResult.data,
+            unread_count: unreadCountResult.count || 0,
           };
         })
       );
