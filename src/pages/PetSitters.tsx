@@ -1126,7 +1126,7 @@ const PetSitters = () => {
                                       size="sm"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        navigate(`/review-booking/${booking.id}`);
+                                        navigate(`/review/${booking.id}`);
                                       }}
                                       className="bg-yellow-500 hover:bg-yellow-600"
                                     >
