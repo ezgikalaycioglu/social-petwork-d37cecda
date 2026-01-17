@@ -734,7 +734,7 @@ const PetSitters = () => {
                       }`}
                     >
                       <CalendarCheck className="w-4 h-4" />
-                      Availability
+                      Sitter Profile
                     </button>
                     <button
                       role="tab"
@@ -1149,19 +1149,6 @@ const PetSitters = () => {
                           </CardContent>
                         </Card>
 
-                        <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm">
-                          <CardContent className="p-4">
-                            <div className="flex items-start gap-3">
-                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                <CalendarCheck className="w-5 h-5 text-primary" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-foreground text-sm">Availability</h4>
-                                <p className="text-xs text-muted-foreground mt-0.5">Manage calendar</p>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
                       </div>
                     </div>
 
