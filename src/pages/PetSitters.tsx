@@ -132,6 +132,9 @@ const PetSitters = () => {
       checkSitterProfile();
     } else if (activeTab === 'sitter-bookings') {
       fetchClientBookings();
+      if (!sitterProfile) {
+        checkSitterProfile();
+      }
     }
   }, [activeTab, user]);
 
@@ -1110,9 +1113,7 @@ const PetSitters = () => {
                   </Card>
                 ) : (
                   <div className="space-y-3">
-                    {clientBookings.map((booking) => {
-                      const clientName = booking.user_profiles?.display_name || booking.user_profiles?.email || 'Unknown Client';
-                      return (
+                    {clientBookings.map((booking) => (
                         <Card 
                           key={booking.id}
                           className="rounded-2xl bg-white border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
@@ -1123,30 +1124,26 @@ const PetSitters = () => {
                               <div className="flex-1 space-y-1">
                                 <div className="flex items-center gap-2">
                                   <h4 className="font-semibold text-foreground">
-                                    {clientName}
+                                    {booking.pet_profiles.name}
                                   </h4>
                                   <Badge className={getStatusColor(booking.status)}>
                                     {booking.status}
                                   </Badge>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
-                                  Pet: {booking.pet_profiles.name}
-                                </p>
-                                <p className="text-sm text-muted-foreground">
                                   {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
                                 </p>
                               </div>
                               <div className="text-right flex flex-col items-end gap-1">
                                 <p className="font-semibold text-foreground">
-                                  {formatPrice(booking.total_price)}
+                                  {formatPrice(booking.total_price, sitterProfile?.currency || 'USD')}
                                 </p>
                                 <ArrowRight className="w-4 h-4 text-muted-foreground" />
                               </div>
                             </div>
                           </CardContent>
                         </Card>
-                      );
-                    })}
+                      ))}
                   </div>
                 )}
               </TabsContent>
