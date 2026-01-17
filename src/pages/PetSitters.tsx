@@ -56,6 +56,9 @@ interface BookingData {
   end_date: string;
   status: string;
   total_price: number;
+  owner_completed?: boolean | null;
+  sitter_completed?: boolean | null;
+  completed_at?: string | null;
   pet_profiles: { name: string };
   sitter_profiles: { 
     id: string;
@@ -99,6 +102,7 @@ const PetSitters = () => {
   
   // My Bookings state
   const [bookings, setBookings] = useState<BookingData[]>([]);
+  const [ownerConfirmingBookingId, setOwnerConfirmingBookingId] = useState<string | null>(null);
   
   // Client Bookings state (for sitters)
   const [clientBookings, setClientBookings] = useState<ClientBookingData[]>([]);
@@ -566,6 +570,40 @@ const PetSitters = () => {
     }
   };
 
+  const handleOwnerMarkCompleted = async (e: React.MouseEvent, booking: BookingData) => {
+    e.stopPropagation();
+    if (!user) return;
+    
+    setOwnerConfirmingBookingId(booking.id);
+    try {
+      const { error } = await supabase
+        .from('sitter_bookings')
+        .update({ owner_completed: true })
+        .eq('id', booking.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Service Marked Complete",
+        description: booking.sitter_completed 
+          ? "Booking is now complete! You can leave a review."
+          : "You've confirmed the service is completed. Waiting for the sitter to confirm.",
+      });
+
+      // Refresh bookings
+      fetchMyBookings();
+    } catch (error) {
+      console.error('Error marking completion:', error);
+      toast({
+        title: "Error",
+        description: "Failed to mark service as completed",
+        variant: "destructive",
+      });
+    } finally {
+      setOwnerConfirmingBookingId(null);
+    }
+  };
+
   const handleSaveRate = async () => {
     if (!sitterProfile) return;
     setSavingRate(true);
@@ -996,39 +1034,118 @@ const PetSitters = () => {
                   </Card>
                 ) : (
                   <div className="space-y-3">
-                    {bookings.map((booking) => (
-                      <Card 
-                        key={booking.id}
-                        className="rounded-2xl bg-white border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-                        onClick={() => handleOpenBookingChat(booking)}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1 space-y-1">
-                              <div className="flex items-center gap-2">
-                                <h4 className="font-semibold text-foreground">
-                                  {booking.sitter_profiles?.name || booking.sitter_profiles?.user_profiles?.display_name || 'Unknown Sitter'}
-                                </h4>
-                                <Badge className={getStatusColor(booking.status)}>
-                                  {booking.status}
-                                </Badge>
+                    {bookings.map((booking) => {
+                      const isEndDatePassed = new Date(booking.end_date) <= new Date();
+                      const ownerHasCompleted = booking.owner_completed;
+                      const sitterHasCompleted = booking.sitter_completed;
+                      const canMarkComplete = booking.status === 'accepted' && isEndDatePassed && !ownerHasCompleted;
+                      const isFullyCompleted = booking.status === 'completed';
+                      const isConfirming = ownerConfirmingBookingId === booking.id;
+
+                      return (
+                        <Card 
+                          key={booking.id}
+                          className="rounded-2xl bg-white border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                          onClick={() => handleOpenBookingChat(booking)}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="font-semibold text-foreground">
+                                    {booking.sitter_profiles?.name || booking.sitter_profiles?.user_profiles?.display_name || 'Unknown Sitter'}
+                                  </h4>
+                                  <Badge className={getStatusColor(booking.status)}>
+                                    {booking.status}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                  {booking.pet_profiles.name}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
+                                </p>
+
+                                {/* Completion Status Indicator */}
+                                {booking.status === 'accepted' && isEndDatePassed && (
+                                  <div className="mt-3 p-3 rounded-lg bg-muted/50 border">
+                                    {ownerHasCompleted && !sitterHasCompleted && (
+                                      <>
+                                        <div className="flex items-center gap-2 text-sm">
+                                          <CheckCircle className="w-4 h-4 text-green-600" />
+                                          <span className="text-green-700 font-medium">You confirmed completion</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-sm mt-1 text-muted-foreground">
+                                          <Clock className="w-4 h-4" />
+                                          <span>Waiting for sitter to confirm...</span>
+                                        </div>
+                                      </>
+                                    )}
+                                    {!ownerHasCompleted && sitterHasCompleted && (
+                                      <div className="flex items-center gap-2 text-sm text-amber-700">
+                                        <Clock className="w-4 h-4" />
+                                        <span>Sitter has confirmed - please confirm to complete</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Completed Status */}
+                                {isFullyCompleted && (
+                                  <div className="mt-3 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                                    <div className="flex items-center gap-2 text-sm text-blue-700">
+                                      <CheckCircle className="w-4 h-4" />
+                                      <span className="font-medium">
+                                        Service completed
+                                        {booking.completed_at && ` on ${new Date(booking.completed_at).toLocaleDateString()}`}
+                                      </span>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Action Buttons */}
+                                <div className="flex flex-wrap gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+                                  {canMarkComplete && (
+                                    <Button
+                                      size="sm"
+                                      onClick={(e) => handleOwnerMarkCompleted(e, booking)}
+                                      disabled={isConfirming}
+                                      className="bg-blue-600 hover:bg-blue-700"
+                                    >
+                                      {isConfirming ? (
+                                        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                                      ) : (
+                                        <CheckCircle className="w-4 h-4 mr-1" />
+                                      )}
+                                      Mark Service Completed
+                                    </Button>
+                                  )}
+
+                                  {isFullyCompleted && (
+                                    <Button
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/review-booking/${booking.id}`);
+                                      }}
+                                      className="bg-yellow-500 hover:bg-yellow-600"
+                                    >
+                                      <Star className="w-4 h-4 mr-1" />
+                                      Leave Review
+                                    </Button>
+                                  )}
+                                </div>
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                {booking.pet_profiles.name}
-                              </p>
-                              <p className="text-sm text-muted-foreground">
-                                {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
-                              </p>
+                              <div className="text-right">
+                                <p className="font-semibold text-foreground">
+                                  {formatPrice(booking.total_price, booking.sitter_profiles?.currency || 'USD')}
+                                </p>
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <p className="font-semibold text-foreground">
-                                {formatPrice(booking.total_price, booking.sitter_profiles?.currency || 'USD')}
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
               </TabsContent>
