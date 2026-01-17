@@ -739,14 +739,14 @@ const PetSitters = () => {
                             <div className="flex-1 space-y-1">
                               <div className="flex items-center gap-2">
                                 <h4 className="font-semibold text-foreground">
-                                  {booking.pet_profiles.name}
+                                  {booking.sitter_profiles?.name || booking.sitter_profiles?.user_profiles?.display_name || 'Unknown Sitter'}
                                 </h4>
                                 <Badge className={getStatusColor(booking.status)}>
                                   {booking.status}
                                 </Badge>
                               </div>
                               <p className="text-sm text-muted-foreground">
-                                {booking.sitter_profiles?.name || booking.sitter_profiles?.user_profiles?.display_name || 'Unknown Sitter'}
+                                {booking.pet_profiles.name}
                               </p>
                               <p className="text-sm text-muted-foreground">
                                 {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
