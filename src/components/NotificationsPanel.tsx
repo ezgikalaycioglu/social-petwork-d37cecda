@@ -198,7 +198,7 @@ const NotificationsPanel = ({ isOpen, onClose }: NotificationsPanelProps) => {
       .eq('id', message.id);
     
     markMessageAsRead(message.id);
-    navigate(`/chat/${message.conversation_id}`);
+    navigate(`/messages/${message.conversation_id}`);
     onClose();
   };
 
