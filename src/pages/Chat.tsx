@@ -278,9 +278,10 @@ const Chat = () => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-3.5rem)] xl:h-[100dvh] max-w-2xl mx-auto">
-      {/* Compact Sticky App Bar - positioned below MobileTopNav on mobile */}
-      <div className="sticky top-14 xl:top-0 z-30 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75 border-b">
+    <div className="flex flex-col h-[calc(100dvh-7rem)] xl:h-[100dvh] max-w-2xl mx-auto">
+      {/* Sticky Header Section - includes app bar + booking card */}
+      <div className="sticky top-14 xl:top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b shadow-sm">
+        {/* Compact App Bar */}
         <div className="flex items-center h-12 sm:h-14 px-2">
           {/* Left: Back chevron */}
           <Button 
@@ -308,13 +309,10 @@ const Chat = () => {
           {/* Right: Spacer for symmetry */}
           <div className="w-11 h-11 shrink-0" />
         </div>
-      </div>
 
-      {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto scroll-py-2">
-        {/* Booking Context Card - scrolls with content */}
+        {/* Booking Context Card - sticky with header */}
         {bookingContext && (
-          <div className="pt-2 px-4">
+          <div className="px-4 pb-2">
             <Card className="p-3 bg-accent/50">
               <div className="flex flex-wrap items-center gap-2 text-sm">
                 <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -327,6 +325,10 @@ const Chat = () => {
             </Card>
           </div>
         )}
+      </div>
+
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto scroll-py-2">
 
         {/* Privacy Notice - scrolls with content */}
         <div className="px-4 pt-2 pb-2">
