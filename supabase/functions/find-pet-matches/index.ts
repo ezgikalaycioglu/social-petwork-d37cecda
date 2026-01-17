@@ -250,11 +250,15 @@ Deno.serve(async (req) => {
       if (distance <= safeRadius) {
         const compatibilityScore = calculateCompatibilityScore(userPet, pet, distance);
         
-        // Exclude user_id from the response for privacy
-        const { user_id, ...petWithoutUserId } = pet;
+        // Exclude user_id AND exact coordinates from the response for privacy
+        // Only expose approximate location (rounded to ~1km precision)
+        const { user_id, latitude: exactLat, longitude: exactLon, ...petWithoutSensitiveData } = pet;
         
         matches.push({
-          ...petWithoutUserId,
+          ...petWithoutSensitiveData,
+          // Provide approximate location instead of exact coordinates
+          latitude: Math.round(exactLat * 100) / 100,
+          longitude: Math.round(exactLon * 100) / 100,
           compatibilityScore,
           distance: Math.round(distance * 10) / 10 // round to 1 decimal
         });
