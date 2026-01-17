@@ -6,9 +6,21 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ChevronLeft, Send, Loader2, Calendar, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Send, Loader2, Calendar, AlertCircle, X } from 'lucide-react';
 import { format, isToday, isYesterday, isSameDay } from 'date-fns';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface Message {
   id: string;
@@ -31,6 +43,7 @@ interface BookingContext {
   end_date: string;
   status: string;
   pet_name: string;
+  owner_id: string;
 }
 
 const Chat = () => {
@@ -43,7 +56,9 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!user || !conversationId) return;
@@ -125,7 +140,8 @@ const Chat = () => {
             start_date,
             end_date,
             status,
-            pet_id
+            pet_id,
+            owner_id
           `)
           .eq('id', conv.booking_id)
           .single();
@@ -141,6 +157,7 @@ const Chat = () => {
           setBookingContext({
             ...booking,
             pet_name: pet?.name || 'Unknown Pet',
+            owner_id: booking.owner_id,
           });
         }
       }
@@ -231,6 +248,35 @@ const Chat = () => {
     }
   };
 
+  const handleCancelBooking = async () => {
+    if (!bookingContext) return;
+    
+    setCancelling(true);
+    try {
+      const { error } = await supabase
+        .from('sitter_bookings')
+        .update({ status: 'cancelled' })
+        .eq('id', bookingContext.id);
+
+      if (error) throw error;
+
+      setBookingContext({ ...bookingContext, status: 'cancelled' });
+      toast({
+        title: "Booking Cancelled",
+        description: "Your booking request has been cancelled.",
+      });
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      toast({
+        title: "Error",
+        description: "Failed to cancel booking. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   const formatMessageTime = (dateString: string) => {
     return format(new Date(dateString), 'HH:mm');
   };
@@ -314,13 +360,55 @@ const Chat = () => {
         {bookingContext && (
           <div className="px-4 pb-2">
             <Card className="p-3 bg-accent/50">
-              <div className="flex flex-wrap items-center gap-2 text-sm">
-                <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
-                <span className="font-medium">{bookingContext.pet_name}</span>
-                <span className="text-muted-foreground">•</span>
-                <span className="text-muted-foreground whitespace-nowrap">
-                  {format(new Date(bookingContext.start_date), 'MMM d')} - {format(new Date(bookingContext.end_date), 'MMM d')}
-                </span>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex flex-wrap items-center gap-2 text-sm">
+                  <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span className="font-medium">{bookingContext.pet_name}</span>
+                  <span className="text-muted-foreground">•</span>
+                  <span className="text-muted-foreground whitespace-nowrap">
+                    {format(new Date(bookingContext.start_date), 'MMM d')} - {format(new Date(bookingContext.end_date), 'MMM d')}
+                  </span>
+                </div>
+                {/* Cancel button for owners on pending/accepted bookings */}
+                {user && bookingContext.owner_id === user.id && 
+                  (bookingContext.status === 'pending' || bookingContext.status === 'accepted') && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="border-destructive text-destructive hover:bg-destructive/10 shrink-0"
+                        disabled={cancelling}
+                      >
+                        {cancelling ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <>
+                            <X className="w-3 h-3 mr-1" />
+                            Cancel
+                          </>
+                        )}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Cancel Booking Request?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to cancel this booking request? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Keep Booking</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={handleCancelBooking}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Yes, Cancel
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
               </div>
             </Card>
           </div>
