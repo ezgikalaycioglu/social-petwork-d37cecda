@@ -65,7 +65,13 @@ const Chat = () => {
         },
         (payload) => {
           const newMsg = payload.new as Message;
-          setMessages((prev) => [...prev, newMsg]);
+          
+          // Add message only if it doesn't already exist (prevents duplicates from optimistic updates)
+          setMessages((prev) => {
+            const exists = prev.some((msg) => msg.id === newMsg.id);
+            if (exists) return prev;
+            return [...prev, newMsg];
+          });
           
           // Mark as read if not from current user
           if (newMsg.sender_user_id !== user.id) {
@@ -192,18 +198,34 @@ const Chat = () => {
     e.preventDefault();
     if (!newMessage.trim() || !user || !conversationId) return;
 
+    const messageBody = newMessage.trim();
     setSending(true);
+    setNewMessage(''); // Clear input immediately for better UX
+
     try {
-      const { error } = await supabase.from('sitter_messages').insert({
-        conversation_id: conversationId,
-        sender_user_id: user.id,
-        body: newMessage.trim(),
-      });
+      const { data, error } = await supabase
+        .from('sitter_messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_user_id: user.id,
+          body: messageBody,
+        })
+        .select()
+        .single();
 
       if (error) throw error;
-      setNewMessage('');
+
+      // Optimistically add the message to local state
+      // Check if message already exists (in case real-time also delivered it)
+      setMessages((prev) => {
+        const exists = prev.some((msg) => msg.id === data.id);
+        if (exists) return prev;
+        return [...prev, data];
+      });
     } catch (error) {
       console.error('Error sending message:', error);
+      // Restore the message input if send failed
+      setNewMessage(messageBody);
     } finally {
       setSending(false);
     }
