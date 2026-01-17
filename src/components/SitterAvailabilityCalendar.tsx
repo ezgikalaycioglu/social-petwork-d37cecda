@@ -15,6 +15,7 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
   const { toast } = useToast();
   const [dateRange, setDateRange] = useState<{start: Date | null; end: Date | null}>({start: null, end: null});
   const [savedAvailableDates, setSavedAvailableDates] = useState<Date[]>([]);
+  const [bookedDates, setBookedDates] = useState<Date[]>([]);
   const [pendingChanges, setPendingChanges] = useState<{
     toAdd: Date[];
     toRemove: Date[];
@@ -22,9 +23,10 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Load existing availability on component mount
+  // Load existing availability and booked dates on component mount
   useEffect(() => {
     loadAvailability();
+    loadBookedDates();
   }, [sitterId]);
 
   const loadAvailability = async () => {
@@ -51,8 +53,37 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
     }
   };
 
+  const loadBookedDates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('sitter_bookings')
+        .select('start_date, end_date')
+        .eq('sitter_id', sitterId)
+        .eq('status', 'accepted');
+
+      if (error) throw error;
+
+      // Generate all dates within each booking range
+      const allBookedDates: Date[] = [];
+      data?.forEach(booking => {
+        let current = new Date(booking.start_date);
+        const end = new Date(booking.end_date);
+        while (current <= end) {
+          allBookedDates.push(new Date(current));
+          current.setDate(current.getDate() + 1);
+        }
+      });
+      
+      setBookedDates(allBookedDates);
+    } catch (error) {
+      console.error('Error loading booked dates:', error);
+    }
+  };
+
   const handleDateSelect = (date: Date | undefined) => {
-    if (!date || isBefore(date, startOfDay(new Date()))) return;
+    // Prevent selection of past dates or booked dates
+    const isBooked = date && bookedDates.some(d => format(d, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd'));
+    if (!date || isBefore(date, startOfDay(new Date())) || isBooked) return;
 
     // If no start date is selected, set this as start
     if (!dateRange.start) {
@@ -186,6 +217,7 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
   };
 
   const modifiers = {
+    booked: bookedDates,
     saved: savedAvailableDates,
     selected: getSelectedDates(),
     rangeStart: dateRange.start ? [dateRange.start] : [],
@@ -194,6 +226,11 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
   };
 
   const modifiersStyles = {
+    booked: {
+      backgroundColor: '#F97316',
+      color: 'white',
+      fontWeight: '600'
+    },
     saved: {
       backgroundColor: '#2ECC71',
       color: 'white',
@@ -291,6 +328,10 @@ const SitterAvailabilityCalendar: React.FC<SitterAvailabilityCalendarProps> = ({
                   <div className="flex items-center space-x-3">
                     <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-green-500 flex-shrink-0"></div>
                     <span className="text-xs sm:text-sm text-gray-700" style={{ fontFamily: 'DM Sans' }}>Saved as Available</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-orange-500 flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700" style={{ fontFamily: 'DM Sans' }}>Booked</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-purple-500 flex-shrink-0"></div>
