@@ -280,7 +280,7 @@ const Chat = () => {
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] max-w-2xl mx-auto">
       {/* Header */}
-      <div className="flex items-center p-4 border-b bg-background">
+      <div className="flex items-center p-4 border-b bg-background sticky top-0 z-10">
         <Button 
           variant="ghost" 
           size="sm" 
