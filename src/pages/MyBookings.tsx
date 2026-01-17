@@ -302,13 +302,13 @@ export default function MyBookings() {
         const sitterIds = [...new Set(ownerData.map(booking => booking.sitter_id))];
         
         // Note: sitter_id in bookings refers to sitter_profiles.id, not user_id
-        // We need to get the sitter profile to find the user_id and currency
+        // We need to get the sitter profile to find the user_id, currency, and name
         const { data: sitterProfilesData } = await supabase
           .from('sitter_profiles')
-          .select('id, user_id, currency')
+          .select('id, user_id, currency, name')
           .in('id', sitterIds);
 
-        // Get user profiles using the user_ids from sitter_profiles
+        // Get user profiles using the user_ids from sitter_profiles (as fallback for name)
         const sitterUserIds = sitterProfilesData?.map(sp => sp.user_id) || [];
         const { data: sitterUserProfiles } = await supabase
           .from('user_profiles')
@@ -328,11 +328,15 @@ export default function MyBookings() {
           const sitterProfileData = sitterProfilesData?.find(sp => sp.id === booking.sitter_id);
           const sitterUserProfile = sitterUserProfiles?.find(p => p.id === sitterProfileData?.user_id);
           const sitterPhotoData = sitterPhotos?.find(sp => sp.id === booking.sitter_id);
+          
+          // Use sitter profile name first, then user profile display_name as fallback
+          const sitterName = sitterProfileData?.name || sitterUserProfile?.display_name;
+          
           return {
             ...booking,
             sitter_user_id: sitterProfileData?.user_id,
             currency: sitterProfileData?.currency || 'USD',
-            sitter_display_name: sitterUserProfile?.display_name,
+            sitter_display_name: sitterName,
             sitter_phone_number: sitterUserProfile?.phone_number,
             sitter_photos: sitterPhotoData?.sitter_photos || []
           };
