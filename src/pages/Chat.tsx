@@ -280,21 +280,16 @@ const Chat = () => {
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] max-w-2xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-4 p-4 border-b bg-background">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/messages')}>
+      <div className="flex items-center p-4 border-b bg-background">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate('/messages')}
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground -ml-2"
+        >
           <ArrowLeft className="w-5 h-5" />
+          <span className="text-sm font-medium">Back</span>
         </Button>
-        <Avatar className="h-10 w-10">
-          <AvatarImage src="" />
-          <AvatarFallback className="bg-primary/10 text-primary">
-            {getInitials(otherUser?.display_name || null, otherUser?.email || null)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex-1">
-          <h2 className="font-semibold">
-            {otherUser?.display_name || otherUser?.email || 'Loading...'}
-          </h2>
-        </div>
       </div>
 
       {/* Booking Context Card */}
