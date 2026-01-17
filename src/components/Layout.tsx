@@ -30,7 +30,7 @@ const Layout = ({ children }: LayoutProps) => {
       {/* Main Content */}
       <main className={`${
         showNavigation 
-          ? `xl:ml-64 ${showTopNav ? 'pt-14' : 'pt-0'} pb-20 xl:pt-0 xl:pb-0 min-h-screen` // Add top padding for mobile top nav only when showing, left margin for desktop sidebar, bottom padding for mobile nav
+          ? `xl:ml-64 ${showTopNav ? 'pt-20' : 'pt-0'} pb-20 xl:pt-0 xl:pb-0 min-h-screen` // Add top padding for mobile top nav (80px) only when showing, left margin for desktop sidebar, bottom padding for mobile nav
           : 'min-h-screen'
       }`}>
         {children}
