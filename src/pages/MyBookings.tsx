@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, Check, X, Star, Loader2 } from "lucide-react";
+import { MessageCircle, Check, X, Star, Loader2, CheckCircle, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -33,6 +33,14 @@ interface Booking {
   sitter_id: string;
   owner_id: string;
   
+  // Completion fields
+  owner_completed?: boolean | null;
+  sitter_completed?: boolean | null;
+  completed_at?: string | null;
+  
+  // Review status
+  has_review?: boolean;
+  
   // Currency from sitter profile
   currency?: string;
   
@@ -60,9 +68,11 @@ interface BookingCardProps {
   booking: Booking;
   userRole: 'owner' | 'sitter';
   onStatusUpdate: (bookingId: string, status: string) => void;
+  onMarkCompleted: (bookingId: string, role: 'owner' | 'sitter') => void;
   onReview: (bookingId: string) => void;
   onOpenChat: (booking: Booking) => void;
   cancellingId: string | null;
+  confirmingId: string | null;
 }
 
 // Format price with correct currency symbol
@@ -87,7 +97,7 @@ const formatPrice = (amount: number, currency: string = 'USD') => {
   return `${symbol}${amount}`;
 };
 
-function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat, cancellingId }: BookingCardProps) {
+function BookingCard({ booking, userRole, onStatusUpdate, onMarkCompleted, onReview, onOpenChat, cancellingId, confirmingId }: BookingCardProps) {
   const otherPersonName = userRole === 'owner' 
     ? booking.sitter_display_name || 'Sitter'
     : booking.owner_display_name || 'Pet Owner';
@@ -105,6 +115,14 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat, 
   
   const isBookingConfirmed = booking.status === 'accepted' || booking.status === 'confirmed';
   const isCancelling = cancellingId === booking.id;
+  const isConfirming = confirmingId === booking.id;
+  
+  // Completion status checks
+  const isEndDatePassed = new Date(booking.end_date) <= new Date();
+  const userHasCompleted = userRole === 'owner' ? booking.owner_completed : booking.sitter_completed;
+  const otherHasCompleted = userRole === 'owner' ? booking.sitter_completed : booking.owner_completed;
+  const canMarkComplete = booking.status === 'accepted' && isEndDatePassed && !userHasCompleted;
+  const isFullyCompleted = booking.status === 'completed';
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -175,6 +193,43 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat, 
               )}
             </div>
 
+            {/* Completion Status Indicator */}
+            {booking.status === 'accepted' && isEndDatePassed && (
+              <div className="mb-4 p-3 rounded-lg bg-muted/50 border">
+                {userHasCompleted && !otherHasCompleted && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-green-700 font-medium">You confirmed completion</span>
+                  </div>
+                )}
+                {userHasCompleted && !otherHasCompleted && (
+                  <div className="flex items-center gap-2 text-sm mt-1 text-muted-foreground">
+                    <Clock className="w-4 h-4" />
+                    <span>Waiting for {userRole === 'owner' ? 'sitter' : 'owner'} to confirm...</span>
+                  </div>
+                )}
+                {!userHasCompleted && otherHasCompleted && (
+                  <div className="flex items-center gap-2 text-sm text-amber-700">
+                    <Clock className="w-4 h-4" />
+                    <span>{userRole === 'owner' ? 'Sitter' : 'Owner'} has confirmed - please confirm to complete</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Completed Status */}
+            {isFullyCompleted && (
+              <div className="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                <div className="flex items-center gap-2 text-sm text-blue-700">
+                  <CheckCircle className="w-4 h-4" />
+                  <span className="font-medium">
+                    Service completed
+                    {booking.completed_at && ` on ${format(new Date(booking.completed_at), 'MMM d, yyyy')}`}
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
               {booking.status === 'pending' && userRole === 'sitter' && (
@@ -200,7 +255,7 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat, 
               )}
 
               {/* Cancel button for owners on pending/accepted bookings */}
-              {(booking.status === 'pending' || booking.status === 'accepted') && userRole === 'owner' && (
+              {(booking.status === 'pending' || booking.status === 'accepted') && userRole === 'owner' && !isEndDatePassed && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
@@ -239,6 +294,23 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat, 
                 </AlertDialog>
               )}
 
+              {/* Mark Completed Button */}
+              {canMarkComplete && (
+                <Button
+                  size="sm"
+                  onClick={() => onMarkCompleted(booking.id, userRole)}
+                  disabled={isConfirming}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {isConfirming ? (
+                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                  ) : (
+                    <CheckCircle className="w-4 h-4 mr-1" />
+                  )}
+                  Mark Service Completed
+                </Button>
+              )}
+
               {booking.status === 'accepted' && (
                 <Button size="sm" variant="outline" onClick={() => onOpenChat(booking)}>
                   <MessageCircle className="w-4 h-4 mr-1" />
@@ -246,7 +318,8 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat, 
                 </Button>
               )}
 
-              {booking.status === 'completed' && userRole === 'owner' && (
+              {/* Review Button - Only for completed bookings where owner hasn't reviewed */}
+              {isFullyCompleted && userRole === 'owner' && !booking.has_review && (
                 <Button
                   size="sm"
                   onClick={() => onReview(booking.id)}
@@ -254,6 +327,22 @@ function BookingCard({ booking, userRole, onStatusUpdate, onReview, onOpenChat, 
                 >
                   <Star className="w-4 h-4 mr-1" />
                   Leave Review
+                </Button>
+              )}
+
+              {/* Review Submitted Badge */}
+              {isFullyCompleted && userRole === 'owner' && booking.has_review && (
+                <Badge className="bg-green-100 text-green-800 border-green-200">
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  Review Submitted
+                </Badge>
+              )}
+
+              {/* Message button for completed bookings */}
+              {isFullyCompleted && (
+                <Button size="sm" variant="outline" onClick={() => onOpenChat(booking)}>
+                  <MessageCircle className="w-4 h-4 mr-1" />
+                  Message
                 </Button>
               )}
             </div>
@@ -273,6 +362,7 @@ export default function MyBookings() {
   const [sitterBookings, setSitterBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -324,6 +414,20 @@ export default function MyBookings() {
           `)
           .in('id', sitterIds);
 
+        // Check for existing reviews on owner's completed bookings
+        const completedBookingIds = ownerData
+          .filter(b => b.status === 'completed')
+          .map(b => b.id);
+        
+        let existingReviewBookingIds: string[] = [];
+        if (completedBookingIds.length > 0) {
+          const { data: existingReviews } = await supabase
+            .from('sitter_reviews')
+            .select('booking_id')
+            .in('booking_id', completedBookingIds);
+          existingReviewBookingIds = existingReviews?.map(r => r.booking_id) || [];
+        }
+
         enrichedOwnerData = ownerData.map(booking => {
           const sitterProfileData = sitterProfilesData?.find(sp => sp.id === booking.sitter_id);
           const sitterUserProfile = sitterUserProfiles?.find(p => p.id === sitterProfileData?.user_id);
@@ -338,7 +442,8 @@ export default function MyBookings() {
             currency: sitterProfileData?.currency || 'USD',
             sitter_display_name: sitterName,
             sitter_phone_number: sitterUserProfile?.phone_number,
-            sitter_photos: sitterPhotoData?.sitter_photos || []
+            sitter_photos: sitterPhotoData?.sitter_photos || [],
+            has_review: existingReviewBookingIds.includes(booking.id)
           };
         });
       }
@@ -430,6 +535,37 @@ export default function MyBookings() {
     }
   };
 
+  const handleMarkCompleted = async (bookingId: string, role: 'owner' | 'sitter') => {
+    setConfirmingId(bookingId);
+    
+    try {
+      const field = role === 'owner' ? 'owner_completed' : 'sitter_completed';
+      
+      const { error } = await supabase
+        .from('sitter_bookings')
+        .update({ [field]: true })
+        .eq('id', bookingId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Service Marked Complete",
+        description: "You've confirmed the service is completed. Waiting for the other party to confirm.",
+      });
+
+      fetchBookings(); // Refresh the data - the trigger will auto-set status to 'completed' if both confirmed
+    } catch (error) {
+      console.error('Error marking completion:', error);
+      toast({
+        title: "Error",
+        description: "Failed to mark service as completed",
+        variant: "destructive",
+      });
+    } finally {
+      setConfirmingId(null);
+    }
+  };
+
   const handleReview = (bookingId: string) => {
     // Navigate to review form or open review modal
     navigate(`/review/${bookingId}`);
@@ -518,9 +654,11 @@ export default function MyBookings() {
                         booking={booking}
                         userRole="owner"
                         onStatusUpdate={handleStatusUpdate}
+                        onMarkCompleted={handleMarkCompleted}
                         onReview={handleReview}
                         onOpenChat={handleOpenChat}
                         cancellingId={cancellingId}
+                        confirmingId={confirmingId}
                       />
                     ))
                 ) : (
@@ -543,9 +681,11 @@ export default function MyBookings() {
                       booking={booking}
                       userRole="sitter"
                       onStatusUpdate={handleStatusUpdate}
+                      onMarkCompleted={handleMarkCompleted}
                       onReview={handleReview}
                       onOpenChat={handleOpenChat}
                       cancellingId={cancellingId}
+                      confirmingId={confirmingId}
                     />
                   ))
                 ) : (
