@@ -278,9 +278,9 @@ const Chat = () => {
   }
 
   return (
-    <div className="flex flex-col h-[100dvh] max-w-2xl mx-auto">
-      {/* Compact Sticky App Bar */}
-      <div className="sticky top-0 z-30 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75 border-b pt-[max(env(safe-area-inset-top),0px)]">
+    <div className="flex flex-col h-[calc(100dvh-3.5rem)] xl:h-[100dvh] max-w-2xl mx-auto">
+      {/* Compact Sticky App Bar - positioned below MobileTopNav on mobile */}
+      <div className="sticky top-14 xl:top-0 z-30 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75 border-b">
         <div className="flex items-center h-12 sm:h-14 px-2">
           {/* Left: Back chevron */}
           <Button 
