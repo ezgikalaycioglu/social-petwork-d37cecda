@@ -67,6 +67,17 @@ interface BookingData {
   } | null;
 }
 
+interface ClientBookingData {
+  id: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+  total_price: number;
+  owner_id: string;
+  pet_profiles: { name: string };
+  user_profiles: { display_name: string | null; email: string } | null;
+}
+
 const PetSitters = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -85,6 +96,10 @@ const PetSitters = () => {
   
   // My Bookings state
   const [bookings, setBookings] = useState<BookingData[]>([]);
+  
+  // Client Bookings state (for sitters)
+  const [clientBookings, setClientBookings] = useState<ClientBookingData[]>([]);
+  const [clientBookingsLoading, setClientBookingsLoading] = useState(false);
   
   // Become Sitter state
   const [userIsSitter, setUserIsSitter] = useState(false);
@@ -115,6 +130,8 @@ const PetSitters = () => {
       checkSitterStatus();
     } else if (activeTab === 'availability') {
       checkSitterProfile();
+    } else if (activeTab === 'sitter-bookings') {
+      fetchClientBookings();
     }
   }, [activeTab, user]);
 
@@ -245,6 +262,76 @@ const PetSitters = () => {
       });
     } finally {
       setAvailabilityLoading(false);
+    }
+  };
+
+  const fetchClientBookings = async () => {
+    if (!user) return;
+    
+    setClientBookingsLoading(true);
+    try {
+      // First get the sitter profile
+      const { data: sitterData, error: sitterError } = await supabase
+        .from('sitter_profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (sitterError || !sitterData) {
+        setClientBookings([]);
+        return;
+      }
+
+      // Then fetch bookings where this sitter is the provider
+      const { data, error } = await supabase
+        .from('sitter_bookings')
+        .select(`
+          id,
+          start_date,
+          end_date,
+          status,
+          total_price,
+          owner_id,
+          pet_profiles!fk_sitter_bookings_pet_profiles (name),
+          user_profiles!fk_sitter_bookings_owner_profiles (display_name, email)
+        `)
+        .eq('sitter_id', sitterData.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setClientBookings((data || []) as unknown as ClientBookingData[]);
+    } catch (error) {
+      console.error('Error fetching client bookings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load client bookings.",
+        variant: "destructive",
+      });
+    } finally {
+      setClientBookingsLoading(false);
+    }
+  };
+
+  const handleOpenClientBookingChat = async (booking: ClientBookingData) => {
+    if (!user) return;
+    
+    try {
+      const { data: conversationId, error } = await supabase
+        .rpc('find_or_create_conversation', {
+          user_a: user.id,
+          user_b: booking.owner_id,
+          linked_booking_id: booking.id
+        });
+
+      if (error) throw error;
+      navigate(`/messages/${conversationId}`);
+    } catch (error) {
+      console.error('Error opening chat:', error);
+      toast({
+        title: "Error",
+        description: "Failed to open chat. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -997,26 +1084,73 @@ const PetSitters = () => {
             )}
 
 
-             {/* Sitter Bookings Tab (New) */}
-             {userType === 'sitter' && userIsSitter && (
-               <TabsContent value="sitter-bookings" className="space-y-4">
-                 <h2 className="text-base font-semibold mb-2 px-4">
-                   Client bookings
-                 </h2>
-                 
-                 <Card className="rounded-2xl border border-gray-100 bg-white shadow-sm max-w-md mx-auto my-4">
-                   <CardContent className="p-4 text-center space-y-3">
-                     <Calendar className="w-8 h-8 mx-auto text-muted-foreground" />
-                     <h3 className="text-base font-semibold text-foreground">
-                       No client bookings yet
-                     </h3>
-                     <p className="text-sm text-muted-foreground">
-                       When clients book your services, they'll appear here
-                     </p>
-                   </CardContent>
-                 </Card>
-               </TabsContent>
-             )}
+            {/* Sitter Bookings Tab (My Clients) */}
+            {userType === 'sitter' && userIsSitter && (
+              <TabsContent value="sitter-bookings" className="space-y-4">
+                <h2 className="text-base font-semibold mb-2 px-4">
+                  Client bookings
+                </h2>
+                
+                {clientBookingsLoading ? (
+                  <div className="text-center py-12">
+                    <Clock className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+                    <p className="text-sm text-muted-foreground">Loading client bookings...</p>
+                  </div>
+                ) : clientBookings.length === 0 ? (
+                  <Card className="rounded-2xl border border-gray-100 bg-white shadow-sm max-w-md mx-auto my-4">
+                    <CardContent className="p-4 text-center space-y-3">
+                      <Calendar className="w-8 h-8 mx-auto text-muted-foreground" />
+                      <h3 className="text-base font-semibold text-foreground">
+                        No client bookings yet
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        When clients book your services, they'll appear here
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-3">
+                    {clientBookings.map((booking) => {
+                      const clientName = booking.user_profiles?.display_name || booking.user_profiles?.email || 'Unknown Client';
+                      return (
+                        <Card 
+                          key={booking.id}
+                          className="rounded-2xl bg-white border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                          onClick={() => handleOpenClientBookingChat(booking)}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="font-semibold text-foreground">
+                                    {clientName}
+                                  </h4>
+                                  <Badge className={getStatusColor(booking.status)}>
+                                    {booking.status}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                  Pet: {booking.pet_profiles.name}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
+                                </p>
+                              </div>
+                              <div className="text-right flex flex-col items-end gap-1">
+                                <p className="font-semibold text-foreground">
+                                  {formatPrice(booking.total_price)}
+                                </p>
+                                <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
+              </TabsContent>
+            )}
            </Tabs>
         </div>
       </div>
