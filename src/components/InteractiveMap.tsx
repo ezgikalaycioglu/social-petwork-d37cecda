@@ -222,6 +222,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
     try {
       console.log('Fetching nearby pets...');
       
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { data, error } = await supabase
         .from('pet_profiles')
         .select('*')
@@ -233,8 +235,26 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         throw error;
       }
 
-      console.log('Fetched nearby pets:', data);
-      setNearbyPets(data || []);
+      // Apply privacy protection: use approximate locations for other users' pets
+      const privacyProtectedPets = (data || []).map(pet => {
+        const isOwnPet = pet.user_id === user?.id;
+        
+        if (isOwnPet) {
+          // Show exact location for user's own pets
+          return pet;
+        } else {
+          // For other users' pets, round coordinates to ~1km precision (0.01 degree)
+          // This protects exact home locations while still showing approximate area
+          return {
+            ...pet,
+            latitude: pet.latitude ? Math.round(pet.latitude * 100) / 100 : null,
+            longitude: pet.longitude ? Math.round(pet.longitude * 100) / 100 : null,
+          };
+        }
+      });
+
+      console.log('Fetched nearby pets with privacy protection:', privacyProtectedPets.length);
+      setNearbyPets(privacyProtectedPets);
     } catch (error) {
       console.error('Error fetching nearby pets:', error);
       toast({

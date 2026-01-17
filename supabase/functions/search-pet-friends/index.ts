@@ -195,11 +195,14 @@ Deno.serve(async (req) => {
         distance = calculateDistance(latitude, longitude, pet.latitude, pet.longitude);
       }
 
-      // Exclude user_id from the response for privacy
-      const { user_id, pet_username, ...petData } = pet;
+      // Exclude user_id and exact coordinates from the response for privacy
+      const { user_id, pet_username, latitude: exactLat, longitude: exactLon, ...petData } = pet;
 
       results.push({
         ...petData,
+        // Provide approximate location instead of exact coordinates (~1km precision)
+        latitude: exactLat ? Math.round(exactLat * 100) / 100 : null,
+        longitude: exactLon ? Math.round(exactLon * 100) / 100 : null,
         owner_name: userProfileMap.get(user_id) || null,
         distance
       });
