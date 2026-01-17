@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, Send, Loader2, Calendar, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Send, Loader2, Calendar, AlertCircle } from 'lucide-react';
 import { format, isToday, isYesterday, isSameDay } from 'date-fns';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -278,110 +278,133 @@ const Chat = () => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] max-w-2xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center p-4 border-b bg-background sticky top-0 z-10">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => navigate('/messages')}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground -ml-2"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm font-medium">Back</span>
-        </Button>
-      </div>
-
-      {/* Booking Context Card */}
-      {bookingContext && (
-        <div className="p-4 border-b">
-          <Card className="p-3 bg-accent/50">
-            <div className="flex items-center gap-2 text-sm">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
-              <span className="font-medium">{bookingContext.pet_name}</span>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-muted-foreground">
-                {format(new Date(bookingContext.start_date), 'MMM d')} - {format(new Date(bookingContext.end_date), 'MMM d, yyyy')}
-              </span>
-              <span className={`ml-auto px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(bookingContext.status)}`}>
+    <div className="flex flex-col h-[100dvh] max-w-2xl mx-auto">
+      {/* Compact Sticky App Bar */}
+      <div className="sticky top-0 z-30 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75 border-b pt-[max(env(safe-area-inset-top),0px)]">
+        <div className="flex items-center h-12 sm:h-14 px-2">
+          {/* Left: Back chevron */}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => navigate('/messages')}
+            aria-label="Go back"
+            className="h-11 w-11 min-w-[44px] min-h-[44px] shrink-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          
+          {/* Center: Title + optional status pill */}
+          <div className="flex-1 flex items-center justify-center gap-2 min-w-0 px-2">
+            <span className="text-base font-semibold truncate">
+              {otherUser?.display_name || otherUser?.email || 'Chat'}
+            </span>
+            {bookingContext && (
+              <span className={`text-xs rounded-full px-2 py-0.5 shrink-0 font-medium ${getStatusColor(bookingContext.status)}`}>
                 {bookingContext.status.charAt(0).toUpperCase() + bookingContext.status.slice(1)}
               </span>
-            </div>
-          </Card>
+            )}
+          </div>
+          
+          {/* Right: Spacer for symmetry */}
+          <div className="w-11 h-11 shrink-0" />
         </div>
-      )}
-
-      {/* Privacy Notice */}
-      <div className="px-4 pt-2">
-        <Alert className="bg-amber-50 border-amber-200">
-          <AlertCircle className="h-4 w-4 text-amber-600" />
-          <AlertDescription className="text-amber-800 text-xs">
-            Only share personal contact info (phone, email) in chat if you choose to. PawCult does not automatically share this information.
-          </AlertDescription>
-        </Alert>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto scroll-py-2">
+        {/* Booking Context Card - scrolls with content */}
+        {bookingContext && (
+          <div className="pt-2 px-4">
+            <Card className="p-3 bg-accent/50">
+              <div className="flex flex-wrap items-center gap-2 text-sm">
+                <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
+                <span className="font-medium">{bookingContext.pet_name}</span>
+                <span className="text-muted-foreground">•</span>
+                <span className="text-muted-foreground whitespace-nowrap">
+                  {format(new Date(bookingContext.start_date), 'MMM d')} - {format(new Date(bookingContext.end_date), 'MMM d')}
+                </span>
+              </div>
+            </Card>
           </div>
-        ) : messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-muted-foreground">
-            No messages yet. Start the conversation!
-          </div>
-        ) : (
-          messages.map((msg, index) => {
-            const isOwn = msg.sender_user_id === user.id;
-            const prevMsg = index > 0 ? messages[index - 1] : null;
-            const showDateSeparator = shouldShowDateSeparator(msg, prevMsg);
+        )}
 
-            return (
-              <React.Fragment key={msg.id}>
-                {showDateSeparator && (
-                  <div className="flex items-center justify-center my-4">
-                    <span className="text-xs text-muted-foreground bg-background px-3 py-1 rounded-full border">
-                      {formatDateSeparator(msg.created_at)}
-                    </span>
-                  </div>
-                )}
-                <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                  <div
-                    className={`max-w-[75%] rounded-2xl px-4 py-2 ${
-                      isOwn
-                        ? 'bg-primary text-primary-foreground rounded-br-md'
-                        : 'bg-muted rounded-bl-md'
-                    }`}
-                  >
-                    <p className="text-sm whitespace-pre-wrap break-words">{msg.body}</p>
-                    <p
-                      className={`text-[10px] mt-1 ${
-                        isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground'
+        {/* Privacy Notice - scrolls with content */}
+        <div className="px-4 pt-2 pb-2">
+          <Alert className="bg-amber-50 border-amber-200">
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-800 text-xs">
+              Only share personal contact info (phone, email) in chat if you choose to. PawCult does not automatically share this information.
+            </AlertDescription>
+          </Alert>
+        </div>
+
+        {/* Messages */}
+        <div className="p-4 space-y-4 pb-24">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="flex items-center justify-center py-12 text-muted-foreground">
+              No messages yet. Start the conversation!
+            </div>
+          ) : (
+            messages.map((msg, index) => {
+              const isOwn = msg.sender_user_id === user.id;
+              const prevMsg = index > 0 ? messages[index - 1] : null;
+              const showDateSeparator = shouldShowDateSeparator(msg, prevMsg);
+
+              return (
+                <React.Fragment key={msg.id}>
+                  {showDateSeparator && (
+                    <div className="flex items-center justify-center my-4">
+                      <span className="text-xs text-muted-foreground bg-background px-3 py-1 rounded-full border">
+                        {formatDateSeparator(msg.created_at)}
+                      </span>
+                    </div>
+                  )}
+                  <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                    <div
+                      className={`max-w-[75%] rounded-2xl px-4 py-2 ${
+                        isOwn
+                          ? 'bg-primary text-primary-foreground rounded-br-md'
+                          : 'bg-muted rounded-bl-md'
                       }`}
                     >
-                      {formatMessageTime(msg.created_at)}
-                    </p>
+                      <p className="text-sm whitespace-pre-wrap break-words">{msg.body}</p>
+                      <p
+                        className={`text-[10px] mt-1 ${
+                          isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                        }`}
+                      >
+                        {formatMessageTime(msg.created_at)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </React.Fragment>
-            );
-          })
-        )}
-        <div ref={messagesEndRef} />
+                </React.Fragment>
+              );
+            })
+          )}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
-      {/* Message Input */}
-      <form onSubmit={sendMessage} className="p-4 border-t bg-background">
+      {/* Sticky Message Input */}
+      <form onSubmit={sendMessage} className="sticky bottom-0 p-4 border-t bg-background pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="flex gap-2">
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1"
+            className="flex-1 h-11 min-h-[44px]"
             disabled={sending}
           />
-          <Button type="submit" size="icon" disabled={!newMessage.trim() || sending}>
+          <Button 
+            type="submit" 
+            size="icon" 
+            disabled={!newMessage.trim() || sending}
+            className="h-11 w-11 min-w-[44px] min-h-[44px]"
+          >
             {sending ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
