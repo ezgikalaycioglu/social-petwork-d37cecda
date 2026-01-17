@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell, PawPrint, Settings, Plus, MapPin, Calendar, Users as UsersIcon, Building2, Tag } from 'lucide-react';
 import MobileMoreMenu from './MobileMoreMenu';
+import NotificationsPanel from './NotificationsPanel';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation as useUserLocation } from '@/hooks/useLocation';
 import { useReadyToPlay } from '@/contexts/ReadyToPlayContext';
+import { useNotificationsContext } from '@/contexts/NotificationsContext';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 import SocialPetworkLogo from './SocialPetworkLogo';
 
 const MobileTopNav = () => {
@@ -17,6 +20,10 @@ const MobileTopNav = () => {
   const { toast } = useToast();
   const { loading: locationLoading, coordinates, error: locationError } = useUserLocation();
   const { isReady } = useReadyToPlay();
+  const { getUnreadCount } = useNotificationsContext();
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  
+  const unreadCount = getUnreadCount();
 
   if (!user) {
     return null;
@@ -38,6 +45,26 @@ const MobileTopNav = () => {
     });
   };
 
+  const NotificationBellButton = () => (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="relative p-2 hover:bg-gray-100 rounded-full"
+      onClick={() => setIsNotificationsOpen(true)}
+      aria-label={unreadCount > 0 ? `Notifications (${unreadCount} unread)` : 'Notifications'}
+    >
+      <Bell className="w-5 h-5 text-gray-600" />
+      {unreadCount > 0 && (
+        <span 
+          className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold"
+          aria-hidden="true"
+        >
+          {unreadCount > 9 ? '9+' : unreadCount}
+        </span>
+      )}
+    </Button>
+  );
+
   const renderContent = () => {
     // Home tab - Logo centered, Notifications right
     if (location.pathname === '/dashboard' || location.pathname === '/') {
@@ -56,7 +83,8 @@ const MobileTopNav = () => {
             </Tooltip>
           </TooltipProvider>
           <SocialPetworkLogo />
-          <div className="absolute right-0">
+          <div className="absolute right-0 flex items-center gap-1">
+            <NotificationBellButton />
             <MobileMoreMenu />
           </div>
         </div>
@@ -81,7 +109,8 @@ const MobileTopNav = () => {
             </Tooltip>
            </TooltipProvider>
            <SocialPetworkLogo />
-           <div className="absolute right-0">
+           <div className="absolute right-0 flex items-center gap-1">
+             <NotificationBellButton />
              <MobileMoreMenu />
            </div>
          </div>
@@ -105,7 +134,8 @@ const MobileTopNav = () => {
             </Tooltip>
           </TooltipProvider>
           <SocialPetworkLogo />
-          <div className="absolute right-0">
+          <div className="absolute right-0 flex items-center gap-1">
+            <NotificationBellButton />
             <MobileMoreMenu />
           </div>
         </div>
@@ -150,7 +180,8 @@ const MobileTopNav = () => {
               Deals
             </Link>
            </nav>
-           <div className="absolute right-0">
+           <div className="absolute right-0 flex items-center gap-1">
+             <NotificationBellButton />
              <MobileMoreMenu />
            </div>
          </div>
@@ -175,7 +206,8 @@ const MobileTopNav = () => {
             </Tooltip>
           </TooltipProvider>
           <SocialPetworkLogo />
-          <div className="absolute right-0">
+          <div className="absolute right-0 flex items-center gap-1">
+            <NotificationBellButton />
             <MobileMoreMenu />
           </div>
         </div>
@@ -198,7 +230,8 @@ const MobileTopNav = () => {
           </Tooltip>
          </TooltipProvider>
          <SocialPetworkLogo />
-         <div className="absolute right-0">
+         <div className="absolute right-0 flex items-center gap-1">
+           <NotificationBellButton />
            <MobileMoreMenu />
          </div>
        </div>
@@ -206,11 +239,18 @@ const MobileTopNav = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full bg-white border-b border-gray-200 shadow-sm z-50 block xl:hidden">
-      <div className="flex h-20 px-4 items-center">{/* Increased height from h-16 to h-20 for more logo space */}
-        {renderContent()}
+    <>
+      <div className="fixed top-0 left-0 w-full bg-white border-b border-gray-200 shadow-sm z-50 block xl:hidden">
+        <div className="flex h-20 px-4 items-center">
+          {renderContent()}
+        </div>
       </div>
-    </div>
+      
+      <NotificationsPanel
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
+      />
+    </>
   );
 };
 
