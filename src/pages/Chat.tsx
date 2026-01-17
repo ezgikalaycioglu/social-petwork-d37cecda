@@ -278,9 +278,9 @@ const Chat = () => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-7rem)] xl:h-[100dvh] max-w-2xl mx-auto">
+    <div className="flex flex-col h-[calc(100dvh-10rem)] xl:h-[100dvh] max-w-2xl mx-auto">
       {/* Sticky Header Section - includes app bar + booking card */}
-      <div className="sticky top-14 xl:top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b shadow-sm">
+      <div className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b shadow-sm">
         {/* Compact App Bar */}
         <div className="flex items-center h-12 sm:h-14 px-2">
           {/* Left: Back chevron */}
