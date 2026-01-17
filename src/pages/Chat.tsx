@@ -52,11 +52,11 @@ const Chat = () => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [otherUser, setOtherUser] = useState<OtherUser | null>(null);
-  const [bookingContext, setBookingContext] = useState<BookingContext | null>(null);
+  const [bookingContexts, setBookingContexts] = useState<BookingContext[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [cancelling, setCancelling] = useState(false);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -131,35 +131,37 @@ const Chat = () => {
 
       setOtherUser(userProfile);
 
-      // Get booking context if exists
-      if (conv.booking_id) {
-        const { data: booking } = await supabase
-          .from('sitter_bookings')
-          .select(`
-            id,
-            start_date,
-            end_date,
-            status,
-            pet_id,
-            owner_id
-          `)
-          .eq('id', conv.booking_id)
-          .single();
+      // Fetch ALL bookings between these two participants (not just the one linked to conversation)
+      // Filter to only show active bookings (pending, accepted, completed) - exclude cancelled
+      const { data: bookings } = await supabase
+        .from('sitter_bookings')
+        .select('id, start_date, end_date, status, pet_id, owner_id, sitter_id')
+        .or(`and(owner_id.eq.${conv.participant_a},sitter_id.eq.${conv.participant_b}),and(owner_id.eq.${conv.participant_b},sitter_id.eq.${conv.participant_a})`)
+        .in('status', ['pending', 'accepted', 'completed'])
+        .order('created_at', { ascending: false });
 
-        if (booking) {
-          // Get pet name
-          const { data: pet } = await supabase
-            .from('pet_profiles')
-            .select('name')
-            .eq('id', booking.pet_id)
-            .single();
+      if (bookings && bookings.length > 0) {
+        // Fetch pet names for all bookings
+        const petIds = [...new Set(bookings.map(b => b.pet_id))];
+        const { data: pets } = await supabase
+          .from('pet_profiles')
+          .select('id, name')
+          .in('id', petIds);
 
-          setBookingContext({
-            ...booking,
-            pet_name: pet?.name || 'Unknown Pet',
-            owner_id: booking.owner_id,
-          });
-        }
+        const petNameMap = new Map(pets?.map(p => [p.id, p.name]) || []);
+
+        const contexts: BookingContext[] = bookings.map(booking => ({
+          id: booking.id,
+          start_date: booking.start_date,
+          end_date: booking.end_date,
+          status: booking.status,
+          pet_name: petNameMap.get(booking.pet_id) || 'Unknown Pet',
+          owner_id: booking.owner_id,
+        }));
+
+        setBookingContexts(contexts);
+      } else {
+        setBookingContexts([]);
       }
     } catch (error) {
       console.error('Error fetching conversation details:', error);
@@ -248,19 +250,18 @@ const Chat = () => {
     }
   };
 
-  const handleCancelBooking = async () => {
-    if (!bookingContext) return;
-    
-    setCancelling(true);
+  const handleCancelBooking = async (bookingId: string) => {
+    setCancellingId(bookingId);
     try {
       const { error } = await supabase
         .from('sitter_bookings')
         .update({ status: 'cancelled' })
-        .eq('id', bookingContext.id);
+        .eq('id', bookingId);
 
       if (error) throw error;
 
-      setBookingContext({ ...bookingContext, status: 'cancelled' });
+      // Remove the cancelled booking from the list
+      setBookingContexts(prev => prev.filter(b => b.id !== bookingId));
       toast({
         title: "Booking Cancelled",
         description: "Your booking request has been cancelled.",
@@ -273,8 +274,16 @@ const Chat = () => {
         variant: "destructive",
       });
     } finally {
-      setCancelling(false);
+      setCancellingId(null);
     }
+  };
+
+  // Derive primary status for header pill (accepted > pending > completed)
+  const getPrimaryStatus = () => {
+    if (bookingContexts.some(b => b.status === 'accepted')) return 'accepted';
+    if (bookingContexts.some(b => b.status === 'pending')) return 'pending';
+    if (bookingContexts.some(b => b.status === 'completed')) return 'completed';
+    return null;
   };
 
   const formatMessageTime = (dateString: string) => {
@@ -345,9 +354,9 @@ const Chat = () => {
             <span className="text-base font-semibold truncate">
               {otherUser?.display_name || otherUser?.email || 'Chat'}
             </span>
-            {bookingContext && (
-              <span className={`text-xs rounded-full px-2 py-0.5 shrink-0 font-medium ${getStatusColor(bookingContext.status)}`}>
-                {bookingContext.status.charAt(0).toUpperCase() + bookingContext.status.slice(1)}
+            {getPrimaryStatus() && (
+              <span className={`text-xs rounded-full px-2 py-0.5 shrink-0 font-medium ${getStatusColor(getPrimaryStatus()!)}`}>
+                {getPrimaryStatus()!.charAt(0).toUpperCase() + getPrimaryStatus()!.slice(1)}
               </span>
             )}
           </div>
@@ -356,61 +365,66 @@ const Chat = () => {
           <div className="w-11 h-11 shrink-0" />
         </div>
 
-        {/* Booking Context Card - sticky with header */}
-        {bookingContext && (
-          <div className="px-4 pb-2">
-            <Card className="p-3 bg-accent/50">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-2 text-sm">
-                  <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
-                  <span className="font-medium">{bookingContext.pet_name}</span>
-                  <span className="text-muted-foreground">•</span>
-                  <span className="text-muted-foreground whitespace-nowrap">
-                    {format(new Date(bookingContext.start_date), 'MMM d')} - {format(new Date(bookingContext.end_date), 'MMM d')}
-                  </span>
-                </div>
-                {/* Cancel button for owners on pending/accepted bookings */}
-                {user && bookingContext.owner_id === user.id && 
-                  (bookingContext.status === 'pending' || bookingContext.status === 'accepted') && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="border-destructive text-destructive hover:bg-destructive/10 shrink-0"
-                        disabled={cancelling}
-                      >
-                        {cancelling ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                        ) : (
-                          <>
-                            <X className="w-3 h-3 mr-1" />
-                            Cancel
-                          </>
-                        )}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Cancel Booking Request?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to cancel this booking request? This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Keep Booking</AlertDialogCancel>
-                        <AlertDialogAction 
-                          onClick={handleCancelBooking}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+        {/* Booking Context Cards - sticky with header - show all active bookings */}
+        {bookingContexts.length > 0 && (
+          <div className="px-4 pb-2 space-y-2">
+            {bookingContexts.map((booking) => (
+              <Card key={booking.id} className="p-3 bg-accent/50">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <span className="font-medium">{booking.pet_name}</span>
+                    <span className="text-muted-foreground">•</span>
+                    <span className="text-muted-foreground whitespace-nowrap">
+                      {format(new Date(booking.start_date), 'MMM d')} - {format(new Date(booking.end_date), 'MMM d')}
+                    </span>
+                    <span className={`text-xs rounded-full px-2 py-0.5 font-medium ${getStatusColor(booking.status)}`}>
+                      {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                    </span>
+                  </div>
+                  {/* Cancel button for owners on pending/accepted bookings */}
+                  {user && booking.owner_id === user.id && 
+                    (booking.status === 'pending' || booking.status === 'accepted') && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="border-destructive text-destructive hover:bg-destructive/10 shrink-0"
+                          disabled={cancellingId === booking.id}
                         >
-                          Yes, Cancel
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </div>
-            </Card>
+                          {cancellingId === booking.id ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : (
+                            <>
+                              <X className="w-3 h-3 mr-1" />
+                              Cancel
+                            </>
+                          )}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Cancel Booking Request?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to cancel this booking request for {booking.pet_name}? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Keep Booking</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={() => handleCancelBooking(booking.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Yes, Cancel
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </div>
+              </Card>
+            ))}
           </div>
         )}
       </div>
