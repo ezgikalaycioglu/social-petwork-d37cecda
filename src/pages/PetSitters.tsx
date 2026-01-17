@@ -74,6 +74,9 @@ interface ClientBookingData {
   status: string;
   total_price: number;
   owner_id: string;
+  owner_completed?: boolean | null;
+  sitter_completed?: boolean | null;
+  completed_at?: string | null;
   pet_profiles: { name: string };
   user_profiles: { display_name: string | null; email: string } | null;
 }
@@ -101,6 +104,7 @@ const PetSitters = () => {
   const [clientBookings, setClientBookings] = useState<ClientBookingData[]>([]);
   const [clientBookingsLoading, setClientBookingsLoading] = useState(false);
   const [processingBookingId, setProcessingBookingId] = useState<string | null>(null);
+  const [confirmingBookingId, setConfirmingBookingId] = useState<string | null>(null);
   
   // Become Sitter state
   const [userIsSitter, setUserIsSitter] = useState(false);
@@ -296,6 +300,9 @@ const PetSitters = () => {
           status,
           total_price,
           owner_id,
+          owner_completed,
+          sitter_completed,
+          completed_at,
           pet_profiles!fk_sitter_bookings_pet_profiles (name),
           user_profiles!fk_sitter_bookings_owner_profiles (display_name, email)
         `)
@@ -474,6 +481,38 @@ const PetSitters = () => {
       });
     } finally {
       setProcessingBookingId(null);
+    }
+  };
+
+  const handleMarkServiceCompleted = async (e: React.MouseEvent, booking: ClientBookingData) => {
+    e.stopPropagation();
+    if (!user) return;
+    
+    setConfirmingBookingId(booking.id);
+    try {
+      const { error } = await supabase
+        .from('sitter_bookings')
+        .update({ sitter_completed: true })
+        .eq('id', booking.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Service Marked Complete",
+        description: "You've confirmed the service is completed. Waiting for the owner to confirm.",
+      });
+
+      // Refresh bookings - the trigger will auto-set status to 'completed' if both confirmed
+      fetchClientBookings();
+    } catch (error) {
+      console.error('Error marking completion:', error);
+      toast({
+        title: "Error",
+        description: "Failed to mark service as completed",
+        variant: "destructive",
+      });
+    } finally {
+      setConfirmingBookingId(null);
     }
   };
 
@@ -1266,6 +1305,43 @@ const PetSitters = () => {
                               </div>
                             </div>
                             
+                            {/* Completion Status Indicator */}
+                            {booking.status === 'accepted' && new Date(booking.end_date) <= new Date() && (
+                              <div className="mt-3 p-2 rounded-lg bg-muted/50 border">
+                                {booking.sitter_completed && !booking.owner_completed && (
+                                  <>
+                                    <div className="flex items-center gap-2 text-sm">
+                                      <CheckCircle className="w-4 h-4 text-green-600" />
+                                      <span className="text-green-700 font-medium">You confirmed completion</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm mt-1 text-muted-foreground">
+                                      <Clock className="w-4 h-4" />
+                                      <span>Waiting for owner to confirm...</span>
+                                    </div>
+                                  </>
+                                )}
+                                {!booking.sitter_completed && booking.owner_completed && (
+                                  <div className="flex items-center gap-2 text-sm text-amber-700">
+                                    <Clock className="w-4 h-4" />
+                                    <span>Owner has confirmed - please confirm to complete</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Completed Status */}
+                            {booking.status === 'completed' && (
+                              <div className="mt-3 p-2 rounded-lg bg-blue-50 border border-blue-200">
+                                <div className="flex items-center gap-2 text-sm text-blue-700">
+                                  <CheckCircle className="w-4 h-4" />
+                                  <span className="font-medium">
+                                    Service completed
+                                    {booking.completed_at && ` on ${new Date(booking.completed_at).toLocaleDateString()}`}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                            
                             {/* Action buttons based on status */}
                             <div className="mt-3 pt-3 border-t border-gray-100">
                               {booking.status === 'pending' ? (
@@ -1299,6 +1375,34 @@ const PetSitters = () => {
                                   </Button>
                                 </div>
                               ) : booking.status === 'accepted' ? (
+                                <div className="flex gap-2 flex-wrap">
+                                  {/* Mark Completed Button - only show after end date and if sitter hasn't confirmed yet */}
+                                  {new Date(booking.end_date) <= new Date() && !booking.sitter_completed && (
+                                    <Button
+                                      size="sm"
+                                      onClick={(e) => handleMarkServiceCompleted(e, booking)}
+                                      disabled={confirmingBookingId === booking.id}
+                                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                                    >
+                                      {confirmingBookingId === booking.id ? (
+                                        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                                      ) : (
+                                        <CheckCircle className="w-4 h-4 mr-1" />
+                                      )}
+                                      Mark Completed
+                                    </Button>
+                                  )}
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className={new Date(booking.end_date) <= new Date() && !booking.sitter_completed ? "" : "w-full"}
+                                    onClick={() => handleOpenClientBookingChat(booking)}
+                                  >
+                                    <ArrowRight className="w-4 h-4 mr-1" />
+                                    Open Chat
+                                  </Button>
+                                </div>
+                              ) : booking.status === 'completed' ? (
                                 <Button
                                   size="sm"
                                   variant="outline"
