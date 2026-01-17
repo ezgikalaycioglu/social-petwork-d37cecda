@@ -100,6 +100,7 @@ const PetSitters = () => {
   // Client Bookings state (for sitters)
   const [clientBookings, setClientBookings] = useState<ClientBookingData[]>([]);
   const [clientBookingsLoading, setClientBookingsLoading] = useState(false);
+  const [processingBookingId, setProcessingBookingId] = useState<string | null>(null);
   
   // Become Sitter state
   const [userIsSitter, setUserIsSitter] = useState(false);
@@ -335,6 +336,144 @@ const PetSitters = () => {
         description: "Failed to open chat. Please try again.",
         variant: "destructive",
       });
+    }
+  };
+
+  // Generate date range for blocking availability
+  const generateDateRange = (startDate: string, endDate: string): string[] => {
+    const dates: string[] = [];
+    const current = new Date(startDate);
+    const end = new Date(endDate);
+    while (current <= end) {
+      dates.push(current.toISOString().split('T')[0]);
+      current.setDate(current.getDate() + 1);
+    }
+    return dates;
+  };
+
+  const handleAcceptBooking = async (e: React.MouseEvent, booking: ClientBookingData) => {
+    e.stopPropagation();
+    if (!user || !sitterProfile) return;
+    
+    setProcessingBookingId(booking.id);
+    try {
+      // 1. Update booking status to accepted
+      const { error: updateError } = await supabase
+        .from('sitter_bookings')
+        .update({ status: 'accepted', updated_at: new Date().toISOString() })
+        .eq('id', booking.id);
+
+      if (updateError) throw updateError;
+
+      // 2. Block availability for the booking dates
+      const datesToBlock = generateDateRange(booking.start_date, booking.end_date);
+      
+      if (datesToBlock.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('sitter_availability')
+          .delete()
+          .eq('sitter_id', sitterProfile.id)
+          .in('available_date', datesToBlock);
+
+        if (deleteError) {
+          console.error('Error blocking dates:', deleteError);
+          // Continue anyway - booking is already accepted
+        }
+      }
+
+      // 3. Send acceptance message to owner
+      const { data: conversationId, error: convError } = await supabase
+        .rpc('find_or_create_conversation', {
+          user_a: user.id,
+          user_b: booking.owner_id,
+          linked_booking_id: booking.id
+        });
+
+      if (!convError && conversationId) {
+        const startFormatted = new Date(booking.start_date).toLocaleDateString();
+        const endFormatted = new Date(booking.end_date).toLocaleDateString();
+        const acceptanceMessage = `Great news! Your booking request for ${booking.pet_profiles.name} from ${startFormatted} to ${endFormatted} has been accepted! 🎉 Looking forward to caring for your pet.`;
+        
+        await supabase
+          .from('sitter_messages')
+          .insert({
+            conversation_id: conversationId,
+            sender_user_id: user.id,
+            body: acceptanceMessage
+          });
+      }
+
+      toast({
+        title: "Booking Accepted",
+        description: `You've accepted the booking for ${booking.pet_profiles.name}. The dates are now blocked on your calendar.`,
+      });
+
+      // Refresh bookings
+      fetchClientBookings();
+    } catch (error) {
+      console.error('Error accepting booking:', error);
+      toast({
+        title: "Error",
+        description: "Failed to accept booking. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingBookingId(null);
+    }
+  };
+
+  const handleDeclineBooking = async (e: React.MouseEvent, booking: ClientBookingData) => {
+    e.stopPropagation();
+    if (!user) return;
+    
+    setProcessingBookingId(booking.id);
+    try {
+      // 1. Update booking status to rejected
+      const { error: updateError } = await supabase
+        .from('sitter_bookings')
+        .update({ status: 'rejected', updated_at: new Date().toISOString() })
+        .eq('id', booking.id);
+
+      if (updateError) throw updateError;
+
+      // 2. Send decline message to owner
+      const { data: conversationId, error: convError } = await supabase
+        .rpc('find_or_create_conversation', {
+          user_a: user.id,
+          user_b: booking.owner_id,
+          linked_booking_id: booking.id
+        });
+
+      if (!convError && conversationId) {
+        const startFormatted = new Date(booking.start_date).toLocaleDateString();
+        const endFormatted = new Date(booking.end_date).toLocaleDateString();
+        const declineMessage = `Unfortunately, I'm unable to accept your booking request for ${booking.pet_profiles.name} from ${startFormatted} to ${endFormatted}. Please feel free to reach out if you have any questions or would like to discuss alternative dates.`;
+        
+        await supabase
+          .from('sitter_messages')
+          .insert({
+            conversation_id: conversationId,
+            sender_user_id: user.id,
+            body: declineMessage
+          });
+      }
+
+      toast({
+        title: "Booking Declined",
+        description: `You've declined the booking for ${booking.pet_profiles.name}.`,
+      });
+
+      // Refresh bookings
+      fetchClientBookings();
+    } catch (error) {
+      console.error('Error declining booking:', error);
+      toast({
+        title: "Error",
+        description: "Failed to decline booking. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingBookingId(null);
     }
   };
 
@@ -1116,8 +1255,7 @@ const PetSitters = () => {
                     {clientBookings.map((booking) => (
                         <Card 
                           key={booking.id}
-                          className="rounded-2xl bg-white border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-                          onClick={() => handleOpenClientBookingChat(booking)}
+                          className="rounded-2xl bg-white border border-gray-100 shadow-sm"
                         >
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between gap-3">
@@ -1138,8 +1276,56 @@ const PetSitters = () => {
                                 <p className="font-semibold text-foreground">
                                   {formatPrice(booking.total_price, sitterProfile?.currency || 'USD')}
                                 </p>
-                                <ArrowRight className="w-4 h-4 text-muted-foreground" />
                               </div>
+                            </div>
+                            
+                            {/* Action buttons based on status */}
+                            <div className="mt-3 pt-3 border-t border-gray-100">
+                              {booking.status === 'pending' ? (
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    className="flex-1"
+                                    onClick={(e) => handleAcceptBooking(e, booking)}
+                                    disabled={processingBookingId === booking.id}
+                                  >
+                                    {processingBookingId === booking.id ? (
+                                      <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                                    ) : (
+                                      <CheckCircle className="w-4 h-4 mr-1" />
+                                    )}
+                                    Accept
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="flex-1"
+                                    onClick={(e) => handleDeclineBooking(e, booking)}
+                                    disabled={processingBookingId === booking.id}
+                                  >
+                                    {processingBookingId === booking.id ? (
+                                      <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                                    ) : (
+                                      <X className="w-4 h-4 mr-1" />
+                                    )}
+                                    Decline
+                                  </Button>
+                                </div>
+                              ) : booking.status === 'accepted' ? (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="w-full"
+                                  onClick={() => handleOpenClientBookingChat(booking)}
+                                >
+                                  <ArrowRight className="w-4 h-4 mr-1" />
+                                  Open Chat
+                                </Button>
+                              ) : (
+                                <p className="text-sm text-muted-foreground text-center">
+                                  {booking.status === 'rejected' ? 'Booking declined' : `Status: ${booking.status}`}
+                                </p>
+                              )}
                             </div>
                           </CardContent>
                         </Card>
