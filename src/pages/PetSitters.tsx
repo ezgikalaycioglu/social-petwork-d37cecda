@@ -61,6 +61,7 @@ interface BookingData {
     id: string;
     user_id: string;
     currency: string;
+    name: string | null;
     user_profiles: { display_name: string } | null; 
     location: string;
   } | null;
@@ -181,6 +182,7 @@ const PetSitters = () => {
             id,
             user_id,
             currency,
+            name,
             user_profiles!fk_sitter_profiles_user_profiles (display_name),
             location
           )
@@ -744,7 +746,7 @@ const PetSitters = () => {
                                 </Badge>
                               </div>
                               <p className="text-sm text-muted-foreground">
-                                {booking.sitter_profiles?.user_profiles?.display_name || 'Unknown Sitter'}
+                                {booking.sitter_profiles?.name || booking.sitter_profiles?.user_profiles?.display_name || 'Unknown Sitter'}
                               </p>
                               <p className="text-sm text-muted-foreground">
                                 {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
