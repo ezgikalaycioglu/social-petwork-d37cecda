@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { Icon, divIcon } from 'leaflet'; // divIcon is correctly imported
+import { Icon, divIcon } from 'leaflet';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -11,7 +11,7 @@ import { useLocationOnDemand } from '@/hooks/useLocationOnDemand';
 import { useNativeLocation } from '@/hooks/useNativeLocation';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useReadyToPlay } from '@/contexts/ReadyToPlayContext';
-import { MapPin, Navigation, PawPrint } from 'lucide-react';
+import { MapPin, Navigation, PawPrint, Plus, Minus, Locate } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -57,9 +57,6 @@ const LocationTracker: React.FC<{ onLocationUpdate: (lat: number, lng: number) =
       return;
     }
 
-    // It's crucial that useLocationOnDemand manages its own watchId,
-    // and this LocationTracker's watchId is distinct or explicitly cleared by it.
-    // For this component's purpose, it's fine as long as it's conditionally rendered.
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
@@ -77,13 +74,61 @@ const LocationTracker: React.FC<{ onLocationUpdate: (lat: number, lng: number) =
     );
 
     return () => {
-      // Cleanup for this specific watcher when component unmounts
       navigator.geolocation.clearWatch(watchId);
       console.log("LocationTracker: Geolocation watch cleared.");
     };
   }, [map, onLocationUpdate]);
 
   return null;
+};
+
+// Custom Map Controls Component (Google Maps style - bottom right vertical stack)
+interface MapControlsProps {
+  userLocation: [number, number] | null;
+}
+
+const MapControls: React.FC<MapControlsProps> = ({ userLocation }) => {
+  const map = useMap();
+
+  const handleCenterOnLocation = () => {
+    if (userLocation) {
+      map.setView(userLocation, 15);
+    }
+  };
+
+  return (
+    <div className="absolute bottom-20 sm:bottom-6 right-3 z-[1000] flex flex-col gap-2">
+      <Button
+        size="icon"
+        variant="secondary"
+        className="w-10 h-10 sm:w-11 sm:h-11 rounded-full shadow-lg bg-white hover:bg-gray-100 border border-gray-200"
+        onClick={() => map.zoomIn()}
+        aria-label="Zoom in"
+      >
+        <Plus className="w-5 h-5 text-gray-700" />
+      </Button>
+      <Button
+        size="icon"
+        variant="secondary"
+        className="w-10 h-10 sm:w-11 sm:h-11 rounded-full shadow-lg bg-white hover:bg-gray-100 border border-gray-200"
+        onClick={() => map.zoomOut()}
+        aria-label="Zoom out"
+      >
+        <Minus className="w-5 h-5 text-gray-700" />
+      </Button>
+      {userLocation && (
+        <Button
+          size="icon"
+          variant="secondary"
+          className="w-10 h-10 sm:w-11 sm:h-11 rounded-full shadow-lg bg-white hover:bg-gray-100 border border-gray-200"
+          onClick={handleCenterOnLocation}
+          aria-label="Center on my location"
+        >
+          <Locate className="w-5 h-5 text-blue-600" />
+        </Button>
+      )}
+    </div>
+  );
 };
 
 const InteractiveMap: React.FC<InteractiveMapProps> = ({ 
@@ -424,44 +469,50 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   }
 
   return (
-    <div className="w-full h-96 relative">
-      {/* Ready to Play Toggle */}
-      <Card className="absolute top-4 left-4 z-[1000] bg-white shadow-lg">
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-3">
-            <Switch
-              checked={isReadyIntent} // Control switch with user's intent
-              onCheckedChange={handleReadyToPlayToggle}
-              disabled={userPets.length === 0}
-            />
-            <div>
-              <p className="font-medium text-sm">Ready to Play</p>
-              <p className="text-xs text-gray-500">
-                {isReadyIntent && !currentLocation && hasPermission // User wants to be ready, has permission, but waiting for coordinates
+    <div className="w-full h-[60vh] sm:h-96 relative">
+      {/* Responsive Top Control Bar - unified layout for mobile */}
+      <div className="absolute top-3 left-3 right-14 sm:right-3 z-[1000] flex items-center justify-between gap-2">
+        {/* Ready to Play Toggle - compact on mobile */}
+        <Card className="bg-white/95 backdrop-blur-sm shadow-lg flex-shrink-0 max-w-[200px] sm:max-w-none">
+          <CardContent className="p-2 sm:p-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Switch
+                checked={isReadyIntent}
+                onCheckedChange={handleReadyToPlayToggle}
+                disabled={userPets.length === 0}
+                className="shrink-0"
+              />
+              <div className="min-w-0">
+                <p className="font-medium text-xs sm:text-sm truncate">Ready to Play</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground truncate hidden sm:block">
+                  {isReadyIntent && !currentLocation && hasPermission
                     ? 'Waiting for location...'
-                    : locationPermission // User is ready and location is active
-                        ? 'Share location with others'
-                        : 'Tap to enable location'} {/* Not ready and no location */}
-              </p>
+                    : locationPermission
+                      ? 'Share location with others'
+                      : 'Tap to enable location'}
+                </p>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Pet Counter */}
-      <Card className="absolute top-4 right-4 z-[1000] bg-white shadow-lg">
-        <CardContent className="p-3">
-          <div className="flex items-center space-x-2">
-            <PawPrint className="w-4 h-4 text-green-600" />
-            <span className="text-sm font-medium">{nearbyPets.length} pets nearby</span>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Pet Counter Badge - compact on mobile */}
+        <Card className="bg-white/95 backdrop-blur-sm shadow-lg flex-shrink-0">
+          <CardContent className="p-2 sm:p-3">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <PawPrint className="w-4 h-4 text-green-600 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium">{nearbyPets.length}</span>
+              <span className="hidden sm:inline text-xs sm:text-sm text-muted-foreground">pets nearby</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Map */}
       <MapContainer
         center={currentLocation || defaultLocation}
         zoom={13}
+        zoomControl={false}
         className="w-full h-full rounded-lg"
         style={{ height: '100%', width: '100%' }}
       >
@@ -470,6 +521,9 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
+        {/* Custom Map Controls - bottom right vertical stack (Google Maps style) */}
+        <MapControls userLocation={currentLocation} />
+
         {/* LocationTracker now only active when actual `isReady` is true and we have a current location */}
         {isReady && currentLocation && (
           <LocationTracker onLocationUpdate={handleLocationUpdate} />
@@ -537,22 +591,22 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
       {/* Location Permission Warning - shown if user intent is ON but no actual permission/location */}
       {isReadyIntent && !locationPermission && (
-        <div className="absolute bottom-4 left-4 right-4 z-[1000]">
-          <Card className="bg-orange-50 border-orange-200">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <MapPin className="w-5 h-5 text-orange-600" />
-                <div>
-                  <p className="text-sm font-medium text-orange-800">Location Access Required</p>
-                  <p className="text-xs text-orange-600">
-                    Enable location sharing to find pets near you and let others discover your pets.
+        <div className="absolute bottom-3 left-3 right-16 sm:right-3 z-[1000]">
+          <Card className="bg-orange-50/95 backdrop-blur-sm border-orange-200">
+            <CardContent className="p-2 sm:p-3">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-orange-800">Location Required</p>
+                  <p className="text-[10px] sm:text-xs text-orange-600 hidden sm:block">
+                    Enable location to find pets near you.
                   </p>
                 </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
