@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,9 +11,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { Settings, DollarSign, MapPin, FileText, Loader2, Sparkles, PawPrint, Link, Copy, Check, X, Power, Camera, User } from 'lucide-react';
+import { Settings, DollarSign, MapPin, FileText, Loader2, Sparkles, PawPrint, Link, Copy, Check, X, Power, Camera, User, Trash2 } from 'lucide-react';
 import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 
 interface SitterProfile {
@@ -60,8 +72,10 @@ const experienceLevels = [
 ];
 
 const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSettingsProps) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -233,6 +247,59 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteProfile = async () => {
+    setDeleting(true);
+    try {
+      // Check for active/pending bookings first
+      const { data: activeBookings } = await supabase
+        .from('sitter_bookings')
+        .select('id')
+        .eq('sitter_id', sitterProfile.id)
+        .in('status', ['pending', 'confirmed']);
+      
+      if (activeBookings && activeBookings.length > 0) {
+        toast({
+          title: "Cannot Delete Profile",
+          description: "Please cancel or complete all pending bookings first.",
+          variant: "destructive",
+        });
+        setDeleting(false);
+        return;
+      }
+      
+      // Delete sitter services
+      await supabase.from('sitter_services').delete().eq('sitter_id', sitterProfile.id);
+      
+      // Delete sitter photos
+      await supabase.from('sitter_photos').delete().eq('sitter_id', sitterProfile.id);
+      
+      // Delete sitter availability
+      await supabase.from('sitter_availability').delete().eq('sitter_id', sitterProfile.id);
+      
+      // Delete the sitter profile
+      const { error } = await supabase.from('sitter_profiles').delete().eq('id', sitterProfile.id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Profile Deleted",
+        description: "Your sitter profile has been permanently deleted.",
+      });
+      
+      setIsOpen(false);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error deleting profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete profile. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -552,6 +619,57 @@ const SitterProfileSettings = ({ sitterProfile, onUpdate }: SitterProfileSetting
                   aria-label="Toggle profile visibility"
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Section 8: Danger Zone - Delete Profile */}
+          <Card className="rounded-xl border border-destructive/50 focus-within:ring-2 focus-within:ring-destructive/20 transition-shadow" aria-labelledby="danger-zone-title">
+            <CardContent className="p-4 sm:p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Trash2 className="w-[18px] h-[18px] text-destructive" />
+                <h3 id="danger-zone-title" className="text-sm font-semibold text-destructive">Danger Zone</h3>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Permanently delete your sitter profile. This will remove all your 
+                services, photos, and you will no longer appear in search results. 
+                Existing bookings will need to be handled separately.
+              </p>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" disabled={deleting}>
+                    {deleting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Deleting...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete Sitter Profile
+                      </>
+                    )}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Sitter Profile?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. Your sitter profile, all services, 
+                      and photos will be permanently deleted. Any pending bookings will 
+                      need to be cancelled manually first.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handleDeleteProfile}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Yes, Delete My Profile
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardContent>
           </Card>
 

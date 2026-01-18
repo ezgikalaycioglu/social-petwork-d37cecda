@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Icon, divIcon } from 'leaflet';
 import { supabase } from '@/integrations/supabase/client';
@@ -136,6 +137,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   onLocationPermissionChange,
   showLocationToasts = false
 }) => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const { loading, coordinates, error, requestLocation, clearLocation, hasPermission } = useLocationOnDemand();
   const { isNative, startBackgroundTracking, stopBackgroundTracking, isBackgroundTrackingActive } = useNativeLocation();
@@ -579,7 +581,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   <Button
                     size="sm"
                     className="bg-green-600 hover:bg-green-700 text-white"
-                    onClick={() => console.log('View profile for pet:', pet.id)}
+                    onClick={() => navigate(`/pet-adventures/${pet.id}`)}
                   >
                     View Profile
                   </Button>
