@@ -148,6 +148,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [isReadyIntent, setIsReadyIntent] = useState(false); // User's desired "Ready to Play" status (from switch)
 
   const [nearbyPets, setNearbyPets] = useState<PetProfile[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const channelRef = useRef<any>(null);
   const locationUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -270,6 +271,9 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       console.log('Fetching nearby pets...');
       
       const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+      }
       
       const { data, error } = await supabase
         .from('pet_profiles')
@@ -503,7 +507,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           <CardContent className="p-2 sm:p-3">
             <div className="flex items-center gap-1 sm:gap-2">
               <PawPrint className="w-4 h-4 text-green-600 shrink-0" />
-              <span className="text-xs sm:text-sm font-medium">{nearbyPets.length}</span>
+              <span className="text-xs sm:text-sm font-medium">{nearbyPets.filter(pet => pet.user_id !== currentUserId).length}</span>
               <span className="hidden sm:inline text-xs sm:text-sm text-muted-foreground">pets nearby</span>
             </div>
           </CardContent>
