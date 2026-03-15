@@ -94,16 +94,10 @@
       "title": "Evcil hayvanınızın sosyal hayatı burada başlar.",
       "subtitle": "Oyun arkadaşları bulun, maceraları takip edin ve evcil hayvan dostu yerleri keşfedin, hepsi tek bir uygulamada.",
       "getStarted": "Ücretsiz Başlayın",
-      "learnMore": "Daha Fazla Bilgi"
-    },
-    "features": {
-      "title": "Evcil Hayvanınızın Sosyalleşmek İçin İhtiyaç Duyduğu Her Şey",
-      "petProfiles": "Evcil Hayvan Profilleri",
-      "petProfilesDesc": "Her evcil hayvanınız için detaylı profiller oluşturun",
-      "findPlaydates": "Oyun Arkadaşları Bulun",
-      "findPlaydatesDesc": "Eğlenceli aktiviteler için yakınlardaki evcil hayvanlarla bağlantı kurun",
-      "localEvents": "Yerel Etkinlikler",
-      "localEventsDesc": "Bölgenizdeki evcil hayvan dostu etkinlikleri keşfedin"
+      "learnMore": "Daha Fazla Bilgi",
+      "joinThePack": "Sürüye Katıl",
+      "alreadyHaveAccount": "Zaten hesabınız var mı?",
+      "logIn": "Giriş Yap"
     },
     "navigation": {
       "features": "Özellikler",
@@ -111,6 +105,98 @@
       "appPreview": "Uygulama Önizlemesi",
       "problemSolution": "Sorun ve Çözüm",
       "getStarted": "Başlayın"
+    },
+    "benefits": {
+      "title": "Neden PawCult?",
+      "subtitle": "Anlamlı bağlantılar ve sonsuz maceralarla evcil hayvanınızın hayatını dönüştürün",
+      "healthierPets": "Daha Sağlıklı, Daha Mutlu Evcil Hayvanlar",
+      "healthierPetsDesc": "Düzenli sosyalleşme ve egzersiz, evcil hayvanınızı fiziksel ve zihinsel olarak canlı tutar.",
+      "buildCommunity": "Bir Topluluk Oluşturun",
+      "buildCommunityDesc": "Mahallenizdeki evcil hayvan sahipleriyle bağlantı kurun ve kalıcı dostluklar oluşturun.",
+      "discoverPlaces": "Yeni Yerler Keşfedin",
+      "discoverPlacesDesc": "Yakınınızdaki evcil hayvan dostu mekanları, parkları ve işletmeleri bulun.",
+      "neverMissAdventures": "Maceraları Kaçırmayın",
+      "neverMissAdventuresDesc": "Çevrenizdeki yerel evcil hayvan etkinlikleri, oyun buluşmaları ve aktiviteler hakkında bildirim alın."
+    },
+    "features": {
+      "title": "Evcil Hayvanınızın İhtiyacı Olan Her Şey",
+      "subtitle": "Oyun arkadaşları bulmaktan yeni maceralar keşfetmeye, PawCult evcil hayvanınızın sosyal hayatını zenginleştirmek için tüm araçlara sahiptir",
+      "petMap": "Evcil Hayvan Haritası",
+      "petMapDesc": "Evcil hayvan dostu mekanları keşfedin, diğer evcil hayvanların nerede oynadığını görün ve maceralar için mükemmel noktaları bulun.",
+      "socialNetwork": "Sosyal Ağ",
+      "socialNetworkDesc": "Diğer evcil hayvan sahipleriyle bağlantı kurun, oyun buluşmaları düzenleyin ve tüylü dostlarınız etrafında bir topluluk oluşturun.",
+      "eventPlanning": "Etkinlik Planlama",
+      "eventPlanningDesc": "Grup yürüyüşleri, evcil hayvan partileri ve eğitim seansları düzenleyin. Yerel evcil hayvan etkinliklerini kaçırmayın.",
+      "petProfiles": "Evcil Hayvan Profilleri",
+      "petProfilesDesc": "Evcil hayvanlarınız için detaylı profiller oluşturun, maceralarını takip edin ve kişiliklerini paylaşın.",
+      "adventureLogging": "Macera Günlüğü",
+      "adventureLoggingDesc": "Evcil hayvanınızın maceralarını fotoğraflar ve hikayelerle belgeleyin. Birlikte yolculuklarınızın kalıcı anılarını oluşturun.",
+      "smartNotifications": "Akıllı Bildirimler",
+      "smartNotificationsDesc": "Oyun buluşma istekleri, yakındaki etkinlikler ve evcil hayvanınızın ilgi alanlarına göre uyarlanmış aktivitelerle güncel kalın."
+    },
+    "featureShowcase": {
+      "title": "Yakınlardaki Diğer Evcil Hayvan Sahipleriyle",
+      "titleHighlight": "Tanışın",
+      "subtitle": "İnteraktif haritamız yakındaki evcil hayvanları keşfetmenize ve sadece birkaç dokunuşla oyun buluşmaları organize etmenize yardımcı olur",
+      "discoverTitle": "Çevrenizdeki Evcil Hayvanları Keşfedin",
+      "discoverDesc": "Hangi evcil hayvanların yakında olduğunu ve oyun buluşmalarına uygun olduğunu görün. Haritamız mahallenizde aktif evcil hayvan sahiplerinin gerçek zamanlı konumlarını gösterir.",
+      "discoverFeature1": "Gizlilik kontrolleriyle gerçek zamanlı konum paylaşımı",
+      "discoverFeature2": "Evcil hayvan türü, boyutu ve kişiliğine göre filtreleme",
+      "discoverFeature3": "Anında oyun buluşma istekleri gönderin",
+      "connectTitle": "Bağlantı Kurun ve Birlikte Planlayın",
+      "connectDesc": "Yakınlarda uyumlu evcil hayvanlar bulduktan sonra, yerleşik mesajlaşma sistemimiz aracılığıyla kolayca buluşmalar koordine edin.",
+      "connectFeature1": "Diğer evcil hayvan sahipleriyle doğrudan mesajlaşma",
+      "connectFeature2": "Grup etkinlik koordinasyon araçları",
+      "connectFeature3": "Maceralarınızdan fotoğraf ve güncellemeler paylaşın"
+    },
+    "problemSolution": {
+      "title": "Evcil Hayvan Sahibi Zorluğu Gerçek",
+      "subtitle": "Evcil hayvanınızı mutlu ve sosyal tutmada karşılaştığınız zorlukları anlıyoruz",
+      "commonProblems": "Yaygın Sorunlar",
+      "ourSolutions": "Çözümlerimiz",
+      "problem1Title": "Yalnız Evcil Hayvanlar",
+      "problem1Desc": "Birçok evcil hayvan sosyal etkileşimden yoksundur, bu da davranış sorunlarına ve sıkıntıya yol açar.",
+      "problem2Title": "Meşgul Evcil Hayvan Sahipleri",
+      "problem2Desc": "Evcil hayvanları sosyalleştirmek ve yeni aktiviteler keşfetmek için zaman bulmak zordur.",
+      "problem3Title": "Sınırlı Kaynaklar",
+      "problem3Desc": "Evcil hayvan sahipleri, evcil hayvan dostu yerler ve etkinlikler hakkında güvenilir bilgi bulmakta zorlanır.",
+      "solution1Title": "Bağlantılı Topluluk",
+      "solution1Desc": "Evcil hayvan arkadaşları ağı oluşturun ve düzenli sosyal aktiviteler ayarlayın.",
+      "solution2Title": "Verimli Planlama",
+      "solution2Desc": "Sadece birkaç dokunuşla evcil hayvan aktivitelerini kolayca organize edin ve katılın.",
+      "solution3Title": "Kapsamlı Rehber",
+      "solution3Desc": "Evcil hayvan dostu mekanlar ve yaklaşan etkinliklerin tam veritabanına erişin.",
+      "ctaTitle": "Evcil Hayvanınızın Hayatını Dönüştürmeye Hazır mısınız?",
+      "ctaSubtitle": "Değişimi zaten yapmış binlerce mutlu evcil hayvan sahibine katılın",
+      "ctaButton": "Bugün Başlayın"
+    },
+    "finalCta": {
+      "title": "Evcil Hayvanınızın En İyi Hayatı Bugün Başlar",
+      "subtitle": "Evcil hayvanların nasıl bağlandığını, oynadığını ve dünyayı birlikte keşfettiğini devrimleştiren topluluğa katılın",
+      "happyPetParents": "Mutlu Evcil Hayvan Sahipleri",
+      "petFriendships": "Evcil Hayvan Dostlukları",
+      "startJourney": "Evcil Hayvanınızın Yolculuğunu Başlatın",
+      "freeToUse": "Ücretsiz kullanım • Kredi kartı gerekmez"
+    },
+    "appShowcase": {
+      "title": "Uygulamayı çalışırken görün",
+      "subtitle": "PawCult'ın diğer evcil hayvan sahipleriyle bağlantı kurmayı nasıl zahmetsiz hale getirdiğine bir göz atın",
+      "interactiveMap": "İnteraktif Harita",
+      "socialFeed": "Sosyal Akış",
+      "events": "Etkinlikler"
+    },
+    "footer": {
+      "description": "Evcil hayvanları ve ailelerini anlamlı sosyal deneyimler, maceralar ve topluluk desteği ile birbirine bağlıyoruz.",
+      "legal": "Yasal",
+      "privacyPolicy": "Gizlilik Politikası",
+      "communityGuidelines": "Topluluk Kuralları",
+      "support": "Destek",
+      "helpCenter": "Yardım Merkezi",
+      "contactUs": "Bize Ulaşın",
+      "changelog": "Değişiklik Günlüğü",
+      "copyright": "© 2025 PawCult. Tüm hakları saklıdır. Yapımcı:",
+      "madeWith": "Yapıldı",
+      "forPets": "evcil hayvanlar ve aileleri için"
     }
   }
 }

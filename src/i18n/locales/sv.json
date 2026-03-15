@@ -91,19 +91,112 @@
   },
   "landing": {
     "hero": {
-      "title": "Anslut Dina Husdjur Med Världen",
-      "subtitle": "Det sociala nätverket designat för husdjursälskare. Skapa profiler, hitta lekträffar och bygg en gemenskap runt dina pälsiga vänner.",
-      "getStarted": "Kom Igång",
-      "joinCommunity": "Gå med i Gemenskapen"
+      "title": "Ditt husdjurs sociala liv börjar här.",
+      "subtitle": "Hitta lekkamrater, spåra äventyr och upptäck husdjursvänliga platser, allt i en app.",
+      "getStarted": "Kom Igång Gratis",
+      "learnMore": "Läs Mer",
+      "joinThePack": "Gå med i Flocken",
+      "alreadyHaveAccount": "Har du redan ett konto?",
+      "logIn": "Logga in"
+    },
+    "navigation": {
+      "features": "Funktioner",
+      "benefits": "Fördelar",
+      "appPreview": "App-förhandsvisning",
+      "problemSolution": "Problem och Lösning",
+      "getStarted": "Kom Igång"
+    },
+    "benefits": {
+      "title": "Varför Välja PawCult?",
+      "subtitle": "Förvandla ditt husdjurs liv med meningsfulla kontakter och oändliga äventyr",
+      "healthierPets": "Friskare, Lyckligare Husdjur",
+      "healthierPetsDesc": "Regelbunden socialisering och motion håller ditt husdjur fysiskt och mentalt stimulerat.",
+      "buildCommunity": "Bygg en Gemenskap",
+      "buildCommunityDesc": "Anslut dig till andra husdjursägare i ditt grannskap och skapa varaktiga vänskaper.",
+      "discoverPlaces": "Upptäck Nya Platser",
+      "discoverPlacesDesc": "Hitta husdjursvänliga platser, parker och företag nära dig som välkomnar din pälsiga vän.",
+      "neverMissAdventures": "Missa Aldrig Äventyr",
+      "neverMissAdventuresDesc": "Bli notifierad om lokala husdjursevenemang, lekträffar och aktiviteter i din närhet."
     },
     "features": {
-      "title": "Allt Ditt Husdjur Behöver för att Socialisera",
+      "title": "Allt Ditt Husdjur Behöver",
+      "subtitle": "Från att hitta lekkamrater till att upptäcka nya äventyr, PawCult har alla verktyg för att berika ditt husdjurs sociala liv",
+      "petMap": "Husdjurskarta",
+      "petMapDesc": "Upptäck husdjursvänliga platser, se var andra husdjur leker och hitta perfekta platser för äventyr.",
+      "socialNetwork": "Socialt Nätverk",
+      "socialNetworkDesc": "Anslut dig till andra husdjursägare, arrangera lekträffar och bygg en gemenskap kring dina pälsiga vänner.",
+      "eventPlanning": "Evenemangsplanering",
+      "eventPlanningDesc": "Organisera grupppromenader, husdjursfester och träningspass. Missa aldrig lokala husdjursevenemang.",
       "petProfiles": "Husdjursprofiler",
-      "petProfilesDesc": "Skapa detaljerade profiler för vart och ett av dina husdjur",
-      "findPlaydates": "Hitta Lekträffar",
-      "findPlaydatesDesc": "Anslut med närliggande husdjur för roliga aktiviteter",
-      "localEvents": "Lokala Evenemang",
-      "localEventsDesc": "Upptäck husdjursvänliga evenemang i ditt område"
+      "petProfilesDesc": "Skapa detaljerade profiler för dina husdjur, spåra deras äventyr och dela deras personligheter.",
+      "adventureLogging": "Äventyrslogg",
+      "adventureLoggingDesc": "Dokumentera ditt husdjurs äventyr med foton och berättelser. Skapa bestående minnen av era resor tillsammans.",
+      "smartNotifications": "Smarta Notifikationer",
+      "smartNotificationsDesc": "Håll dig uppdaterad med lekträff-förfrågningar, närliggande evenemang och aktiviteter anpassade till ditt husdjurs intressen."
+    },
+    "featureShowcase": {
+      "title": "Träffa Andra Husdjursägare",
+      "titleHighlight": "Nära Dig",
+      "subtitle": "Vår interaktiva karta hjälper dig att upptäcka husdjur i närheten och organisera lekträffar med bara några klick",
+      "discoverTitle": "Upptäck Husdjur Omkring Dig",
+      "discoverDesc": "Se vilka husdjur som är i närheten och tillgängliga för lekträffar. Vår karta visar realtidspositioner för aktiva husdjursägare i ditt grannskap.",
+      "discoverFeature1": "Realtidsdelning av plats med integritetskontroller",
+      "discoverFeature2": "Filtrera efter husdjurstyp, storlek och personlighet",
+      "discoverFeature3": "Skicka lekträff-förfrågningar direkt",
+      "connectTitle": "Anslut och Planera Tillsammans",
+      "connectDesc": "När du har hittat kompatibla husdjur i närheten, koordinera enkelt träffar via vårt inbyggda meddelandesystem.",
+      "connectFeature1": "Direktmeddelanden med andra husdjursägare",
+      "connectFeature2": "Koordineringsverktyg för gruppevenemang",
+      "connectFeature3": "Dela foton och uppdateringar från dina äventyr"
+    },
+    "problemSolution": {
+      "title": "Husdjursägarens Utmaning är Verklig",
+      "subtitle": "Vi förstår utmaningarna du möter för att hålla ditt husdjur lyckligt och socialt",
+      "commonProblems": "Vanliga Problem",
+      "ourSolutions": "Våra Lösningar",
+      "problem1Title": "Isolerade Husdjur",
+      "problem1Desc": "Många husdjur saknar social interaktion, vilket leder till beteendeproblem och tristess.",
+      "problem2Title": "Upptagna Husdjursägare",
+      "problem2Desc": "Att hitta tid att socialisera husdjur och upptäcka nya aktiviteter är utmanande.",
+      "problem3Title": "Begränsade Resurser",
+      "problem3Desc": "Husdjursägare kämpar med att hitta pålitlig information om husdjursvänliga platser och evenemang.",
+      "solution1Title": "Ansluten Gemenskap",
+      "solution1Desc": "Bygg ett nätverk av husdjursvänner och arrangera regelbundna sociala aktiviteter.",
+      "solution2Title": "Effektiv Planering",
+      "solution2Desc": "Organisera och gå med i husdjursaktiviteter enkelt med bara några klick.",
+      "solution3Title": "Omfattande Katalog",
+      "solution3Desc": "Få tillgång till en komplett databas med husdjursvänliga platser och kommande evenemang.",
+      "ctaTitle": "Redo att Förvandla Ditt Husdjurs Liv?",
+      "ctaSubtitle": "Gå med tusentals lyckliga husdjursägare som redan gjort bytet",
+      "ctaButton": "Kom Igång Idag"
+    },
+    "finalCta": {
+      "title": "Ditt Husdjurs Bästa Liv Börjar Idag",
+      "subtitle": "Gå med i gemenskapen som revolutionerar hur husdjur ansluter, leker och utforskar världen tillsammans",
+      "happyPetParents": "Lyckliga Husdjursägare",
+      "petFriendships": "Husdjursvänskaper",
+      "startJourney": "Starta Ditt Husdjurs Resa",
+      "freeToUse": "Gratis att använda • Inget kreditkort krävs"
+    },
+    "appShowcase": {
+      "title": "Se appen i aktion",
+      "subtitle": "Få en glimt av hur PawCult gör det enkelt att ansluta med andra husdjursägare",
+      "interactiveMap": "Interaktiv Karta",
+      "socialFeed": "Socialt Flöde",
+      "events": "Evenemang"
+    },
+    "footer": {
+      "description": "Ansluter husdjur och deras familjer genom meningsfulla sociala upplevelser, äventyr och gemenskapsstöd.",
+      "legal": "Juridiskt",
+      "privacyPolicy": "Integritetspolicy",
+      "communityGuidelines": "Gemenskapsriktlinjer",
+      "support": "Support",
+      "helpCenter": "Hjälpcenter",
+      "contactUs": "Kontakta Oss",
+      "changelog": "Ändringslogg",
+      "copyright": "© 2025 PawCult. Alla rättigheter förbehållna. Gjord av",
+      "madeWith": "Gjord med",
+      "forPets": "för husdjur och deras familjer"
     }
   }
 }
