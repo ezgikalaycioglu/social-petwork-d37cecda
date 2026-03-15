@@ -1,40 +1,43 @@
 
-import { AlertTriangle, CheckCircle, Heart, Users } from 'lucide-react';
+import { AlertTriangle, CheckCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ProblemSolution = () => {
+  const { t } = useTranslation();
+
   const problems = [
     {
       icon: <AlertTriangle className="w-8 h-8 text-red-500" />,
-      title: "Isolated Pets",
-      description: "Many pets lack social interaction, leading to behavioral issues and boredom."
+      title: t('landing.problemSolution.problem1Title'),
+      description: t('landing.problemSolution.problem1Desc')
     },
     {
       icon: <AlertTriangle className="w-8 h-8 text-red-500" />,
-      title: "Busy Pet Parents",
-      description: "Finding time to socialize pets and discover new activities is challenging."
+      title: t('landing.problemSolution.problem2Title'),
+      description: t('landing.problemSolution.problem2Desc')
     },
     {
       icon: <AlertTriangle className="w-8 h-8 text-red-500" />,
-      title: "Limited Resources",
-      description: "Pet parents struggle to find reliable information about pet-friendly places and events."
+      title: t('landing.problemSolution.problem3Title'),
+      description: t('landing.problemSolution.problem3Desc')
     }
   ];
 
   const solutions = [
     {
       icon: <CheckCircle className="w-8 h-8 text-green-500" />,
-      title: "Connected Community",
-      description: "Build a network of pet friends and arrange regular social activities."
+      title: t('landing.problemSolution.solution1Title'),
+      description: t('landing.problemSolution.solution1Desc')
     },
     {
       icon: <CheckCircle className="w-8 h-8 text-green-500" />,
-      title: "Efficient Planning",
-      description: "Easily organize and join pet activities with just a few taps."
+      title: t('landing.problemSolution.solution2Title'),
+      description: t('landing.problemSolution.solution2Desc')
     },
     {
       icon: <CheckCircle className="w-8 h-8 text-green-500" />,
-      title: "Comprehensive Directory",
-      description: "Access a complete database of pet-friendly locations and upcoming events."
+      title: t('landing.problemSolution.solution3Title'),
+      description: t('landing.problemSolution.solution3Desc')
     }
   ];
 
@@ -43,10 +46,10 @@ const ProblemSolution = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-gray-900 mb-6">
-            The Pet Parent Struggle is Real
+            {t('landing.problemSolution.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            We understand the challenges you face in keeping your pet happy and social
+            {t('landing.problemSolution.subtitle')}
           </p>
         </div>
 
@@ -56,7 +59,7 @@ const ProblemSolution = () => {
             <div className="text-center lg:text-left">
               <h3 className="text-3xl font-bold text-red-600 mb-8 flex items-center justify-center lg:justify-start">
                 <AlertTriangle className="w-8 h-8 mr-3" />
-                Common Problems
+                {t('landing.problemSolution.commonProblems')}
               </h3>
             </div>
             
@@ -86,7 +89,7 @@ const ProblemSolution = () => {
             <div className="text-center lg:text-left">
               <h3 className="text-3xl font-bold text-green-600 mb-8 flex items-center justify-center lg:justify-start">
                 <CheckCircle className="w-8 h-8 mr-3" />
-                Our Solutions
+                {t('landing.problemSolution.ourSolutions')}
               </h3>
             </div>
             
@@ -115,10 +118,10 @@ const ProblemSolution = () => {
         {/* Call to Action */}
         <div className="text-center mt-16">
           <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl p-8 text-white">
-            <h3 className="text-3xl font-bold mb-4">Ready to Transform Your Pet's Life?</h3>
-            <p className="text-xl mb-6 opacity-90">Join thousands of happy pet parents who've already made the switch</p>
+            <h3 className="text-3xl font-bold mb-4">{t('landing.problemSolution.ctaTitle')}</h3>
+            <p className="text-xl mb-6 opacity-90">{t('landing.problemSolution.ctaSubtitle')}</p>
             <button className="bg-white text-green-600 font-bold py-3 px-8 rounded-full text-lg hover:bg-gray-100 transition-colors duration-300">
-              Get Started Today
+              {t('landing.problemSolution.ctaButton')}
             </button>
           </div>
         </div>

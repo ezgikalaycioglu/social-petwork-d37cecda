@@ -1,42 +1,45 @@
 
 import { MapPin, Users, Calendar, Heart, Camera, Bell } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Features = () => {
+  const { t } = useTranslation();
+
   const features = [
     {
       icon: <MapPin className="w-12 h-12 text-green-600" />,
-      title: "Pet Map",
-      description: "Discover pet-friendly locations, see where other pets are playing, and find the perfect spots for adventures.",
+      title: t('landing.features.petMap'),
+      description: t('landing.features.petMapDesc'),
       color: "green"
     },
     {
       icon: <Users className="w-12 h-12 text-blue-600" />,
-      title: "Social Network",
-      description: "Connect with other pet parents, arrange playdates, and build a community around your furry friends.",
+      title: t('landing.features.socialNetwork'),
+      description: t('landing.features.socialNetworkDesc'),
       color: "blue"
     },
     {
       icon: <Calendar className="w-12 h-12 text-purple-600" />,
-      title: "Event Planning",
-      description: "Organize group walks, pet parties, and training sessions. Never miss out on local pet events.",
+      title: t('landing.features.eventPlanning'),
+      description: t('landing.features.eventPlanningDesc'),
       color: "purple"
     },
     {
       icon: <Heart className="w-12 h-12 text-pink-600" />,
-      title: "Pet Profiles",
-      description: "Create detailed profiles for your pets, track their adventures, and share their personalities.",
+      title: t('landing.features.petProfiles'),
+      description: t('landing.features.petProfilesDesc'),
       color: "pink"
     },
     {
       icon: <Camera className="w-12 h-12 text-orange-600" />,
-      title: "Adventure Logging",
-      description: "Document your pet's adventures with photos and stories. Create lasting memories of your journeys together.",
+      title: t('landing.features.adventureLogging'),
+      description: t('landing.features.adventureLoggingDesc'),
       color: "orange"
     },
     {
       icon: <Bell className="w-12 h-12 text-red-600" />,
-      title: "Smart Notifications",
-      description: "Stay updated with playdate requests, nearby events, and activities tailored to your pet's interests.",
+      title: t('landing.features.smartNotifications'),
+      description: t('landing.features.smartNotificationsDesc'),
       color: "red"
     }
   ];
@@ -46,10 +49,10 @@ const Features = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-gray-900 mb-6">
-            Everything Your Pet Needs
+            {t('landing.features.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            From finding playmates to discovering new adventures, PawCult has all the tools to enrich your pet's social life
+            {t('landing.features.subtitle')}
           </p>
         </div>
 

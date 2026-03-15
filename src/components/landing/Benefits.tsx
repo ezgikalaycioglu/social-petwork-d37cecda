@@ -1,27 +1,30 @@
 
 import { Heart, Users, MapPin, Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Benefits = () => {
+  const { t } = useTranslation();
+
   const benefits = [
     {
       icon: <Heart className="w-8 h-8 text-pink-500" />,
-      title: "Healthier, Happier Pets",
-      description: "Regular socialization and exercise keep your pet physically and mentally stimulated."
+      title: t('landing.benefits.healthierPets'),
+      description: t('landing.benefits.healthierPetsDesc')
     },
     {
       icon: <Users className="w-8 h-8 text-green-500" />,
-      title: "Build a Community",
-      description: "Connect with fellow pet parents in your neighborhood and create lasting friendships."
+      title: t('landing.benefits.buildCommunity'),
+      description: t('landing.benefits.buildCommunityDesc')
     },
     {
       icon: <MapPin className="w-8 h-8 text-blue-500" />,
-      title: "Discover New Places",
-      description: "Find pet-friendly locations, parks, and businesses near you that welcome your furry friend."
+      title: t('landing.benefits.discoverPlaces'),
+      description: t('landing.benefits.discoverPlacesDesc')
     },
     {
       icon: <Calendar className="w-8 h-8 text-purple-500" />,
-      title: "Never Miss Adventures",
-      description: "Get notified about local pet events, playdates, and activities happening around you."
+      title: t('landing.benefits.neverMissAdventures'),
+      description: t('landing.benefits.neverMissAdventuresDesc')
     }
   ];
 
@@ -30,10 +33,10 @@ const Benefits = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-800 mb-4">
-            Why Choose PawCult?
+            {t('landing.benefits.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Transform your pet's life with meaningful connections and endless adventures
+            {t('landing.benefits.subtitle')}
           </p>
         </div>
 

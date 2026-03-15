@@ -22,7 +22,7 @@ const Hero = () => {
         inline: 'nearest'
       });
     }
-    setIsMenuOpen(false); // Close mobile menu after clicking
+    setIsMenuOpen(false);
   };
 
   const navigationItems = [
@@ -38,7 +38,6 @@ const Hero = () => {
       {/* Sticky Navigation Header */}
       <header className="sticky top-0 z-50 bg-white shadow-md">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          {/* Logo */}
           <div className="flex items-center">
             <img 
               src="/lovable-uploads/bed53e0f-52d4-45b8-ae07-fcb1a7eeabb8.png" 
@@ -48,7 +47,6 @@ const Hero = () => {
             <span className="text-2xl font-bold text-gray-800">PawCult</span>
           </div>
           
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navigationItems.map((item) => (
               <button
@@ -62,7 +60,6 @@ const Hero = () => {
             <LanguageSwitcher variant="compact" className="ml-4" />
           </nav>
           
-          {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-2">
             <LanguageSwitcher variant="compact" />
             <button
@@ -78,7 +75,6 @@ const Hero = () => {
           </div>
         </div>
         
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
             <nav className="px-4 pt-2 pb-4 space-y-2">
@@ -100,7 +96,6 @@ const Hero = () => {
       <section className="px-4 py-12 lg:py-20 relative overflow-hidden" style={{ backgroundColor: '#F3FCF6' }}>
 
       <div className="max-w-6xl mx-auto text-center">
-        {/* Logo */}
         <div className="flex justify-center mb-8">
           <img 
             src="/lovable-uploads/bed53e0f-52d4-45b8-ae07-fcb1a7eeabb8.png" 
@@ -109,39 +104,35 @@ const Hero = () => {
           />
         </div>
 
-        {/* Main Headline */}
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6" style={{ color: '#FFB3A7' }}>
             {t('landing.hero.title')}
           </h1>
           
-          {/* Subheading */}
           <p className="text-xl md:text-2xl text-gray-700 leading-relaxed mb-8 max-w-3xl mx-auto">
             {t('landing.hero.subtitle')}
           </p>
           
-          {/* CTA Block */}
           <div className="flex flex-col items-center mb-12">
             <Button
               size="lg"
               onClick={() => navigate('/auth', { state: { mode: 'signup' } })}
               className="bg-pink-600 hover:bg-pink-700 text-white font-bold text-lg px-8 py-6 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 min-w-[240px]"
             >
-              Join the Pack
+              {t('landing.hero.joinThePack')}
             </Button>
             
             <p className="mt-4 text-sm text-gray-600">
-              Already have an account?{' '}
+              {t('landing.hero.alreadyHaveAccount')}{' '}
               <button
                 onClick={() => navigate('/auth', { state: { mode: 'login' } })}
                 className="text-gray-600 hover:text-gray-800 underline cursor-pointer font-medium transition-colors"
               >
-                Log in
+                {t('landing.hero.logIn')}
               </button>
             </p>
           </div>
           
-          {/* Learn More Link */}
           <button 
             onClick={() => scrollToSection('features')}
             className="flex items-center font-medium hover:opacity-80 transition-opacity text-lg px-6 py-3 text-gray-600 hover:text-gray-800 mx-auto"
@@ -156,4 +147,3 @@ const Hero = () => {
 };
 
 export default Hero;
-
