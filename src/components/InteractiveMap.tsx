@@ -148,6 +148,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [isReadyIntent, setIsReadyIntent] = useState(false); // User's desired "Ready to Play" status (from switch)
 
   const [nearbyPets, setNearbyPets] = useState<PetProfile[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const channelRef = useRef<any>(null);
   const locationUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
