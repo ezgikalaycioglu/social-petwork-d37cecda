@@ -271,6 +271,9 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       console.log('Fetching nearby pets...');
       
       const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+      }
       
       const { data, error } = await supabase
         .from('pet_profiles')
