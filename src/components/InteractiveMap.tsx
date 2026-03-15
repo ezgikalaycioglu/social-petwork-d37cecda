@@ -507,7 +507,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           <CardContent className="p-2 sm:p-3">
             <div className="flex items-center gap-1 sm:gap-2">
               <PawPrint className="w-4 h-4 text-green-600 shrink-0" />
-              <span className="text-xs sm:text-sm font-medium">{nearbyPets.length}</span>
+              <span className="text-xs sm:text-sm font-medium">{nearbyPets.filter(pet => pet.user_id !== currentUserId).length}</span>
               <span className="hidden sm:inline text-xs sm:text-sm text-muted-foreground">pets nearby</span>
             </div>
           </CardContent>
