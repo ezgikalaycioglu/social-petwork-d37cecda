@@ -1,15 +1,19 @@
 
+import { useTranslation } from 'react-i18next';
+
 const FeatureShowcase = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="py-20" style={{ backgroundColor: '#F3FCF6' }}>
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            Meet Other Pet Parents 
-            <span style={{ color: '#FFB3A7' }}> Near You</span>
+            {t('landing.featureShowcase.title')}{' '}
+            <span style={{ color: '#FFB3A7' }}>{t('landing.featureShowcase.titleHighlight')}</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Our interactive map helps you discover nearby pets and organize playdates with just a few taps
+            {t('landing.featureShowcase.subtitle')}
           </p>
         </div>
         
@@ -25,23 +29,23 @@ const FeatureShowcase = () => {
           
           <div className="order-1 lg:order-2 space-y-6">
             <h3 className="text-3xl md:text-4xl font-bold text-gray-800">
-              Discover Pets Around You
+              {t('landing.featureShowcase.discoverTitle')}
             </h3>
             <p className="text-lg text-gray-600 leading-relaxed">
-              See which pets are nearby and available for playdates. Our map shows you real-time locations of active pet parents in your neighborhood, making it easy to coordinate spontaneous meetups or planned activities.
+              {t('landing.featureShowcase.discoverDesc')}
             </p>
             <ul className="space-y-3 text-gray-600">
               <li className="flex items-start">
                 <div className="w-2 h-2 rounded-full bg-green-500 mt-2 mr-3 flex-shrink-0"></div>
-                <span>Real-time location sharing with privacy controls</span>
+                <span>{t('landing.featureShowcase.discoverFeature1')}</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 rounded-full bg-green-500 mt-2 mr-3 flex-shrink-0"></div>
-                <span>Filter by pet type, size, and personality</span>
+                <span>{t('landing.featureShowcase.discoverFeature2')}</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 rounded-full bg-green-500 mt-2 mr-3 flex-shrink-0"></div>
-                <span>Send playdate requests instantly</span>
+                <span>{t('landing.featureShowcase.discoverFeature3')}</span>
               </li>
             </ul>
           </div>
@@ -51,23 +55,23 @@ const FeatureShowcase = () => {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-6">
             <h3 className="text-3xl md:text-4xl font-bold text-gray-800">
-              Connect & Plan Together
+              {t('landing.featureShowcase.connectTitle')}
             </h3>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Once you've found compatible pets nearby, easily coordinate meetups through our built-in messaging system. Plan pack walks, puppy playdates, or visit pet-friendly venues together.
+              {t('landing.featureShowcase.connectDesc')}
             </p>
             <ul className="space-y-3 text-gray-600">
               <li className="flex items-start">
                 <div className="w-2 h-2 rounded-full bg-orange-500 mt-2 mr-3 flex-shrink-0"></div>
-                <span>Direct messaging with other pet parents</span>
+                <span>{t('landing.featureShowcase.connectFeature1')}</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 rounded-full bg-orange-500 mt-2 mr-3 flex-shrink-0"></div>
-                <span>Pack event coordination tools</span>
+                <span>{t('landing.featureShowcase.connectFeature2')}</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 rounded-full bg-orange-500 mt-2 mr-3 flex-shrink-0"></div>
-                <span>Share photos and updates from your adventures</span>
+                <span>{t('landing.featureShowcase.connectFeature3')}</span>
               </li>
             </ul>
           </div>

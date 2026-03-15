@@ -94,16 +94,10 @@
       "title": "La vida social de tu mascota comienza aquí.",
       "subtitle": "Encuentra compañeros de juego, rastrea aventuras y descubre lugares amigables para mascotas, todo en una aplicación.",
       "getStarted": "Comenzar Gratis",
-      "learnMore": "Saber Más"
-    },
-    "features": {
-      "title": "Todo lo que Tu Mascota Necesita para Socializar",
-      "petProfiles": "Perfiles de Mascotas",
-      "petProfilesDesc": "Crea perfiles detallados para cada una de tus mascotas",
-      "findPlaydates": "Encuentra Citas de Juego",
-      "findPlaydatesDesc": "Conecta con mascotas cercanas para actividades divertidas",
-      "localEvents": "Eventos Locales",
-      "localEventsDesc": "Descubre eventos amigables para mascotas en tu área"
+      "learnMore": "Saber Más",
+      "joinThePack": "Únete a la Manada",
+      "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+      "logIn": "Iniciar sesión"
     },
     "navigation": {
       "features": "Características",
@@ -111,6 +105,98 @@
       "appPreview": "Vista Previa de la App",
       "problemSolution": "Problema y Solución",
       "getStarted": "Comenzar"
+    },
+    "benefits": {
+      "title": "¿Por Qué Elegir PawCult?",
+      "subtitle": "Transforma la vida de tu mascota con conexiones significativas y aventuras sin fin",
+      "healthierPets": "Mascotas Más Sanas y Felices",
+      "healthierPetsDesc": "La socialización y el ejercicio regular mantienen a tu mascota estimulada física y mentalmente.",
+      "buildCommunity": "Construye una Comunidad",
+      "buildCommunityDesc": "Conéctate con otros dueños de mascotas en tu vecindario y crea amistades duraderas.",
+      "discoverPlaces": "Descubre Nuevos Lugares",
+      "discoverPlacesDesc": "Encuentra ubicaciones, parques y negocios amigables con mascotas cerca de ti.",
+      "neverMissAdventures": "Nunca Te Pierdas Aventuras",
+      "neverMissAdventuresDesc": "Recibe notificaciones sobre eventos locales de mascotas, citas de juego y actividades a tu alrededor."
+    },
+    "features": {
+      "title": "Todo lo que Tu Mascota Necesita",
+      "subtitle": "Desde encontrar compañeros de juego hasta descubrir nuevas aventuras, PawCult tiene todas las herramientas para enriquecer la vida social de tu mascota",
+      "petMap": "Mapa de Mascotas",
+      "petMapDesc": "Descubre ubicaciones amigables con mascotas, ve dónde están jugando otras mascotas y encuentra los lugares perfectos para aventuras.",
+      "socialNetwork": "Red Social",
+      "socialNetworkDesc": "Conéctate con otros dueños de mascotas, organiza citas de juego y construye una comunidad alrededor de tus amigos peludos.",
+      "eventPlanning": "Planificación de Eventos",
+      "eventPlanningDesc": "Organiza paseos grupales, fiestas de mascotas y sesiones de entrenamiento. Nunca te pierdas eventos locales de mascotas.",
+      "petProfiles": "Perfiles de Mascotas",
+      "petProfilesDesc": "Crea perfiles detallados para tus mascotas, rastrea sus aventuras y comparte sus personalidades.",
+      "adventureLogging": "Registro de Aventuras",
+      "adventureLoggingDesc": "Documenta las aventuras de tu mascota con fotos e historias. Crea recuerdos duraderos de sus viajes juntos.",
+      "smartNotifications": "Notificaciones Inteligentes",
+      "smartNotificationsDesc": "Mantente actualizado con solicitudes de juego, eventos cercanos y actividades adaptadas a los intereses de tu mascota."
+    },
+    "featureShowcase": {
+      "title": "Conoce a Otros Dueños de Mascotas",
+      "titleHighlight": "Cerca de Ti",
+      "subtitle": "Nuestro mapa interactivo te ayuda a descubrir mascotas cercanas y organizar citas de juego con solo unos toques",
+      "discoverTitle": "Descubre Mascotas a Tu Alrededor",
+      "discoverDesc": "Ve qué mascotas están cerca y disponibles para citas de juego. Nuestro mapa muestra ubicaciones en tiempo real de dueños de mascotas activos en tu vecindario.",
+      "discoverFeature1": "Compartir ubicación en tiempo real con controles de privacidad",
+      "discoverFeature2": "Filtrar por tipo de mascota, tamaño y personalidad",
+      "discoverFeature3": "Enviar solicitudes de juego al instante",
+      "connectTitle": "Conecta y Planifica Juntos",
+      "connectDesc": "Una vez que hayas encontrado mascotas compatibles cerca, coordina fácilmente encuentros a través de nuestro sistema de mensajería.",
+      "connectFeature1": "Mensajería directa con otros dueños de mascotas",
+      "connectFeature2": "Herramientas de coordinación de eventos grupales",
+      "connectFeature3": "Comparte fotos y actualizaciones de tus aventuras"
+    },
+    "problemSolution": {
+      "title": "La Lucha del Dueño de Mascotas es Real",
+      "subtitle": "Entendemos los desafíos que enfrentas para mantener a tu mascota feliz y social",
+      "commonProblems": "Problemas Comunes",
+      "ourSolutions": "Nuestras Soluciones",
+      "problem1Title": "Mascotas Aisladas",
+      "problem1Desc": "Muchas mascotas carecen de interacción social, lo que lleva a problemas de comportamiento y aburrimiento.",
+      "problem2Title": "Dueños Ocupados",
+      "problem2Desc": "Encontrar tiempo para socializar mascotas y descubrir nuevas actividades es desafiante.",
+      "problem3Title": "Recursos Limitados",
+      "problem3Desc": "Los dueños de mascotas luchan por encontrar información confiable sobre lugares y eventos amigables con mascotas.",
+      "solution1Title": "Comunidad Conectada",
+      "solution1Desc": "Construye una red de amigos mascotas y organiza actividades sociales regulares.",
+      "solution2Title": "Planificación Eficiente",
+      "solution2Desc": "Organiza y únete fácilmente a actividades de mascotas con solo unos toques.",
+      "solution3Title": "Directorio Completo",
+      "solution3Desc": "Accede a una base de datos completa de ubicaciones amigables con mascotas y próximos eventos.",
+      "ctaTitle": "¿Listo para Transformar la Vida de Tu Mascota?",
+      "ctaSubtitle": "Únete a miles de dueños felices que ya dieron el paso",
+      "ctaButton": "Comenzar Hoy"
+    },
+    "finalCta": {
+      "title": "La Mejor Vida de Tu Mascota Comienza Hoy",
+      "subtitle": "Únete a la comunidad que está revolucionando cómo las mascotas se conectan, juegan y exploran el mundo juntas",
+      "happyPetParents": "Dueños Felices",
+      "petFriendships": "Amistades entre Mascotas",
+      "startJourney": "Comienza el Viaje de Tu Mascota",
+      "freeToUse": "Uso gratuito • Sin tarjeta de crédito"
+    },
+    "appShowcase": {
+      "title": "Mira la app en acción",
+      "subtitle": "Descubre cómo PawCult hace que conectar con otros dueños de mascotas sea muy fácil",
+      "interactiveMap": "Mapa Interactivo",
+      "socialFeed": "Feed Social",
+      "events": "Eventos"
+    },
+    "footer": {
+      "description": "Conectando mascotas y sus familias a través de experiencias sociales significativas, aventuras y apoyo comunitario.",
+      "legal": "Legal",
+      "privacyPolicy": "Política de Privacidad",
+      "communityGuidelines": "Normas de la Comunidad",
+      "support": "Soporte",
+      "helpCenter": "Centro de Ayuda",
+      "contactUs": "Contáctanos",
+      "changelog": "Registro de Cambios",
+      "copyright": "© 2025 PawCult. Todos los derechos reservados. Hecho por",
+      "madeWith": "Hecho con",
+      "forPets": "para mascotas y sus familias"
     }
   }
 }

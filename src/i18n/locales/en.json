@@ -94,16 +94,10 @@
       "title": "Your pet's social life starts here.",
       "subtitle": "Find playmates, track adventures, and discover pet-friendly places, all in one app.",
       "getStarted": "Get Started for Free",
-      "learnMore": "Learn More"
-    },
-    "features": {
-      "title": "Everything Your Pet Needs to Socialize",
-      "petProfiles": "Pet Profiles",
-      "petProfilesDesc": "Create detailed profiles for each of your pets",
-      "findPlaydates": "Find Playdates",
-      "findPlaydatesDesc": "Connect with nearby pets for fun activities",
-      "localEvents": "Local Events",
-      "localEventsDesc": "Discover pet-friendly events in your area"
+      "learnMore": "Learn More",
+      "joinThePack": "Join the Pack",
+      "alreadyHaveAccount": "Already have an account?",
+      "logIn": "Log in"
     },
     "navigation": {
       "features": "Features",
@@ -111,6 +105,98 @@
       "appPreview": "App Preview",
       "problemSolution": "Problem & Solution",
       "getStarted": "Get Started"
+    },
+    "benefits": {
+      "title": "Why Choose PawCult?",
+      "subtitle": "Transform your pet's life with meaningful connections and endless adventures",
+      "healthierPets": "Healthier, Happier Pets",
+      "healthierPetsDesc": "Regular socialization and exercise keep your pet physically and mentally stimulated.",
+      "buildCommunity": "Build a Community",
+      "buildCommunityDesc": "Connect with fellow pet parents in your neighborhood and create lasting friendships.",
+      "discoverPlaces": "Discover New Places",
+      "discoverPlacesDesc": "Find pet-friendly locations, parks, and businesses near you that welcome your furry friend.",
+      "neverMissAdventures": "Never Miss Adventures",
+      "neverMissAdventuresDesc": "Get notified about local pet events, playdates, and activities happening around you."
+    },
+    "features": {
+      "title": "Everything Your Pet Needs",
+      "subtitle": "From finding playmates to discovering new adventures, PawCult has all the tools to enrich your pet's social life",
+      "petMap": "Pet Map",
+      "petMapDesc": "Discover pet-friendly locations, see where other pets are playing, and find the perfect spots for adventures.",
+      "socialNetwork": "Social Network",
+      "socialNetworkDesc": "Connect with other pet parents, arrange playdates, and build a community around your furry friends.",
+      "eventPlanning": "Event Planning",
+      "eventPlanningDesc": "Organize group walks, pet parties, and training sessions. Never miss out on local pet events.",
+      "petProfiles": "Pet Profiles",
+      "petProfilesDesc": "Create detailed profiles for your pets, track their adventures, and share their personalities.",
+      "adventureLogging": "Adventure Logging",
+      "adventureLoggingDesc": "Document your pet's adventures with photos and stories. Create lasting memories of your journeys together.",
+      "smartNotifications": "Smart Notifications",
+      "smartNotificationsDesc": "Stay updated with playdate requests, nearby events, and activities tailored to your pet's interests."
+    },
+    "featureShowcase": {
+      "title": "Meet Other Pet Parents",
+      "titleHighlight": "Near You",
+      "subtitle": "Our interactive map helps you discover nearby pets and organize playdates with just a few taps",
+      "discoverTitle": "Discover Pets Around You",
+      "discoverDesc": "See which pets are nearby and available for playdates. Our map shows you real-time locations of active pet parents in your neighborhood, making it easy to coordinate spontaneous meetups or planned activities.",
+      "discoverFeature1": "Real-time location sharing with privacy controls",
+      "discoverFeature2": "Filter by pet type, size, and personality",
+      "discoverFeature3": "Send playdate requests instantly",
+      "connectTitle": "Connect & Plan Together",
+      "connectDesc": "Once you've found compatible pets nearby, easily coordinate meetups through our built-in messaging system. Plan pack walks, puppy playdates, or visit pet-friendly venues together.",
+      "connectFeature1": "Direct messaging with other pet parents",
+      "connectFeature2": "Pack event coordination tools",
+      "connectFeature3": "Share photos and updates from your adventures"
+    },
+    "problemSolution": {
+      "title": "The Pet Parent Struggle is Real",
+      "subtitle": "We understand the challenges you face in keeping your pet happy and social",
+      "commonProblems": "Common Problems",
+      "ourSolutions": "Our Solutions",
+      "problem1Title": "Isolated Pets",
+      "problem1Desc": "Many pets lack social interaction, leading to behavioral issues and boredom.",
+      "problem2Title": "Busy Pet Parents",
+      "problem2Desc": "Finding time to socialize pets and discover new activities is challenging.",
+      "problem3Title": "Limited Resources",
+      "problem3Desc": "Pet parents struggle to find reliable information about pet-friendly places and events.",
+      "solution1Title": "Connected Community",
+      "solution1Desc": "Build a network of pet friends and arrange regular social activities.",
+      "solution2Title": "Efficient Planning",
+      "solution2Desc": "Easily organize and join pet activities with just a few taps.",
+      "solution3Title": "Comprehensive Directory",
+      "solution3Desc": "Access a complete database of pet-friendly locations and upcoming events.",
+      "ctaTitle": "Ready to Transform Your Pet's Life?",
+      "ctaSubtitle": "Join thousands of happy pet parents who've already made the switch",
+      "ctaButton": "Get Started Today"
+    },
+    "finalCta": {
+      "title": "Your Pet's Best Life Starts Today",
+      "subtitle": "Join the community that's revolutionizing how pets connect, play, and explore the world together",
+      "happyPetParents": "Happy Pet Parents",
+      "petFriendships": "Pet Friendships",
+      "startJourney": "Start Your Pet's Journey",
+      "freeToUse": "Free to use • No credit card required"
+    },
+    "appShowcase": {
+      "title": "See the app in action",
+      "subtitle": "Get a glimpse of how PawCult makes connecting with other pet parents effortless",
+      "interactiveMap": "Interactive Map",
+      "socialFeed": "Social Feed",
+      "events": "Events"
+    },
+    "footer": {
+      "description": "Connecting pets and their families through meaningful social experiences, adventures, and community support.",
+      "legal": "Legal",
+      "privacyPolicy": "Privacy Policy",
+      "communityGuidelines": "Community Guidelines",
+      "support": "Support",
+      "helpCenter": "Help Center",
+      "contactUs": "Contact Us",
+      "changelog": "Changelog",
+      "copyright": "© 2025 PawCult. All rights reserved. Made by",
+      "madeWith": "Made with",
+      "forPets": "for pets and their families"
     }
   }
 }

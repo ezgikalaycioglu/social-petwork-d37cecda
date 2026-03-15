@@ -2,24 +2,24 @@
 import { ArrowRight, Users, Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../../integrations/supabase/client';
 
 const FinalCTA = () => {
   const navigate = useNavigate();
-  const [stats, setStats] = useState([
-    { icon: <Users className="w-6 h-6" />, number: "0", label: "Happy Pet Parents" },
-    { icon: <Heart className="w-6 h-6" />, number: "0", label: "Pet Friendships" }
+  const { t } = useTranslation();
+  const [stats, setStats] = useState<{ icon: React.ReactNode; number: string; labelKey: string }[]>([
+    { icon: <Users className="w-6 h-6" />, number: "0", labelKey: "landing.finalCta.happyPetParents" },
+    { icon: <Heart className="w-6 h-6" />, number: "0", labelKey: "landing.finalCta.petFriendships" }
   ]);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Get count of happy pet parents (users with profiles)
         const { count: userCount } = await supabase
           .from('user_profiles')
           .select('*', { count: 'exact', head: true });
 
-        // Get count of pet friendships
         const { count: friendshipCount } = await supabase
           .from('pet_friendships')
           .select('*', { count: 'exact', head: true });
@@ -28,12 +28,12 @@ const FinalCTA = () => {
           { 
             icon: <Users className="w-6 h-6" />, 
             number: userCount ? `${userCount.toLocaleString()}+` : "0", 
-            label: "Happy Pet Parents" 
+            labelKey: "landing.finalCta.happyPetParents"
           },
           { 
             icon: <Heart className="w-6 h-6" />, 
             number: friendshipCount ? `${friendshipCount.toLocaleString()}+` : "0", 
-            label: "Pet Friendships" 
+            labelKey: "landing.finalCta.petFriendships"
           }
         ]);
       } catch (error) {
@@ -49,10 +49,10 @@ const FinalCTA = () => {
       <div className="max-w-6xl mx-auto text-center">
         <div className="mb-12">
           <h2 className="text-5xl font-bold mb-6">
-            Your Pet's Best Life Starts Today
+            {t('landing.finalCta.title')}
           </h2>
           <p className="text-2xl opacity-90 max-w-4xl mx-auto leading-relaxed">
-            Join the community that's revolutionizing how pets connect, play, and explore the world together
+            {t('landing.finalCta.subtitle')}
           </p>
         </div>
 
@@ -64,7 +64,7 @@ const FinalCTA = () => {
                 {stat.icon}
               </div>
               <div className="text-3xl font-bold mb-1">{stat.number}</div>
-              <div className="text-lg opacity-80">{stat.label}</div>
+              <div className="text-lg opacity-80">{t(stat.labelKey)}</div>
             </div>
           ))}
         </div>
@@ -75,12 +75,12 @@ const FinalCTA = () => {
             onClick={() => navigate('/auth')}
             className="bg-white text-green-600 font-bold text-xl px-12 py-4 rounded-full hover:bg-gray-100 transition-colors duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
           >
-            Start Your Pet's Journey
+            {t('landing.finalCta.startJourney')}
             <ArrowRight className="inline-block ml-2 w-6 h-6" />
           </button>
           
           <p className="text-lg opacity-80">
-            Free to use • No credit card required
+            {t('landing.finalCta.freeToUse')}
           </p>
         </div>
       </div>

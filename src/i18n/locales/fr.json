@@ -91,19 +91,112 @@
   },
   "landing": {
     "hero": {
-      "title": "Connectez Vos Animaux avec le Monde",
-      "subtitle": "Le réseau social conçu pour les amoureux des animaux. Créez des profils, trouvez des rendez-vous de jeu et construisez une communauté autour de vos amis à fourrure.",
-      "getStarted": "Commencer",
-      "joinCommunity": "Rejoindre la Communauté"
+      "title": "La vie sociale de votre animal commence ici.",
+      "subtitle": "Trouvez des compagnons de jeu, suivez les aventures et découvrez des lieux accueillants pour les animaux, le tout dans une seule application.",
+      "getStarted": "Commencer Gratuitement",
+      "learnMore": "En Savoir Plus",
+      "joinThePack": "Rejoindre la Meute",
+      "alreadyHaveAccount": "Vous avez déjà un compte ?",
+      "logIn": "Se connecter"
+    },
+    "navigation": {
+      "features": "Fonctionnalités",
+      "benefits": "Avantages",
+      "appPreview": "Aperçu de l'App",
+      "problemSolution": "Problème et Solution",
+      "getStarted": "Commencer"
+    },
+    "benefits": {
+      "title": "Pourquoi Choisir PawCult ?",
+      "subtitle": "Transformez la vie de votre animal avec des connexions significatives et des aventures sans fin",
+      "healthierPets": "Animaux Plus Sains et Plus Heureux",
+      "healthierPetsDesc": "La socialisation et l'exercice réguliers gardent votre animal stimulé physiquement et mentalement.",
+      "buildCommunity": "Construisez une Communauté",
+      "buildCommunityDesc": "Connectez-vous avec d'autres propriétaires d'animaux de votre quartier et créez des amitiés durables.",
+      "discoverPlaces": "Découvrez de Nouveaux Endroits",
+      "discoverPlacesDesc": "Trouvez des lieux, parcs et commerces accueillants pour les animaux près de chez vous.",
+      "neverMissAdventures": "Ne Manquez Jamais d'Aventures",
+      "neverMissAdventuresDesc": "Soyez notifié des événements locaux pour animaux, des rendez-vous de jeu et des activités autour de vous."
     },
     "features": {
-      "title": "Tout ce dont Votre Animal a Besoin pour Socialiser",
+      "title": "Tout ce dont Votre Animal a Besoin",
+      "subtitle": "De la recherche de compagnons de jeu à la découverte de nouvelles aventures, PawCult dispose de tous les outils pour enrichir la vie sociale de votre animal",
+      "petMap": "Carte des Animaux",
+      "petMapDesc": "Découvrez des lieux accueillants pour les animaux, voyez où jouent les autres animaux et trouvez les endroits parfaits pour les aventures.",
+      "socialNetwork": "Réseau Social",
+      "socialNetworkDesc": "Connectez-vous avec d'autres propriétaires d'animaux, organisez des rendez-vous de jeu et construisez une communauté autour de vos amis à fourrure.",
+      "eventPlanning": "Planification d'Événements",
+      "eventPlanningDesc": "Organisez des promenades en groupe, des fêtes d'animaux et des séances d'entraînement. Ne manquez jamais les événements locaux pour animaux.",
       "petProfiles": "Profils d'Animaux",
-      "petProfilesDesc": "Créez des profils détaillés pour chacun de vos animaux",
-      "findPlaydates": "Trouvez des Rendez-vous de Jeu",
-      "findPlaydatesDesc": "Connectez-vous avec des animaux à proximité pour des activités amusantes",
-      "localEvents": "Événements Locaux",
-      "localEventsDesc": "Découvrez des événements adaptés aux animaux dans votre région"
+      "petProfilesDesc": "Créez des profils détaillés pour vos animaux, suivez leurs aventures et partagez leurs personnalités.",
+      "adventureLogging": "Journal d'Aventures",
+      "adventureLoggingDesc": "Documentez les aventures de votre animal avec des photos et des histoires. Créez des souvenirs durables de vos voyages ensemble.",
+      "smartNotifications": "Notifications Intelligentes",
+      "smartNotificationsDesc": "Restez informé des demandes de jeu, des événements à proximité et des activités adaptées aux intérêts de votre animal."
+    },
+    "featureShowcase": {
+      "title": "Rencontrez d'Autres Propriétaires d'Animaux",
+      "titleHighlight": "Près de Vous",
+      "subtitle": "Notre carte interactive vous aide à découvrir les animaux à proximité et à organiser des rendez-vous de jeu en quelques clics",
+      "discoverTitle": "Découvrez les Animaux Autour de Vous",
+      "discoverDesc": "Voyez quels animaux sont à proximité et disponibles pour jouer. Notre carte affiche les positions en temps réel des propriétaires actifs dans votre quartier.",
+      "discoverFeature1": "Partage de position en temps réel avec contrôles de confidentialité",
+      "discoverFeature2": "Filtrer par type d'animal, taille et personnalité",
+      "discoverFeature3": "Envoyez des demandes de jeu instantanément",
+      "connectTitle": "Connectez-vous et Planifiez Ensemble",
+      "connectDesc": "Une fois les animaux compatibles trouvés à proximité, coordonnez facilement des rencontres via notre système de messagerie intégré.",
+      "connectFeature1": "Messagerie directe avec d'autres propriétaires d'animaux",
+      "connectFeature2": "Outils de coordination d'événements de groupe",
+      "connectFeature3": "Partagez des photos et des nouvelles de vos aventures"
+    },
+    "problemSolution": {
+      "title": "La Difficulté des Propriétaires d'Animaux est Réelle",
+      "subtitle": "Nous comprenons les défis que vous rencontrez pour garder votre animal heureux et sociable",
+      "commonProblems": "Problèmes Courants",
+      "ourSolutions": "Nos Solutions",
+      "problem1Title": "Animaux Isolés",
+      "problem1Desc": "Beaucoup d'animaux manquent d'interaction sociale, ce qui entraîne des problèmes de comportement et de l'ennui.",
+      "problem2Title": "Propriétaires Occupés",
+      "problem2Desc": "Trouver du temps pour socialiser les animaux et découvrir de nouvelles activités est un défi.",
+      "problem3Title": "Ressources Limitées",
+      "problem3Desc": "Les propriétaires d'animaux ont du mal à trouver des informations fiables sur les lieux et événements accueillants.",
+      "solution1Title": "Communauté Connectée",
+      "solution1Desc": "Construisez un réseau d'amis animaux et organisez des activités sociales régulières.",
+      "solution2Title": "Planification Efficace",
+      "solution2Desc": "Organisez et rejoignez facilement des activités pour animaux en quelques clics.",
+      "solution3Title": "Répertoire Complet",
+      "solution3Desc": "Accédez à une base de données complète de lieux accueillants et d'événements à venir.",
+      "ctaTitle": "Prêt à Transformer la Vie de Votre Animal ?",
+      "ctaSubtitle": "Rejoignez des milliers de propriétaires heureux qui ont déjà fait le pas",
+      "ctaButton": "Commencer Aujourd'hui"
+    },
+    "finalCta": {
+      "title": "La Meilleure Vie de Votre Animal Commence Aujourd'hui",
+      "subtitle": "Rejoignez la communauté qui révolutionne la façon dont les animaux se connectent, jouent et explorent le monde ensemble",
+      "happyPetParents": "Propriétaires Heureux",
+      "petFriendships": "Amitiés entre Animaux",
+      "startJourney": "Commencez le Voyage de Votre Animal",
+      "freeToUse": "Utilisation gratuite • Aucune carte de crédit requise"
+    },
+    "appShowcase": {
+      "title": "Voyez l'application en action",
+      "subtitle": "Découvrez comment PawCult rend la connexion avec d'autres propriétaires d'animaux simple et agréable",
+      "interactiveMap": "Carte Interactive",
+      "socialFeed": "Fil Social",
+      "events": "Événements"
+    },
+    "footer": {
+      "description": "Connecter les animaux et leurs familles à travers des expériences sociales significatives, des aventures et un soutien communautaire.",
+      "legal": "Mentions Légales",
+      "privacyPolicy": "Politique de Confidentialité",
+      "communityGuidelines": "Règles de la Communauté",
+      "support": "Support",
+      "helpCenter": "Centre d'Aide",
+      "contactUs": "Nous Contacter",
+      "changelog": "Journal des Modifications",
+      "copyright": "© 2025 PawCult. Tous droits réservés. Créé par",
+      "madeWith": "Fait avec",
+      "forPets": "pour les animaux et leurs familles"
     }
   }
 }
